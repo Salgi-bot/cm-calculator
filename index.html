@@ -1,0 +1,1268 @@
+<!DOCTYPE html>
+<!--
+  ╔══════════════════════════════════════════════════════════════╗
+  ║       건설사업관리 인월수 산출 Ver 1.1 (Web)                  ║
+  ║                                                              ║
+  ║  Copyright (c) 2025 (주)아이팝엔지니어링. All rights reserved.║
+  ║  Designed & Developed by SalGI                               ║
+  ║                                                              ║
+  ║  본 프로그램의 무단 복제, 수정, 재배포를 금합니다.             ║
+  ║  국토교통부 고시 제2023-580호 기준 적용                       ║
+  ║  Unauthorized copying, modification or redistribution        ║
+  ║  of this software is strictly prohibited.                    ║
+  ╚══════════════════════════════════════════════════════════════╝
+-->
+<html lang="ko">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>건설사업관리 인월수 산출 Ver 1.1 | (주)아이팝엔지니어링</title>
+<link href="https://fonts.googleapis.com/css2?family=Noto+Sans+KR:wght@300;400;500;700;900&family=JetBrains+Mono:wght@400;600&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --bg: #dde6f2;
+    --surface: #ffffff;
+    --surface2: #f4f7fc;
+    --surface3: #e8edf7;
+    --border: #ccd6e8;
+    --border2: #b0bdd4;
+    --accent: #1d4ed8;
+    --accent2: #2563eb;
+    --accent-glow: rgba(29,78,216,0.12);
+    --green: #059669;
+    --yellow: #92400e;
+    --red: #dc2626;
+    --text: #0f172a;
+    --text2: #334155;
+    --text3: #64748b;
+    --mono: 'JetBrains Mono', monospace;
+    --sans: 'Noto Sans KR', sans-serif;
+  }
+
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+  html, body {
+    height: 100%;
+    color: var(--text);
+    font-family: var(--sans);
+    font-size: 14px;
+    background-color: #cfd9ea;
+    background-image:
+      linear-gradient(rgba(29,78,216,0.07) 1px, transparent 1px),
+      linear-gradient(90deg, rgba(29,78,216,0.07) 1px, transparent 1px),
+      linear-gradient(rgba(29,78,216,0.025) 1px, transparent 1px),
+      linear-gradient(90deg, rgba(29,78,216,0.025) 1px, transparent 1px);
+    background-size: 80px 80px, 80px 80px, 20px 20px, 20px 20px;
+  }
+
+  /* ── LAYOUT ── */
+  #app { display: grid; grid-template-rows: 52px 1fr 32px; height: 100vh; }
+
+  /* ── TOPBAR ── */
+  #topbar {
+    display: flex; align-items: center; justify-content: space-between;
+    padding: 0 20px; background: var(--accent); border-bottom: 3px solid #1e40af;
+    position: sticky; top: 0; z-index: 100; gap: 12px;
+    box-shadow: 0 2px 12px rgba(29,78,216,0.25);
+  }
+  .topbar-brand { display: flex; align-items: baseline; gap: 10px; flex-shrink: 0; }
+  .topbar-company {
+    font-size: 13px; font-weight: 700; color: #fff;
+    border: 1px solid rgba(255,255,255,0.5); border-radius: 4px; padding: 2px 8px;
+    letter-spacing: 0.3px; background: rgba(255,255,255,0.15);
+  }
+  .topbar-title { font-size: 15px; font-weight: 700; color: #fff; letter-spacing: -0.3px; }
+  .topbar-title span { color: #bfdbfe; }
+  .topbar-ver { font-size: 11px; color: rgba(255,255,255,0.6); font-weight: 400; }
+  .topbar-right { display: flex; align-items: center; gap: 8px; flex-shrink: 0; }
+
+  /* ── MAIN LAYOUT ── */
+  #main { display: grid; grid-template-columns: 370px 1fr; overflow: hidden; }
+  #left-panel { overflow-y: auto; border-right: 1px solid var(--border); background: var(--surface); box-shadow: 2px 0 8px rgba(29,78,216,0.06); }
+  #right-panel { display: grid; grid-template-rows: 230px 1fr; overflow: hidden; background: var(--surface2); }
+  #log-panel { border-bottom: 1px solid var(--border); overflow: hidden; display: flex; flex-direction: column; }
+  #result-panel { overflow: hidden; display: flex; flex-direction: column; }
+
+  /* ── FOOTER ── */
+  #footer {
+    display: flex; align-items: center; justify-content: space-between;
+    padding: 0 20px; background: #1e3a8a; border-top: 1px solid #1e40af;
+    font-size: 11px; color: rgba(255,255,255,0.6);
+  }
+
+  /* ── SCROLLBAR ── */
+  ::-webkit-scrollbar { width: 6px; height: 6px; }
+  ::-webkit-scrollbar-track { background: #f1f5f9; }
+  ::-webkit-scrollbar-thumb { background: #94a3b8; border-radius: 3px; }
+  ::-webkit-scrollbar-thumb:hover { background: #64748b; }
+
+  /* ── SECTIONS ── */
+  .section { padding: 14px 16px 12px; border-bottom: 1px solid var(--border); }
+  .section-title {
+    font-size: 11px; font-weight: 700; letter-spacing: 1px; text-transform: uppercase;
+    color: var(--accent); margin-bottom: 10px; display: flex; align-items: center; gap: 6px;
+  }
+  .section-title::before { content: ''; display: inline-block; width: 3px; height: 12px; background: var(--accent); border-radius: 2px; }
+
+  /* ── FORM FIELDS ── */
+  .field { display: flex; align-items: center; margin-bottom: 5px; gap: 8px; overflow: hidden; }
+  .field label { font-size: 12px; color: var(--text2); width: 126px; flex-shrink: 0; text-align: right; }
+  .field input[type=text], .field input[type=number] {
+    flex: 1; min-width: 0; background: #fff; border: 1.5px solid var(--border2); border-radius: 6px;
+    color: var(--text); font-family: var(--sans); font-size: 13px; padding: 5px 10px; height: 32px;
+    transition: border-color 0.15s, box-shadow 0.15s; outline: none;
+  }
+  .field input:focus { border-color: var(--accent); box-shadow: 0 0 0 3px var(--accent-glow); }
+  .field input.is-auto   { color: #64748b !important; background: #f1f5f9 !important; border-color: #cbd5e1 !important; }
+  .field input.is-manual { color: #92400e !important; background: #fffbeb !important; border-color: #f59e0b !important; font-weight: 600; }
+  /* 프로젝트 정보 필드 스피너 제거 (수량 테이블은 유지) */
+  .field input[type=number]::-webkit-inner-spin-button,
+  .field input[type=number]::-webkit-outer-spin-button { -webkit-appearance: none; margin: 0; }
+  .field input[type=number] { -moz-appearance: textfield; }
+  .field .unit { font-size: 11px; color: var(--text3); white-space: nowrap; width: 44px; }
+
+  /* ── FIELD GROUP ── */
+  .field-group {
+    background: #f8fafd;
+    border: 1px solid var(--border);
+    border-radius: 8px;
+    padding: 10px 10px 6px;
+    margin-bottom: 8px;
+  }
+  .group-label {
+    font-size: 10px; font-weight: 700; letter-spacing: 0.8px; text-transform: uppercase;
+    color: var(--accent); margin-bottom: 7px; padding-left: 2px;
+  }
+
+  /* ── COLOR LEGEND ── */
+  .color-legend {
+    display: flex; gap: 14px; padding: 7px 14px 9px;
+    font-size: 11px; background: #f0f6ff; border-bottom: 1px solid var(--border);
+  }
+  .legend-item { display: flex; align-items: center; gap: 5px; color: var(--text2); font-weight: 500; }
+  .legend-dot { width: 10px; height: 10px; border-radius: 3px; flex-shrink: 0; }
+  .legend-dot.auto   { background: #f1f5f9; border: 1.5px solid #94a3b8; }
+  .legend-dot.manual { background: #fffbeb; border: 1.5px solid #f59e0b; }
+
+  /* ── SEGMENT BUTTON ── */
+  .seg-group { display: flex; gap: 4px; margin-bottom: 10px; }
+  .seg-btn {
+    flex: 1; height: 32px; border: 1.5px solid var(--border2); background: #f8fafc;
+    color: var(--text2); font-family: var(--sans); font-size: 13px; font-weight: 500;
+    border-radius: 6px; cursor: pointer; transition: all 0.15s;
+  }
+  .seg-btn:hover { border-color: var(--accent); color: var(--accent); background: #eff6ff; }
+  .seg-btn.active { background: var(--accent); border-color: var(--accent); color: #fff; font-weight: 700; box-shadow: 0 2px 8px rgba(29,78,216,0.3); }
+
+  /* ── CHECKBOX ── */
+  .chk-row { display: flex; align-items: center; gap: 8px; margin-bottom: 6px; cursor: pointer; user-select: none; }
+  .chk-row input[type=checkbox] { display: none; }
+  .chk-box {
+    width: 18px; height: 18px; border: 1.5px solid var(--border2); border-radius: 4px;
+    background: #fff; display: flex; align-items: center; justify-content: center;
+    transition: all 0.15s; flex-shrink: 0;
+  }
+  .chk-row input:checked + .chk-box { background: var(--accent); border-color: var(--accent); }
+  .chk-box::after { content: '✓'; font-size: 11px; font-weight: 700; color: #fff; display: none; }
+  .chk-row input:checked + .chk-box::after { display: block; }
+  .chk-label { font-size: 13px; color: var(--text2); }
+
+  /* ── QUANTITY TABLE ── */
+  .qty-table { width: 100%; border-collapse: collapse; table-layout: fixed; }
+  .qty-table tr { border-bottom: 1px solid var(--border); }
+  .qty-table tr:last-child { border-bottom: none; }
+  .qty-table td { padding: 4px 2px; vertical-align: middle; overflow: hidden; }
+  .qty-table .task-name { font-size: 12px; color: var(--text); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+  .qty-table .unit-label { font-size: 11px; color: var(--text3); width: 68px; text-align: center; white-space: nowrap; }
+  .qty-table td:last-child { width: 80px; }
+  .qty-table input {
+    width: 76px; background: #fff; border: 1.5px solid var(--border2); border-radius: 5px;
+    color: var(--text); font-family: var(--mono); font-size: 12px; padding: 3px 4px 3px 6px; height: 26px;
+    text-align: right; outline: none; transition: border-color 0.12s;
+  }
+  .qty-table input:focus { border-color: var(--accent); box-shadow: 0 0 0 2px var(--accent-glow); }
+  .qty-section-head { font-size: 10px; font-weight: 700; color: var(--text3); letter-spacing: 0.5px; padding: 6px 2px 2px; }
+
+  /* ── BUTTONS ── */
+  .btn {
+    display: inline-flex; align-items: center; gap: 6px; padding: 0 14px; height: 34px;
+    border: none; border-radius: 7px; font-family: var(--sans); font-size: 13px; font-weight: 600;
+    cursor: pointer; transition: all 0.15s; white-space: nowrap;
+  }
+  .btn-primary { background: var(--accent); color: #fff; }
+  .btn-primary:hover { background: var(--accent2); transform: translateY(-1px); box-shadow: 0 4px 12px rgba(61,127,255,0.35); }
+  .btn-sm { height: 28px; padding: 0 12px; font-size: 12px; border-radius: 5px; }
+  .btn-xs { height: 24px; padding: 0 10px; font-size: 11px; border-radius: 4px; }
+  .btn-gray { background: rgba(255,255,255,0.2); color: #fff; border: 1px solid rgba(255,255,255,0.4); }
+  .btn-gray:hover { background: rgba(255,255,255,0.35); color: #fff; }
+  .btn-yellow { background: #b77800; color: #fff; }
+  .btn-yellow:hover { background: #d4890a; }
+  .btn-green { background: #00875a; color: #fff; }
+  .btn-green:hover { background: #00a368; }
+  .btn-reset { background: #f1f5f9; color: #64748b; border: 1px solid #cbd5e1; font-size: 11px; }
+  .btn-reset:hover { color: #92400e; border-color: #f59e0b; background: #fffbeb; }
+  .btn-calc {
+    width: calc(100% - 32px); margin: 14px 16px 16px; height: 46px; font-size: 15px;
+    background: linear-gradient(135deg, #1d4ed8, #3d7fff);
+    box-shadow: 0 2px 16px rgba(61,127,255,0.3); border-radius: 10px;
+  }
+  .btn-calc:hover { transform: translateY(-1px); box-shadow: 0 6px 22px rgba(61,127,255,0.45); }
+
+  /* ── PANEL HEADER ── */
+  .panel-header {
+    display: flex; align-items: center; justify-content: space-between;
+    padding: 8px 14px; border-bottom: 1px solid var(--border); background: #e8eef8;
+    flex-shrink: 0;
+  }
+  .panel-title { font-size: 11px; font-weight: 700; letter-spacing: 0.8px; text-transform: uppercase; color: var(--accent); }
+
+  /* ── LOG ── */
+  #log-content {
+    flex: 1; overflow-y: auto; padding: 10px 14px;
+    font-family: var(--mono); font-size: 12px; line-height: 1.8; color: #065f46;
+    background: #ecfdf5; white-space: pre;
+    border-left: 3px solid #10b981;
+  }
+  #log-content.empty {
+    color: var(--text3); font-family: var(--sans); font-size: 13px;
+    white-space: normal; display: flex; align-items: center; justify-content: center;
+    background: var(--surface2); border-left: none;
+  }
+
+  /* ── RESULT TABLE ── */
+  #result-scroll { flex: 1; overflow: auto; }
+  .res-table { width: 100%; border-collapse: collapse; font-size: 13px; background: #fff; transition: opacity 0.3s; }
+  #res-tbody { transition: opacity 0.3s; }
+  #summary-box { transition: opacity 0.3s; }
+  .res-table th {
+    position: sticky; top: 0; background: #1d4ed8; color: #fff;
+    font-size: 11px; font-weight: 600; letter-spacing: 0.5px; padding: 9px 10px;
+    border-bottom: 2px solid #1e40af; text-align: center; white-space: nowrap;
+  }
+  .res-table th:first-child { text-align: left; padding-left: 14px; }
+  .res-table td { padding: 6px 10px; border-bottom: 1px solid #e2e8f0; text-align: center; color: var(--text2); }
+  .res-table td:first-child { text-align: left; color: var(--text); padding-left: 14px; font-weight: 500; }
+  .res-table tr:hover td { background: #eff6ff; }
+  .res-table .val-cell { font-family: var(--mono); color: #1d4ed8; font-weight: 700; }
+  .res-table .warn { font-size: 10px; color: #d97706; margin-left: 3px; }
+  .res-table .th-unit { font-size: 10px; font-weight: 400; color: #bfdbfe; display: block; margin-top: 1px; }
+
+  /* ── SUMMARY BOX ── */
+  #summary-box {
+    padding: 14px 18px; background: #eff6ff;
+    border-top: 3px solid var(--accent); display: none; flex-shrink: 0;
+  }
+  #summary-box.visible { display: block; }
+  .sum-title { font-size: 11px; font-weight: 700; color: var(--accent); letter-spacing: 0.5px; margin-bottom: 10px; }
+  .summary-grid { display: grid; grid-template-columns: repeat(4, 1fr); gap: 10px; margin-bottom: 10px; }
+  .sum-card {
+    background: #fff; border-radius: 8px; padding: 10px 12px;
+    border: 1px solid #bfdbfe; box-shadow: 0 1px 4px rgba(29,78,216,0.08);
+  }
+  .sum-card.highlight { border-color: var(--accent); background: #dbeafe; box-shadow: 0 2px 8px rgba(29,78,216,0.15); }
+  .sum-card-label { font-size: 11px; color: var(--text3); margin-bottom: 4px; }
+  .sum-card-value { font-family: var(--mono); font-size: 18px; font-weight: 700; color: #92400e; line-height: 1.2; }
+  .sum-card.highlight .sum-card-value { color: #1d4ed8; }
+  .sum-card-unit { font-size: 11px; color: var(--text3); margin-left: 3px; }
+  .sum-note { font-size: 11px; color: #d97706; line-height: 1.7; padding: 6px 0 0; border-top: 1px solid #bfdbfe; font-weight: 500; }
+
+  /* ── DIVIDER ── */
+  .divider { height: 1px; background: var(--border); margin: 8px 0; }
+
+  /* ── MOBILE TABS (hidden on desktop) ── */
+  #mobile-tabs { display: none; }
+
+  /* ── TOOLTIP ── */
+  [data-tip] { position: relative; cursor: help; }
+  [data-tip]:hover::after {
+    content: attr(data-tip);
+    position: absolute; bottom: calc(100% + 6px); left: 50%; transform: translateX(-50%);
+    background: #1e293b; border: 1px solid #334155; color: #f1f5f9;
+    font-size: 11px; white-space: nowrap; padding: 4px 8px; border-radius: 5px;
+    z-index: 200; pointer-events: none; font-weight: 400; font-family: var(--sans);
+    box-shadow: 0 2px 8px rgba(0,0,0,0.2);
+  }
+
+  /* ── PRINT OVERVIEW (hidden on screen) ── */
+  #print-overview { display: none; }
+
+  /* ══════════════════════════════
+     RESPONSIVE — MOBILE
+  ══════════════════════════════ */
+  @media (max-width: 860px) {
+    #app { grid-template-rows: 52px auto 1fr 32px; height: 100vh; }
+    #main { grid-template-columns: 1fr; grid-template-rows: 1fr; overflow: hidden; }
+    #mobile-tabs {
+      display: flex; background: #fff; border-bottom: 2px solid var(--border);
+      padding: 6px 12px; gap: 8px;
+    }
+    .tab-btn {
+      flex: 1; height: 32px; border: 1.5px solid var(--border2); background: #f8fafc;
+      color: var(--text2); font-family: var(--sans); font-size: 12px; font-weight: 600;
+      border-radius: 6px; cursor: pointer; transition: all 0.15s;
+    }
+    .tab-btn.active { background: var(--accent); border-color: var(--accent); color: #fff; box-shadow: 0 2px 8px rgba(29,78,216,0.25); }
+    #left-panel { display: none; border: none; height: 100%; }
+    #right-panel { display: none; height: 100%; grid-template-rows: 200px 1fr; }
+    #left-panel.tab-active { display: block; overflow-y: auto; }
+    #right-panel.tab-active { display: grid; }
+    .topbar-company { display: none; }
+    .topbar-title { font-size: 13px; }
+    #footer span:first-child { display: none; }
+  }
+
+  /* ══════════════════════════════
+     PRINT
+  ══════════════════════════════ */
+  @media print {
+    * { -webkit-print-color-adjust: exact; print-color-adjust: exact; }
+    #app { display: block; height: auto; }
+    body { background: #fff !important; color: #000 !important; }
+    #topbar {
+      position: static; padding: 10px 20px;
+      background: #1d4ed8 !important; border-bottom: 2px solid #1e40af;
+    }
+    .topbar-right, #footer, #mobile-tabs { display: none !important; }
+    #main { display: block; }
+    #left-panel { display: none; }
+    #right-panel { display: block; height: auto; overflow: visible; }
+    #log-panel { height: auto; overflow: visible; page-break-after: avoid; }
+    #log-content {
+      max-height: none; overflow: visible; color: #065f46 !important;
+      background: #ecfdf5 !important; border: 1px solid #a7f3d0;
+      border-left: 3px solid #10b981 !important;
+      white-space: pre; font-size: 11px; padding: 12px;
+    }
+    #log-content.empty { display: none; }
+    #result-panel { height: auto; overflow: visible; }
+    #result-scroll { overflow: visible; }
+    .panel-header { background: #e8eef8 !important; border-bottom: 1px solid #bfdbfe; }
+    .panel-title { color: #1d4ed8 !important; }
+    .panel-header .btn, #result-buttons { display: none !important; }
+    .res-table { background: #fff !important; }
+    .res-table th { background: #1d4ed8 !important; color: #fff !important; }
+    .res-table td { color: #334155 !important; border-bottom: 1px solid #e2e8f0; }
+    .res-table td:first-child { color: #0f172a !important; }
+    .res-table tr:hover td { background: transparent !important; }
+    .res-table .val-cell { color: #1d4ed8 !important; }
+    #summary-box { background: #eff6ff !important; border-top: 3px solid #1d4ed8; }
+    .sum-card { background: #fff !important; border: 1px solid #bfdbfe; }
+    .sum-card.highlight { background: #dbeafe !important; }
+    .sum-card-value { color: #92400e !important; }
+    .sum-card.highlight .sum-card-value { color: #1d4ed8 !important; }
+    #print-overview {
+      display: block !important; margin: 12px 20px; padding: 12px 16px;
+      background: #f0f6ff !important; border: 1px solid #bfdbfe; border-radius: 6px;
+      font-size: 12px; line-height: 2; color: #1e293b;
+      page-break-inside: avoid;
+    }
+    #print-overview strong { color: #1d4ed8; }
+    #summary-box.visible { display: block !important; page-break-inside: avoid; }
+  }
+</style>
+</head>
+<body>
+<div id="app">
+
+  <!-- ── TOP BAR ── -->
+  <header id="topbar">
+    <div class="topbar-brand">
+      <span class="topbar-company">(주)아이팝엔지니어링</span>
+      <span class="topbar-title">건설사업관리 <span>인월수 산출</span></span>
+      <span class="topbar-ver">Ver 1.1 (Web)</span>
+    </div>
+    <div class="topbar-right">
+      <button class="btn btn-sm btn-gray" onclick="showHelp()">? 사용설명서</button>
+      <button class="btn btn-sm btn-gray" onclick="loadProject()">📂 불러오기</button>
+      <button class="btn btn-sm btn-gray" onclick="saveProject()">💾 저장</button>
+    </div>
+  </header>
+
+  <!-- ── MOBILE TABS ── -->
+  <div id="mobile-tabs">
+    <button class="tab-btn active" id="tab-input" onclick="switchTab('input')">✏️ 입력</button>
+    <button class="tab-btn" id="tab-result" onclick="switchTab('result')">📊 결과</button>
+  </div>
+
+  <!-- ── MAIN ── -->
+  <div id="main">
+
+    <!-- LEFT PANEL -->
+    <div id="left-panel" class="tab-active">
+
+      <!-- 색상 범례 -->
+      <div class="color-legend">
+        <span class="legend-item"><span class="legend-dot auto"></span>회색 = 자동 계산</span>
+        <span class="legend-item"><span class="legend-dot manual"></span>노란색 = 직접 입력</span>
+      </div>
+
+      <!-- 1. 프로젝트 정보 -->
+      <div class="section">
+        <div class="section-title">1 프로젝트 정보</div>
+
+        <!-- 기본 정보 그룹 -->
+        <div class="field-group">
+          <div class="field">
+            <label>용역명</label>
+            <input type="text" id="proj_name" value="OOO 신축공사" class="is-manual">
+            <span class="unit"></span>
+          </div>
+          <div class="field">
+            <label>대지위치</label>
+            <input type="text" id="proj_addr" value="대전시" class="is-manual">
+            <span class="unit"></span>
+          </div>
+        </div>
+
+        <!-- 연면적 / 공사비 그룹 -->
+        <div class="field-group">
+          <div class="group-label">연면적 · 공사비</div>
+          <div class="field">
+            <label>연면적</label>
+            <input type="number" id="area_m2" value="" oninput="onAreaM2Change()" class="is-manual">
+            <span class="unit">㎡</span>
+          </div>
+          <div class="field">
+            <label></label>
+            <input type="number" id="area" value="3000" oninput="onAreaPyeongChange()" class="is-auto">
+            <span class="unit">평</span>
+          </div>
+          <div class="field">
+            <label>평당단가 (만원)</label>
+            <input type="number" id="unit_price" value="800" oninput="onUnitPriceChange()" class="is-manual">
+            <span class="unit"></span>
+          </div>
+          <div class="field">
+            <label>총 공사비 (억원)</label>
+            <input type="number" id="cost" value="455" oninput="onCostManual()" class="is-auto">
+            <span class="unit"></span>
+          </div>
+        </div>
+
+        <!-- 골조 그룹 -->
+        <div class="field-group">
+          <div class="group-label">골조</div>
+          <div class="field">
+            <label>골조비중 (%)</label>
+            <input type="number" id="struct_ratio" value="30" oninput="onStructRatioChange()" class="is-manual">
+            <span class="unit"></span>
+          </div>
+          <div class="field">
+            <label>골조공사비 (억원)</label>
+            <input type="number" id="struct" value="136.5" oninput="calcRatioFromStruct()" class="is-auto">
+            <span class="unit"></span>
+          </div>
+        </div>
+
+        <!-- 공사기간 / 난이도 그룹 -->
+        <div class="field-group" style="margin-bottom:0;">
+          <div class="group-label">기간 · 난이도</div>
+          <div class="field">
+            <label>공사기간 (개월)</label>
+            <input type="number" id="dur" value="42" oninput="onDurChange()" class="is-manual">
+            <span class="unit"></span>
+          </div>
+          <div class="field">
+            <label>적용 난이도 (D)</label>
+            <input type="text" id="difficulty" class="is-auto" style="font-family:var(--mono);" readonly>
+            <span class="unit"></span>
+          </div>
+        </div>
+      </div>
+
+      <!-- 2. 옵션 -->
+      <div class="section">
+        <div class="section-title">2 옵션 선택</div>
+        <div class="seg-group">
+          <button class="seg-btn" id="seg_단순" onclick="setSeg('단순')" data-tip="공종보정계수 Ka = 0.90">단순</button>
+          <button class="seg-btn active" id="seg_보통" onclick="setSeg('보통')" data-tip="공종보정계수 Ka = 1.00">보통</button>
+          <button class="seg-btn" id="seg_복잡" onclick="setSeg('복잡')" data-tip="공종보정계수 Ka = 1.10">복잡</button>
+        </div>
+        <label class="chk-row">
+          <input type="checkbox" id="chk_super" onchange="scheduleAutoCalc()">
+          <div class="chk-box"></div>
+          <span class="chk-label">감독권한대행 등 건설사업관리 시행</span>
+        </label>
+        <label class="chk-row">
+          <input type="checkbox" id="chk_remodel" onchange="scheduleAutoCalc()">
+          <div class="chk-box"></div>
+          <span class="chk-label">리모델링 적용 <span style="color:var(--accent2);font-size:11px;">(Kb × 1.1)</span></span>
+        </label>
+        <label class="chk-row">
+          <input type="checkbox" id="chk_bim" onchange="scheduleAutoCalc()">
+          <div class="chk-box"></div>
+          <span class="chk-label">BIM 적용 <span style="color:var(--accent2);font-size:11px;">(Kc × 1.1)</span></span>
+        </label>
+      </div>
+
+      <!-- 3. 수량 조정 -->
+      <div class="section">
+        <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:10px;">
+          <div class="section-title" style="margin-bottom:0;">3 수량 미세 조정</div>
+          <button class="btn btn-xs btn-reset" onclick="resetQ()">🔄 자동값 초기화</button>
+        </div>
+        <table class="qty-table" id="qty-table"></table>
+      </div>
+
+      <button class="btn btn-primary btn-calc" onclick="calculate()">▶ 전체 계산 및 출력</button>
+    </div><!-- /left-panel -->
+
+    <!-- RIGHT PANEL -->
+    <div id="right-panel">
+
+      <!-- 인쇄용 프로젝트 개요 (화면에서는 숨김) -->
+      <div id="print-overview"></div>
+
+      <!-- LOG -->
+      <div id="log-panel">
+        <div class="panel-header">
+          <span class="panel-title">4 상세 산식 검증 (Log)</span>
+        </div>
+        <div id="log-content" class="empty">계산 버튼을 누르면 상세 산식이 여기에 표시됩니다.</div>
+      </div>
+
+      <!-- RESULT -->
+      <div id="result-panel">
+        <div class="panel-header">
+          <span class="panel-title">5 최종 산출 내역서</span>
+          <div id="result-buttons" style="display:none;gap:6px;">
+            <button class="btn btn-sm btn-yellow" onclick="saveCSV()">💾 CSV 저장</button>
+            <button class="btn btn-sm btn-green" onclick="printReport()">🖨️ 인쇄 / PDF</button>
+          </div>
+        </div>
+        <div id="result-scroll">
+          <table class="res-table">
+            <thead>
+              <tr>
+                <th style="width:170px;">업무항목</th>
+                <th>수량</th>
+                <th>기준</th>
+                <th data-tip="공종보정계수 (단순0.9/보통1.0/복잡1.1)">a</th>
+                <th data-tip="리모델링 보정계수 (1.1)">b</th>
+                <th data-tip="BIM 적용 보정계수 (1.1)">c</th>
+                <th>난이도</th>
+                <th>산출 <span class="th-unit">(인ㆍ일)</span></th>
+              </tr>
+            </thead>
+            <tbody id="res-tbody">
+              <tr>
+                <td colspan="8" style="text-align:center;padding:50px;color:var(--text3);font-size:13px;">
+                  좌측 입력 후 계산 버튼을 누르세요
+                </td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+
+        <!-- 요약 -->
+        <div id="summary-box">
+          <div class="sum-title">■ 최종 산출 결과</div>
+          <div class="summary-grid" id="summary-grid"></div>
+          <div class="sum-note" id="summary-note"></div>
+        </div>
+      </div><!-- /result-panel -->
+
+    </div><!-- /right-panel -->
+  </div><!-- /main -->
+
+  <!-- FOOTER: JS에서 동적 생성 (저작권 보호) -->
+  <footer id="footer"></footer>
+</div><!-- /app -->
+
+<!-- ══════════════════════════════
+     HELP MODAL
+══════════════════════════════ -->
+<div id="help-modal" style="display:none;position:fixed;inset:0;background:rgba(15,23,42,0.6);z-index:999;align-items:center;justify-content:center;">
+  <div style="background:#fff;border:1px solid #bfdbfe;border-radius:12px;width:min(560px,92vw);max-height:85vh;overflow-y:auto;padding:28px;position:relative;box-shadow:0 20px 60px rgba(29,78,216,0.2);">
+    <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:18px;">
+      <span style="font-size:16px;font-weight:700;color:#0f172a;">사용설명서</span>
+      <button onclick="closeHelp()" style="background:#f1f5f9;border:1px solid #e2e8f0;color:#64748b;font-size:18px;cursor:pointer;line-height:1;width:32px;height:32px;border-radius:6px;">✕</button>
+    </div>
+    <div style="font-size:13px;line-height:2;color:#334155;">
+      <p style="color:#1d4ed8;font-weight:600;margin-bottom:14px;font-size:12px;background:#eff6ff;padding:8px 12px;border-radius:6px;border-left:3px solid #1d4ed8;">
+        국토교통부 고시 제2023-580호 · 건설엔지니어링 대가 등에 관한 기준
+      </p>
+
+      <p style="color:#0f172a;font-weight:700;margin-bottom:4px;">1. 프로젝트 정보 입력</p>
+      <p>· 연면적 × 평당단가 → 총 공사비 자동 계산</p>
+      <p>· 골조비중(%) 입력 → 골조공사비 자동 계산</p>
+      <p>· 공사기간 입력 → 난이도(D) 자동 산출</p>
+      <p>· 난이도(D)는 자동값이지만 직접 수정도 가능합니다</p>
+
+      <div style="margin:10px 0;padding:10px 14px;background:#f8fafc;border-radius:6px;border:1px solid #e2e8f0;display:flex;gap:20px;">
+        <span style="display:flex;align-items:center;gap:6px;">
+          <span style="display:inline-block;width:32px;height:20px;background:#fffbeb;border:1.5px solid #f59e0b;border-radius:3px;"></span>
+          <span style="font-size:12px;color:#92400e;font-weight:600;">노란색 = 직접 입력</span>
+        </span>
+        <span style="display:flex;align-items:center;gap:6px;">
+          <span style="display:inline-block;width:32px;height:20px;background:#f1f5f9;border:1.5px solid #94a3b8;border-radius:3px;"></span>
+          <span style="font-size:12px;color:#64748b;font-weight:600;">회색 = 자동 계산</span>
+        </span>
+      </div>
+
+      <p style="color:#0f172a;font-weight:700;margin-bottom:4px;margin-top:12px;">2. 옵션 설명</p>
+      <p>· <b>단순/보통/복잡</b> → 공종보정계수 Ka (0.9 / 1.0 / 1.1)</p>
+      <p>· <b>a</b> = Ka 적용 항목 &nbsp; <b>b</b> = 리모델링(Kb) 적용 항목 &nbsp; <b>c</b> = BIM(Kc) 적용 항목</p>
+      <p>· 감독권한대행 미해당 시 최종 인월수에서 <b>20% 감산</b></p>
+      <p>· 안전관리 항목은 난이도 보정 최솟값 = 1.0 (하한 적용)</p>
+
+      <p style="color:#0f172a;font-weight:700;margin-bottom:4px;margin-top:12px;">3. 수량 미세 조정</p>
+      <p>· 공사기간 변경 시 자동으로 재산출</p>
+      <p>· 개별 항목은 직접 수정 가능</p>
+      <p>· <b>🔄 자동값 초기화</b> 버튼으로 원래대로 복원</p>
+
+      <p style="color:#0f172a;font-weight:700;margin-bottom:4px;margin-top:12px;">4. 저장 및 출력</p>
+      <p>· <b>프로젝트 저장/불러오기</b>: JSON 파일 (모든 입력값 보존)</p>
+      <p>· <b>CSV 저장</b>: 엑셀에서 열 수 있는 형식</p>
+      <p>· <b>인쇄/PDF</b>: 프로젝트 개요 + 산식 + 산출 내역 포함</p>
+    </div>
+  </div>
+</div>
+
+<script>
+// ═══════════════════════════════════════════
+// DB
+// ═══════════════════════════════════════════
+const DB = [
+  ["공사착수",                    "식",      72.7,  false, false, false, false],
+  ["시공성과확인 및 검측업무",     "공사일수",  2.9,  true,  true,  true,  true ],
+  ["사용자재의 적정성 검토",       "공사개월", 10.0,  true,  true,  false, true ],
+  ["품질시험 및 성과검토",         "공사개월", 12.6,  true,  false, false, true ],
+  ["시공계획검토",                 "공사개월",  8.8,  true,  true,  true,  true ],
+  ["기술검토 및 교육",             "공사개월", 10.1,  true,  false, false, true ],
+  ["공정관리",                     "공사개월",  9.0,  true,  true,  false, true ],
+  ["안전관리",                     "공사개월", 22.0,  false, true,  false, true ],
+  ["환경관리",                     "공사개월",  5.3,  false, true,  false, true ],
+  ["설계변경 관리",                "공사개월",  7.5,  false, false, true,  true ],
+  ["기성검사",                     "회",       6.6,  false, false, false, false],
+  ["준공검사",                     "식",       3.8,  false, false, false, false],
+  ["계약자간 시공인터페이스 조정", "공사개월",  2.8,  true,  false, false, false],
+  ["하도급적정성검토",             "공사년수", 23.0,  false, false, false, true ],
+  ["시공단계의 예산검증 및 지원",  "회",      36.4,  false, false, false, true ],
+  ["일반행정업무",                 "용역일수",  1.6,  false, false, false, true ],
+];
+
+// ═══════════════════════════════════════════
+// INIT
+// ═══════════════════════════════════════════
+window.addEventListener('DOMContentLoaded', () => {
+  buildQtyTable();
+  // area_m2 초기값: 기본 평값(3000)에서 ㎡ 계산
+  const initPyeong = fv('area');
+  if (initPyeong > 0) sv('area_m2', (initPyeong * M2_PER_PYEONG).toFixed(1));
+  updateDifficulty();
+  resetQ();
+  // 초기 색상: ㎡=노란색(직접입력), 평=회색(자동), 나머지 자동 필드
+  document.getElementById('area_m2').className = 'is-manual';
+  document.getElementById('area').className    = 'is-auto';
+  ['cost', 'struct', 'difficulty'].forEach(id => {
+    document.getElementById(id).className = 'is-auto';
+  });
+});
+
+function buildQtyTable() {
+  const tb = document.getElementById('qty-table');
+  tb.innerHTML = '';
+  DB.forEach(([task, unit]) => {
+    const tr = document.createElement('tr');
+    tr.innerHTML = `
+      <td class="task-name">${task}</td>
+      <td class="unit-label">(${unit})</td>
+      <td style="text-align:right;"><input type="number" id="q_${escId(task)}" step="0.1" value="0" min="0" oninput="scheduleAutoCalc()"></td>
+    `;
+    tb.appendChild(tr);
+  });
+}
+
+// ID에서 특수문자 처리
+function escId(task) { return task.replace(/\s/g,'_').replace(/[^a-zA-Z0-9_ㄱ-ㅎ가-힣]/g,''); }
+function qEl(task) { return document.getElementById('q_' + escId(task)); }
+
+// ═══════════════════════════════════════════
+// 평균건설사업관리기간 직선보간 테이블
+// ═══════════════════════════════════════════
+const AVG_T_TABLE = [
+  [10,10],[30,14],[50,17],[70,24],[100,28],[150,30],
+  [200,37],[300,38],[400,38],[500,39],[700,45],[1000,54]
+];
+
+function getAvgTInfo(cost) {
+  if (cost <= 10)   return { val: 10, log: "10억 이하 → 10개월 (하한 적용)" };
+  if (cost >= 1000) return { val: 54, log: "1000억 이상 → 54개월 (상한 적용)" };
+  for (let i = 0; i < AVG_T_TABLE.length - 1; i++) {
+    const [c1, d1] = AVG_T_TABLE[i], [c2, d2] = AVG_T_TABLE[i + 1];
+    if (cost >= c1 && cost <= c2) {
+      const val = d1 + (cost - c1) * (d2 - d1) / (c2 - c1);
+      const log = `직선보간: ${c1}억(${d1}개월) ~ ${c2}억(${d2}개월)\n       = ${d1} + (${cost} - ${c1}) / (${c2} - ${c1}) × (${d2} - ${d1})`;
+      return { val, log };
+    }
+  }
+  return { val: 38, log: "오류" };
+}
+
+// ═══════════════════════════════════════════
+// DIFFICULTY
+// ═══════════════════════════════════════════
+function updateDifficulty() {
+  try {
+    const C = fv('cost'), S = fv('struct'), T = fv('dur');
+    if (!C || !T) return;
+    const C_unit = C / 10;
+    const { val: avg_T } = getAvgTInfo(C);
+    const p_corr = (avg_T - T) / avg_T * 0.1;
+    const s_ratio = Math.min(S / C, 1.0);
+    let D;
+    if (C_unit <= 200) {
+      const cost_f = 0.011 * C_unit * (1 - 0.0025 * C_unit);
+      D = cost_f + p_corr + 0.5 * s_ratio + 0.2;
+    } else {
+      D = 1.1 + p_corr + 0.5 * s_ratio + 0.2 + (C_unit - 200) / 250;
+    }
+    D = Math.max(0.6, Math.min(D, 2.0));
+    const el = document.getElementById('difficulty');
+    el.value = D.toFixed(3);
+    el.className = 'is-auto';
+  } catch(e) {}
+}
+
+// ═══════════════════════════════════════════
+// INPUT HELPERS
+// ═══════════════════════════════════════════
+function fv(id) { return parseFloat(document.getElementById(id).value) || 0; }
+function sv(id, val) { document.getElementById(id).value = val; }
+
+const M2_PER_PYEONG = 3.30579; // 1평 = 3.30579㎡
+
+// ㎡ 입력 → 평 자동 계산 (회색)
+function onAreaM2Change() {
+  document.getElementById('area_m2').className = 'is-manual';
+  const m2 = fv('area_m2');
+  if (m2 > 0) {
+    sv('area', (m2 / M2_PER_PYEONG).toFixed(1));
+    document.getElementById('area').className = 'is-auto';
+  }
+  calcCostFromArea();
+  scheduleAutoCalc();
+}
+
+// 평 입력 → ㎡ 자동 계산 (회색)
+function onAreaPyeongChange() {
+  document.getElementById('area').className = 'is-manual';
+  const pyeong = fv('area');
+  if (pyeong > 0) {
+    sv('area_m2', (pyeong * M2_PER_PYEONG).toFixed(1));
+    document.getElementById('area_m2').className = 'is-auto';
+  }
+  calcCostFromArea();
+  scheduleAutoCalc();
+}
+
+// 연면적(평) × 평당단가 → 총공사비 자동 계산
+function calcCostFromArea() {
+  const area = fv('area'), up = fv('unit_price');
+  if (area && up) {
+    sv('cost', ((area * up) / 10000).toFixed(1));
+    document.getElementById('cost').className = 'is-auto';
+  }
+  calcStructFromRatio();
+  updateDifficulty();
+}
+
+// 총공사비 직접 입력 → 평당단가 역산
+function onCostManual() {
+  document.getElementById('cost').className = 'is-manual';
+  const area = fv('area'), cost = fv('cost');
+  if (area > 0 && cost > 0) {
+    sv('unit_price', (cost * 10000 / area).toFixed(0));
+    document.getElementById('unit_price').className = 'is-auto';
+  }
+  calcStructFromRatio();
+  updateDifficulty();
+  scheduleAutoCalc();
+}
+
+// 평당단가 직접 입력
+function onUnitPriceChange() {
+  document.getElementById('unit_price').className = 'is-manual';
+  calcCostFromArea();
+  scheduleAutoCalc();
+}
+
+// 골조비중 변경 → 골조공사비 자동 계산 (골조공사비가 수동 입력 중이면 건드리지 않음)
+function calcStructFromRatio() {
+  const cost = fv('cost'), ratio = fv('struct_ratio');
+  const structEl = document.getElementById('struct');
+  // 골조공사비가 직접 입력(is-manual) 상태면 역산하지 않고 비중만 재계산
+  if (structEl.classList.contains('is-manual')) {
+    // 골조공사비가 수동값이면 비중 역산만 업데이트
+    if (cost > 0 && fv('struct') > 0) {
+      sv('struct_ratio', (fv('struct') / cost * 100).toFixed(1));
+      document.getElementById('struct_ratio').className = 'is-auto';
+    }
+  } else {
+    if (cost && ratio) {
+      sv('struct', (cost * ratio / 100).toFixed(1));
+      structEl.className = 'is-auto';
+    }
+  }
+  updateDifficulty();
+}
+
+// 골조비중 직접 입력 → 골조공사비 자동 계산 모드로 전환
+function onStructRatioChange() {
+  document.getElementById('struct_ratio').className = 'is-manual';
+  document.getElementById('struct').className = 'is-auto'; // 골조공사비 자동 모드로 복귀
+  calcStructFromRatio();
+  scheduleAutoCalc();
+}
+
+// 골조공사비 직접 입력 → 골조비중 역산
+function calcRatioFromStruct() {
+  document.getElementById('struct').className = 'is-manual';
+  const cost = fv('cost'), s = fv('struct');
+  if (cost > 0 && s > 0) {
+    sv('struct_ratio', (s / cost * 100).toFixed(1));
+    document.getElementById('struct_ratio').className = 'is-auto';
+  }
+  updateDifficulty();
+  scheduleAutoCalc();
+}
+
+function onDurChange() {
+  updateDifficulty();
+  resetQ();
+  scheduleAutoCalc();
+}
+
+// ═══════════════════════════════════════════
+// SEGMENT
+// ═══════════════════════════════════════════
+let currentSeg = '보통';
+function setSeg(val) {
+  currentSeg = val;
+  ['단순','보통','복잡'].forEach(v =>
+    document.getElementById('seg_' + v).classList.toggle('active', v === val)
+  );
+  scheduleAutoCalc();
+}
+
+// ═══════════════════════════════════════════
+// RESET Q
+// ═══════════════════════════════════════════
+function resetQ() {
+  const T = fv('dur') || 42;
+  DB.forEach(([task, unit]) => {
+    let val;
+    if      (task.includes("시공계획") || task.includes("기술검토"))                         val = 20.0;
+    else if (task.includes("설계변경") || task.includes("시공인터페이스") || task.includes("예산검증")) val = 1.0;
+    else if (task.includes("일반행정"))                                                       val = 0.0;
+    else if (task.includes("사용자재") || task.includes("품질시험") || task.includes("기성검사")) val = T / 6;
+    else if (unit === "공사개월")                                                             val = T;
+    else if (unit === "공사일수" || unit === "용역일수")                                      val = T * 22;
+    else if (unit === "공사년수")                                                             val = T / 12;
+    else if (task.includes("준공"))                                                           val = 1.0;
+    else if (unit === "회")                                                                   val = T;
+    else                                                                                      val = 1.0;
+    const el = qEl(task);
+    if (el) el.value = val.toFixed(1);
+  });
+}
+
+// ═══════════════════════════════════════════
+// CALCULATE
+// ═══════════════════════════════════════════
+// 자동 계산 (B방식: 첫 계산 후부터 1초 디바운스)
+// ═══════════════════════════════════════════
+let hasCalculated = false;   // 최초 계산 버튼을 눌렀는지 여부
+let autoCalcTimer = null;    // 디바운스 타이머
+
+function scheduleAutoCalc() {
+  if (!hasCalculated) return; // 아직 첫 계산 전이면 무시
+  clearTimeout(autoCalcTimer);
+  // 업데이트 중 표시 (결과 패널 살짝 흐리게)
+  document.getElementById('res-tbody').style.opacity = '0.45';
+  document.getElementById('summary-box').style.opacity = '0.45';
+  autoCalcTimer = setTimeout(() => {
+    calculate(true); // silent=true: 모바일 탭 자동이동 안 함
+    document.getElementById('res-tbody').style.opacity = '1';
+    document.getElementById('summary-box').style.opacity = '1';
+  }, 2000);
+}
+
+// ═══════════════════════════════════════════
+// CALCULATE
+// ═══════════════════════════════════════════
+function calculate(silent = false) {
+  const C = fv('cost'), S = fv('struct'), T = fv('dur');
+  const D_user = parseFloat(document.getElementById('difficulty').value);
+  // silent 모드(자동갱신)일 땐 alert 없이 조용히 종료
+  if (!C || !T || isNaN(D_user)) {
+    if (!silent) alert("입력값을 확인하세요.");
+    return;
+  }
+
+  const C_unit = C / 10;
+  const { val: avg_T, log: avg_log } = getAvgTInfo(C);
+  const p_corr = (avg_T - T) / avg_T * 0.1;
+  const s_ratio = C > 0 ? Math.min(S / C, 1.0) : 0;
+  const cost_f  = C_unit <= 200
+    ? 0.011 * C_unit * (1 - 0.0025 * C_unit)
+    : 1.1 + (C_unit - 200) / 250;
+
+  // ── LOG ──
+  const logEl = document.getElementById('log-content');
+  logEl.className = '';
+  logEl.textContent =
+`══════════════════════════════════════════════════════
+[STEP 1] 평균건설사업관리기간 (직선보간)
+  ${avg_log}
+  → 평균기간 = ${avg_T.toFixed(4)} 개월
+
+[STEP 2] 기간보정계수
+  = (${avg_T.toFixed(4)} - ${T}) / ${avg_T.toFixed(4)} × 0.1
+  = ${p_corr.toFixed(5)}
+
+[STEP 3] 공사난이도 (D) 산출
+  비용 항목  = ${cost_f.toFixed(4)}
+  기간 항목  = ${p_corr.toFixed(4)}
+  골조 항목  = ${(0.5 * s_ratio).toFixed(4)}  (골조비중 ${(s_ratio*100).toFixed(1)}%)
+  상수       = 0.2000
+  ─────────────────────────────────────
+  산출 D     = ${(cost_f + p_corr + 0.5 * s_ratio + 0.2).toFixed(4)}
+  적용 D     = ${D_user}  (자동 산출)
+══════════════════════════════════════════════════════`;
+
+  // ── COEFFICIENTS ──
+  const Ka = currentSeg === '단순' ? 0.9 : currentSeg === '복잡' ? 1.1 : 1.0;
+  const Kb = document.getElementById('chk_remodel').checked ? 1.1 : 1.0;
+  const Kc = document.getElementById('chk_bim').checked    ? 1.1 : 1.0;
+  const is_authority = document.getElementById('chk_super').checked;
+
+  // ── TABLE ──
+  const tbody = document.getElementById('res-tbody');
+  tbody.innerHTML = '';
+  let total_md = 0;
+
+  DB.forEach(([task, unit, std, has_a, has_b, has_c, has_D]) => {
+    const Q  = parseFloat((qEl(task) || {}).value) || 0;
+    const ka = has_a ? Ka : 1.0;
+    const kb = has_b ? Kb : 1.0;
+    const kc = has_c ? Kc : 1.0;
+    const k_final = ka * kb * kc;
+    let d_app = has_D ? D_user : 1.0;
+    if (task === "안전관리" && d_app < 1.0) d_app = 1.0;
+
+    let row_val = std * Q * k_final * d_app;
+    let warnHtml = '';
+    if (task === "안전관리" && k_final * d_app < 1.0) {
+      row_val = std * Q;
+      warnHtml = '<span class="warn">(Min)</span>';
+    }
+    row_val = Math.round(row_val * 10) / 10;
+    total_md += row_val;
+
+    const fmt  = (v, f) => f ? v.toFixed(2) : '';
+    const fmtd = (v, f) => f ? v.toFixed(3) : '';
+
+    const tr = document.createElement('tr');
+    tr.innerHTML = `
+      <td>${task}</td>
+      <td>${Q.toFixed(1)}</td>
+      <td>${std}</td>
+      <td>${fmt(ka, has_a)}</td>
+      <td>${fmt(kb, has_b)}</td>
+      <td>${fmt(kc, has_c)}</td>
+      <td>${fmtd(d_app, has_D)}</td>
+      <td class="val-cell">${row_val.toLocaleString('ko-KR',{minimumFractionDigits:1,maximumFractionDigits:1})}${warnHtml}</td>
+    `;
+    tbody.appendChild(tr);
+  });
+
+  // ── SUMMARY ──
+  const base_mm  = Math.round(total_md / 22 * 1000) / 1000;
+  const final_mm = is_authority ? base_mm : Math.round(base_mm * 0.8 * 1000) / 1000;
+  const tech_ratio = currentSeg === '단순' ? 0.10 : currentSeg === '보통' ? 0.15 : 0.20;
+  const tech_mm  = Math.floor(final_mm * tech_ratio * 1000) / 1000;
+  const res_mm   = Math.round((final_mm - tech_mm) * 1000) / 1000;
+
+  document.getElementById('summary-box').classList.add('visible');
+  document.getElementById('summary-grid').innerHTML = `
+    <div class="sum-card">
+      <div class="sum-card-label">감독권한대행 기준</div>
+      <div class="sum-card-value">${base_mm.toFixed(3)}<span class="sum-card-unit">인ㆍ월수</span></div>
+    </div>
+    <div class="sum-card highlight">
+      <div class="sum-card-label">최종 투입인월수</div>
+      <div class="sum-card-value">${final_mm.toFixed(3)}<span class="sum-card-unit">인ㆍ월수</span></div>
+    </div>
+    <div class="sum-card">
+      <div class="sum-card-label">상주기술인</div>
+      <div class="sum-card-value">${res_mm.toFixed(3)}<span class="sum-card-unit">인ㆍ월수</span></div>
+    </div>
+    <div class="sum-card">
+      <div class="sum-card-label">기술지원기술인 (${(tech_ratio*100).toFixed(0)}%)</div>
+      <div class="sum-card-value">${tech_mm.toFixed(3)}<span class="sum-card-unit">인ㆍ월수</span></div>
+    </div>
+  `;
+
+  let note = '';
+  if (!is_authority) note = '※ 감독권한대행 등 건설사업관리가 아닌 경우에는 시공단계의 투입인원수에서 20%를 감하여 산정한다.';
+  document.getElementById('summary-note').textContent = note;
+
+  // ── 결과 버튼 표시 ──
+  document.getElementById('result-buttons').style.display = 'flex';
+
+  // ── 인쇄용 개요 업데이트 ──
+  updatePrintOverview(D_user, final_mm, base_mm, res_mm, tech_mm, tech_ratio, is_authority);
+
+  // 첫 계산 완료 → 이후부터 자동 갱신 활성화
+  hasCalculated = true;
+
+  // 모바일: 버튼으로 계산한 경우만 결과 탭으로 자동 이동
+  if (!silent && window.innerWidth <= 860) switchTab('result');
+}
+
+// ── 인쇄용 프로젝트 개요 블록 ──
+function updatePrintOverview(D_user, final_mm, base_mm, res_mm, tech_mm, tech_ratio, is_authority) {
+  const box = document.getElementById('print-overview');
+  box.innerHTML = `
+    <strong>[ 프로젝트 개요 ]</strong><br>
+    용역명: ${document.getElementById('proj_name').value} &nbsp;&nbsp; 대지위치: ${document.getElementById('proj_addr').value}<br>
+    연면적: <strong>${fv('area_m2').toLocaleString()} ㎡</strong> (${fv('area').toLocaleString()} 평) &nbsp;&nbsp;
+    평당단가: <strong>${fv('unit_price').toLocaleString()} 만원/평</strong><br>
+    총 공사비: <strong>${fv('cost')} 억원</strong> &nbsp;&nbsp;
+    골조공사비: <strong>${fv('struct')} 억원</strong> (${fv('struct_ratio')}%) &nbsp;&nbsp;
+    공사기간: <strong>${fv('dur')} 개월</strong><br>
+    공종: <strong>${currentSeg}</strong> &nbsp;&nbsp;
+    적용난이도(D): <strong>${D_user}</strong> &nbsp;&nbsp;
+    감독권한대행: <strong>${is_authority ? '해당' : '미해당'}</strong>
+    ${document.getElementById('chk_remodel').checked ? ' &nbsp;&nbsp; 리모델링: 해당' : ''}
+    ${document.getElementById('chk_bim').checked    ? ' &nbsp;&nbsp; BIM: 해당' : ''}
+  `;
+}
+
+// ═══════════════════════════════════════════
+// CSV 저장
+// ═══════════════════════════════════════════
+function saveCSV() {
+  const D_user = parseFloat(document.getElementById('difficulty').value);
+  const Ka = currentSeg === '단순' ? 0.9 : currentSeg === '복잡' ? 1.1 : 1.0;
+  const Kb = document.getElementById('chk_remodel').checked ? 1.1 : 1.0;
+  const Kc = document.getElementById('chk_bim').checked    ? 1.1 : 1.0;
+  const is_authority = document.getElementById('chk_super').checked;
+
+  const rows = [];
+  rows.push(['건설사업관리 대가 산출 내역서']);
+  rows.push(['(주)아이팝엔지니어링 / SalGI']);
+  rows.push(['작성일', new Date().toLocaleDateString('ko-KR')]);
+  rows.push([]);
+  rows.push(['용역명', document.getElementById('proj_name').value, '대지위치', document.getElementById('proj_addr').value]);
+  rows.push(['연면적(㎡)', `${fv('area_m2')} ㎡`, '연면적(평)', `${fv('area')} 평`, '평당단가', `${fv('unit_price')} 만원/평`]);
+  rows.push(['총공사비', `${fv('cost')} 억원`, '골조공사비', `${fv('struct')} 억원`, '골조비중', `${fv('struct_ratio')}%`]);
+  rows.push(['공사기간', `${fv('dur')} 개월`, '난이도(D)', D_user, '공종', currentSeg]);
+  rows.push(['감독권한대행', is_authority ? '해당' : '미해당',
+             '리모델링', document.getElementById('chk_remodel').checked ? '해당' : '미해당',
+             'BIM', document.getElementById('chk_bim').checked ? '해당' : '미해당']);
+  rows.push([]);
+  rows.push(['업무항목','단위','기준값','수량','a(공종)','b(리모)','c(BIM)','난이도','산출(인일)']);
+
+  let total_md = 0;
+  DB.forEach(([task, unit, std, has_a, has_b, has_c, has_D]) => {
+    const Q  = parseFloat((qEl(task) || {}).value) || 0;
+    const ka = has_a ? Ka : 1.0, kb = has_b ? Kb : 1.0, kc = has_c ? Kc : 1.0;
+    let d_app = has_D ? D_user : 1.0;
+    if (task === "안전관리" && d_app < 1.0) d_app = 1.0;
+    let row_val = Math.round(std * Q * ka * kb * kc * d_app * 10) / 10;
+    if (task === "안전관리" && (ka*kb*kc*d_app) < 1.0) row_val = std * Q;
+    total_md += row_val;
+    rows.push([task, unit, std, Q.toFixed(1),
+      has_a ? ka.toFixed(2) : '-', has_b ? kb.toFixed(2) : '-', has_c ? kc.toFixed(2) : '-',
+      has_D ? d_app.toFixed(3) : '-', row_val.toFixed(1)]);
+  });
+
+  rows.push([]);
+  rows.push(['[ 최종 결과 ]']);
+  const base_mm  = Math.round(total_md / 22 * 1000) / 1000;
+  const final_mm = is_authority ? base_mm : Math.round(base_mm * 0.8 * 1000) / 1000;
+  const tech_ratio = currentSeg === '단순' ? 0.10 : currentSeg === '보통' ? 0.15 : 0.20;
+  const tech_mm  = Math.floor(final_mm * tech_ratio * 1000) / 1000;
+  const res_mm   = Math.round((final_mm - tech_mm) * 1000) / 1000;
+
+  rows.push(['감독권한대행 기준',  `${base_mm.toFixed(3)} 인ㆍ월수`]);
+  rows.push(['최종 투입인월수',    `${final_mm.toFixed(3)} 인ㆍ월수`]);
+  if (!is_authority) rows.push(['(비고)', '감독권한대행 등 건설사업관리 미해당 시 20% 감산 적용']);
+  rows.push(['상주기술인',         `${res_mm.toFixed(3)} 인ㆍ월수`]);
+  rows.push(['기술지원기술인',     `${tech_mm.toFixed(3)} 인ㆍ월수 (${(tech_ratio*100).toFixed(0)}%)`]);
+
+  const csv = rows.map(r => r.map(c => `"${String(c).replace(/"/g,'""')}"`).join(',')).join('\n');
+  const blob = new Blob(['\uFEFF' + csv], { type: 'text/csv;charset=utf-8;' });
+  const a = document.createElement('a');
+  a.href = URL.createObjectURL(blob);
+  const today = new Date().toISOString().slice(0,10).replace(/-/g,'');
+  a.download = `${today}_${document.getElementById('proj_name').value || '건설인원산정'}.csv`;
+  a.click();
+}
+
+// ═══════════════════════════════════════════
+// 인쇄
+// ═══════════════════════════════════════════
+function printReport() {
+  window.print();
+}
+
+// ═══════════════════════════════════════════
+// 프로젝트 저장 / 불러오기
+// ═══════════════════════════════════════════
+function saveProject() {
+  const data = {
+    version: '1.1',
+    proj_name:    document.getElementById('proj_name').value,
+    proj_addr:    document.getElementById('proj_addr').value,
+    area_m2:      fv('area_m2'),
+    area:         fv('area'),
+    unit_price:   fv('unit_price'),
+    cost:         fv('cost'),
+    struct_ratio: fv('struct_ratio'),
+    struct:       fv('struct'),
+    dur:          fv('dur'),
+    seg_comp:     currentSeg,
+    chk_super:    document.getElementById('chk_super').checked,
+    chk_remodel:  document.getElementById('chk_remodel').checked,
+    chk_bim:      document.getElementById('chk_bim').checked,
+    quantities:   {}
+  };
+  DB.forEach(([task]) => {
+    const el = qEl(task);
+    if (el) data.quantities[task] = el.value;
+  });
+
+  const blob = new Blob([JSON.stringify(data, null, 2)], { type: 'application/json' });
+  const a = document.createElement('a');
+  a.href = URL.createObjectURL(blob);
+  a.download = `${data.proj_name || '프로젝트'}.json`;
+  a.click();
+}
+
+function loadProject() {
+  const input = document.createElement('input');
+  input.type = 'file';
+  input.accept = '.json';
+  input.onchange = e => {
+    const file = e.target.files[0];
+    if (!file) return;
+    const reader = new FileReader();
+    reader.onload = ev => {
+      try {
+        const d = JSON.parse(ev.target.result);
+        document.getElementById('proj_name').value = d.proj_name || '';
+        document.getElementById('proj_addr').value = d.proj_addr || '';
+        sv('area_m2',      d.area_m2      || (d.area ? (d.area * M2_PER_PYEONG).toFixed(1) : ''));
+        sv('area',         d.area         || '');
+        sv('unit_price',   d.unit_price   || '');
+        sv('cost',         d.cost         || '');
+        sv('struct_ratio', d.struct_ratio || '');
+        sv('struct',       d.struct       || '');
+        sv('dur',          d.dur          || '');
+        // 클래스 복원
+        ['proj_name','proj_addr','area','area_m2','unit_price','dur','struct_ratio'].forEach(id => {
+          document.getElementById(id).className = 'is-manual';
+        });
+        document.getElementById('cost').className   = 'is-auto';
+        document.getElementById('struct').className = 'is-auto';
+        updateDifficulty();
+        setSeg(d.seg_comp || '보통');
+        document.getElementById('chk_super').checked   = !!d.chk_super;
+        document.getElementById('chk_remodel').checked = !!d.chk_remodel;
+        document.getElementById('chk_bim').checked     = !!d.chk_bim;
+        if (d.quantities) {
+          Object.entries(d.quantities).forEach(([k, v]) => {
+            const el = qEl(k);
+            if (el) el.value = v;
+          });
+        }
+        calculate();
+      } catch(err) { alert('불러오기 실패: ' + err.message); }
+    };
+    reader.readAsText(file);
+  };
+  input.click();
+}
+
+// ═══════════════════════════════════════════
+// MOBILE TAB
+// ═══════════════════════════════════════════
+function switchTab(tab) {
+  const leftPanel  = document.getElementById('left-panel');
+  const rightPanel = document.getElementById('right-panel');
+  const tabInput   = document.getElementById('tab-input');
+  const tabResult  = document.getElementById('tab-result');
+  if (tab === 'input') {
+    leftPanel.classList.add('tab-active');
+    rightPanel.classList.remove('tab-active');
+    tabInput.classList.add('active');
+    tabResult.classList.remove('active');
+  } else {
+    rightPanel.classList.add('tab-active');
+    leftPanel.classList.remove('tab-active');
+    tabResult.classList.add('active');
+    tabInput.classList.remove('active');
+  }
+}
+
+// ═══════════════════════════════════════════
+// HELP MODAL
+// ═══════════════════════════════════════════
+function showHelp() {
+  document.getElementById('help-modal').style.display = 'flex';
+}
+function closeHelp() {
+  document.getElementById('help-modal').style.display = 'none';
+}
+document.getElementById('help-modal').addEventListener('click', e => {
+  if (e.target === document.getElementById('help-modal')) closeHelp();
+});
+
+// ═══════════════════════════════════════════
+// 저작권 보호
+// ═══════════════════════════════════════════
+
+// 1. 도메인 잠금 - 허가된 도메인 외 실행 차단
+(function() {
+  const ALLOWED = ['salgi-bot.github.io', 'localhost', '127.0.0.1'];
+  const host = location.hostname;
+  if (!ALLOWED.some(d => host === d || host.endsWith('.' + d))) {
+    document.body.innerHTML = `
+      <div style="display:flex;align-items:center;justify-content:center;height:100vh;
+                  background:#0f172a;color:#fff;font-family:sans-serif;text-align:center;">
+        <div>
+          <div style="font-size:48px;margin-bottom:16px;">🔒</div>
+          <div style="font-size:20px;font-weight:700;margin-bottom:8px;">접근이 제한된 페이지입니다</div>
+          <div style="font-size:14px;color:#94a3b8;">
+            Copyright (c) 2025 (주)아이팝엔지니어링<br>
+            무단 복제 및 재배포를 금합니다.
+          </div>
+        </div>
+      </div>`;
+    throw new Error('Unauthorized domain');
+  }
+})();
+
+// 2. footer 동적 생성 (워터마크 고정)
+function renderFooter() {
+  const f = document.getElementById('footer');
+  if (!f) return;
+  f.innerHTML =
+    '<span>국토교통부 고시 제2023-580호 · 건설엔지니어링 대가 등에 관한 기준</span>' +
+    '<span>Copyright &copy; 2025 (주)아이팝엔지니어링 &nbsp;|&nbsp; Developed by SalGI</span>';
+}
+renderFooter();
+
+// 3. footer 감시 - 누군가 footer 내용을 지우거나 수정하면 즉시 복원
+(function() {
+  const f = document.getElementById('footer');
+  if (!f) return;
+  const obs = new MutationObserver(() => renderFooter());
+  obs.observe(f, { childList: true, subtree: true, characterData: true });
+})();
+</script>
+</body>
+</html>
