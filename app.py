@@ -462,6 +462,7 @@ if not st.session_state.auth_ok:
                 _tg_send(TG_TOKEN, TG_CHAT_ID,
                     f"📋 <b>건설사업관리 인월수 산출 — 사용 신청</b>\n\n"
                     f"👤 이름: {req_name}\n📞 연락처: {req_contact}\n\n"
+                    f"🔗 https://cm-calculator-ngd5xmshzk5vmypksklpnt.streamlit.app\n"
                     f"✅ 관리자 패널에서 승인 후 코드를 전달해주세요.")
                 st.session_state.show_login = True
                 st.session_state.req_sent = True
@@ -492,7 +493,9 @@ if not st.session_state.auth_ok:
                         _approve_request(r['id'], new_code)
                         _tg_send(TG_TOKEN, TG_CHAT_ID,
                             f"✅ <b>승인 완료</b>\n👤 {r['name']}\n🔐 <code>{new_code}</code>\n"
-                            f"📞 {r['contact']}\n⚠️ 수동으로 코드를 전달해주세요.")
+                            f"📞 {r['contact']}\n"
+                            f"🔗 https://cm-calculator-ngd5xmshzk5vmypksklpnt.streamlit.app\n"
+                            f"⚠️ 수동으로 코드를 전달해주세요.")
                         st.success(f"코드 발급: **{new_code}** — 텔레그램으로 수동 전달 필요")
                         st.rerun()
 
@@ -511,9 +514,12 @@ if not st.session_state.auth_ok:
                         ok = _tg_send(TG_TOKEN, u['chat_id'],
                             f"🔑 <b>건설사업관리 인월수 산출 — 승인 코드</b>\n\n"
                             f"👤 {display_name}님\n🔐 코드: <code>{new_code}</code>\n\n"
+                            f"🔗 https://cm-calculator-ngd5xmshzk5vmypksklpnt.streamlit.app\n"
                             f"⚠️ 1회 사용 후 <b>30일간</b> 재인증 없이 사용 가능합니다.")
                         _tg_send(TG_TOKEN, TG_CHAT_ID,
-                            f"✅ <b>승인</b>\n👤 {display_name}\n🔐 {new_code}\n{'📤 발송 성공' if ok else '⚠️ 발송 실패'}")
+                            f"✅ <b>승인</b>\n👤 {display_name}\n🔐 {new_code}\n"
+                            f"🔗 https://cm-calculator-ngd5xmshzk5vmypksklpnt.streamlit.app\n"
+                            f"{'📤 발송 성공' if ok else '⚠️ 발송 실패'}")
                         if ok:
                             st.success(f"✅ {display_name} 텔레그램 발송 완료!")
                         else:
@@ -531,8 +537,11 @@ if not st.session_state.auth_ok:
                 _add_code(new_code, manual_name)
                 msg = (f"🔑 <b>건설사업관리 인월수 산출 승인 코드</b>\n\n"
                        f"👤 {manual_name}님\n🔐 코드: <code>{new_code}</code>\n\n"
+                       f"🔗 https://cm-calculator-ngd5xmshzk5vmypksklpnt.streamlit.app\n"
                        f"⚠️ 1회 사용 후 30일간 재인증 없이 사용 가능합니다.")
-                sent_to_admin = _tg_send(TG_TOKEN, TG_CHAT_ID, f"🔑 수동 발급\n👤 {manual_name}\n🔐 <code>{new_code}</code>")
+                _tg_send(TG_TOKEN, TG_CHAT_ID,
+                    f"🔑 수동 발급\n👤 {manual_name}\n🔐 <code>{new_code}</code>\n"
+                    f"🔗 https://cm-calculator-ngd5xmshzk5vmypksklpnt.streamlit.app")
                 if manual_chat:
                     ok = _tg_send(TG_TOKEN, manual_chat, msg)
                     if ok:
@@ -616,8 +625,59 @@ if not st.session_state.auth_ok:
     st.stop()
 
 # ════════════════════════════════════════════════════════════
-# 메인 앱 — 인월수 산출
+# 메인 앱 — 인월수 산출 (HTML 유사 레이아웃)
 # ════════════════════════════════════════════════════════════
+
+# ── CSS 커스텀 ──
+st.markdown("""
+<style>
+/* 상단 헤더 여백 줄이기 */
+.block-container { padding-top: 1rem !important; }
+/* 섹션 타이틀 */
+.sec-title {
+    font-size: 11px; font-weight: 700; letter-spacing: 1px;
+    text-transform: uppercase; color: #1d4ed8;
+    display: flex; align-items: center; gap: 6px; margin-bottom: 10px;
+}
+.sec-title::before {
+    content: ''; display: inline-block;
+    width: 3px; height: 12px; background: #1d4ed8; border-radius: 2px;
+}
+/* 결과 테이블 헤더 */
+.res-header {
+    background: #1d4ed8; color: white;
+    padding: 6px 4px; font-size: 11px; font-weight: 600;
+    text-align: center; border-radius: 4px 4px 0 0;
+}
+/* 그룹 카드 */
+.field-group {
+    background: #f8fafd; border: 1px solid #e2e8f0;
+    border-radius: 8px; padding: 12px 10px 8px; margin-bottom: 8px;
+}
+.group-label {
+    font-size: 10px; font-weight: 700; letter-spacing: 0.8px;
+    text-transform: uppercase; color: #1d4ed8; margin-bottom: 6px;
+}
+/* 결과 카드 */
+.sum-card {
+    background: #fff; border: 1px solid #bfdbfe;
+    border-radius: 8px; padding: 10px 12px;
+    text-align: center; margin-bottom: 6px;
+}
+.sum-card.highlight { background: #dbeafe; border-color: #1d4ed8; }
+.sum-label { font-size: 11px; color: #64748b; margin-bottom: 4px; }
+.sum-value { font-size: 20px; font-weight: 700; color: #92400e; }
+.sum-card.highlight .sum-value { color: #1d4ed8; }
+/* 로그 창 */
+.log-box {
+    background: #ecfdf5; border: 1px solid #a7f3d0;
+    border-left: 3px solid #10b981; border-radius: 6px;
+    padding: 10px 14px; font-family: monospace; font-size: 12px;
+    color: #065f46; white-space: pre-wrap; line-height: 1.8;
+    max-height: 220px; overflow-y: auto;
+}
+</style>
+""", unsafe_allow_html=True)
 
 # ═══ 계산 DB ═══
 DB = [
@@ -643,247 +703,272 @@ AVG_T_TABLE = [
     [10,10],[30,14],[50,17],[70,24],[100,28],[150,30],
     [200,37],[300,38],[400,38],[500,39],[700,45],[1000,54]
 ]
-
 M2_PER_PYEONG = 3.30579
 
 def get_avg_T(cost):
-    if cost <= 10:  return 10.0
+    if cost <= 10:   return 10.0
     if cost >= 1000: return 54.0
     for i in range(len(AVG_T_TABLE)-1):
-        c1, d1 = AVG_T_TABLE[i]
-        c2, d2 = AVG_T_TABLE[i+1]
+        c1,d1 = AVG_T_TABLE[i]; c2,d2 = AVG_T_TABLE[i+1]
         if c1 <= cost <= c2:
             return d1 + (cost-c1)*(d2-d1)/(c2-c1)
     return 38.0
 
 def calc_difficulty(C, S, T):
-    if C <= 0 or T <= 0:
-        return 1.0
-    C_unit = C / 10
-    avg_T  = get_avg_T(C)
-    p_corr = (avg_T - T) / avg_T * 0.1
-    s_ratio = min(S/C, 1.0) if C > 0 else 0
+    if C <= 0 or T <= 0: return 1.0
+    C_unit = C/10; avg_T = get_avg_T(C)
+    p_corr = (avg_T-T)/avg_T*0.1
+    s_ratio = min(S/C,1.0) if C>0 else 0
     if C_unit <= 200:
-        cost_f = 0.011 * C_unit * (1 - 0.0025 * C_unit)
+        cost_f = 0.011*C_unit*(1-0.0025*C_unit)
         D = cost_f + p_corr + 0.5*s_ratio + 0.2
     else:
         D = 1.1 + p_corr + 0.5*s_ratio + 0.2 + (C_unit-200)/250
     return round(max(0.6, min(D, 2.0)), 3)
 
 def default_q(task, unit, T):
-    if any(k in task for k in ["시공계획", "기술검토"]): return 20.0
-    if any(k in task for k in ["설계변경", "시공인터페이스", "예산검증"]): return 1.0
+    if any(k in task for k in ["시공계획","기술검토"]): return 20.0
+    if any(k in task for k in ["설계변경","시공인터페이스","예산검증"]): return 1.0
     if "일반행정" in task: return 0.0
-    if any(k in task for k in ["사용자재", "품질시험", "기성검사"]): return round(T/6, 1)
+    if any(k in task for k in ["사용자재","품질시험","기성검사"]): return round(T/6,1)
     if unit == "공사개월": return T
     if unit in ["공사일수","용역일수"]: return T*22
-    if unit == "공사년수": return round(T/12, 2)
+    if unit == "공사년수": return round(T/12,2)
     if "준공" in task: return 1.0
     if unit == "회": return T
     return 1.0
 
-# ─── 사이드바 ───
-with st.sidebar:
-    st.markdown("### 🏗️ 건설사업관리 인월수 산출")
-    st.caption("국토교통부 고시 제2023-580호")
-    st.divider()
+# ══════════════════════════════════════════════
+# 상단 타이틀바
+# ══════════════════════════════════════════════
+top_l, top_r = st.columns([3,1])
+with top_l:
+    st.markdown("### 🏗️ 건설사업관리 인월수 산출 &nbsp;<span style='font-size:13px;color:#94a3b8;font-weight:400;'>Ver 1.1</span>", unsafe_allow_html=True)
+    st.caption("국토교통부 고시 제2023-580호 · 건설엔지니어링 대가 등에 관한 기준 &nbsp;|&nbsp; (주)아이팝엔지니어링")
 
-    st.markdown("#### 1️⃣ 프로젝트 정보")
-    proj_name = st.text_input("용역명", value="OOO 신축공사")
-    proj_addr = st.text_input("대지위치", value="대전시")
+# ══════════════════════════════════════════════
+# 좌(입력) / 우(결과) 2컬럼 레이아웃
+# ══════════════════════════════════════════════
+left_col, right_col = st.columns([1, 1.6], gap="medium")
 
-    st.divider()
-    col_m2, col_py = st.columns(2)
-    with col_m2:
+# ─────────────────── 좌측 입력 패널 ───────────────────
+with left_col:
+
+    # 색상 범례
+    st.markdown("""
+    <div style='display:flex;gap:14px;padding:6px 0 10px;font-size:11px;'>
+        <span style='display:flex;align-items:center;gap:5px;'>
+            <span style='width:10px;height:10px;background:#f1f5f9;border:1.5px solid #94a3b8;border-radius:3px;display:inline-block;'></span>
+            <span style='color:#64748b;'>회색 = 자동 계산</span>
+        </span>
+        <span style='display:flex;align-items:center;gap:5px;'>
+            <span style='width:10px;height:10px;background:#fffbeb;border:1.5px solid #f59e0b;border-radius:3px;display:inline-block;'></span>
+            <span style='color:#92400e;'>노란색 = 직접 입력</span>
+        </span>
+    </div>
+    """, unsafe_allow_html=True)
+
+    # ① 프로젝트 정보
+    st.markdown('<div class="sec-title">1 프로젝트 정보</div>', unsafe_allow_html=True)
+    with st.container():
+        proj_name = st.text_input("용역명", value="OOO 신축공사", label_visibility="collapsed",
+                                   placeholder="용역명")
+        proj_addr = st.text_input("대지위치", value="대전시", label_visibility="collapsed",
+                                   placeholder="대지위치")
+
+    st.markdown('<div class="group-label" style="margin-top:8px;">연면적 · 공사비</div>', unsafe_allow_html=True)
+    c_m2, c_py = st.columns(2)
+    with c_m2:
         area_m2 = st.number_input("연면적 (㎡)", min_value=0.0, value=9917.4, step=1.0)
-    with col_py:
+    with c_py:
         area_py = st.number_input("연면적 (평)", min_value=0.0,
-                                   value=round(area_m2/M2_PER_PYEONG, 1), step=1.0)
+                                   value=round(9917.4/M2_PER_PYEONG,1), step=1.0)
 
     unit_price = st.number_input("평당단가 (만원)", min_value=0.0, value=800.0, step=10.0)
     cost_auto  = round(area_py * unit_price / 10000, 1)
-    cost = st.number_input("총 공사비 (억원)", min_value=0.0, value=cost_auto, step=1.0,
-                            help="연면적×평당단가 자동계산. 직접 입력 가능")
+    cost = st.number_input("총 공사비 (억원)", min_value=0.0, value=cost_auto, step=1.0)
 
+    st.markdown('<div class="group-label" style="margin-top:8px;">골조</div>', unsafe_allow_html=True)
     struct_ratio = st.number_input("골조비중 (%)", min_value=0.0, max_value=100.0, value=30.0, step=1.0)
     struct_auto  = round(cost * struct_ratio / 100, 1)
-    struct = st.number_input("골조공사비 (억원)", min_value=0.0, value=struct_auto, step=1.0,
-                              help="골조비중 자동계산. 직접 입력 가능")
+    struct = st.number_input("골조공사비 (억원)", min_value=0.0, value=struct_auto, step=1.0)
 
-    st.divider()
+    st.markdown('<div class="group-label" style="margin-top:8px;">기간 · 난이도</div>', unsafe_allow_html=True)
     dur = st.number_input("공사기간 (개월)", min_value=1.0, value=42.0, step=1.0)
     D_auto = calc_difficulty(cost, struct, dur)
-    st.metric("적용 난이도 (D)", f"{D_auto:.3f}")
+    st.markdown(f"""
+    <div style='background:#f1f5f9;border:1px solid #cbd5e1;border-radius:6px;padding:6px 12px;
+                font-family:monospace;font-size:13px;color:#64748b;margin-bottom:8px;'>
+        적용 난이도 (D) &nbsp;&nbsp; <b style='color:#1d4ed8;font-size:16px;'>{D_auto:.3f}</b>
+    </div>
+    """, unsafe_allow_html=True)
 
-    st.divider()
-    st.markdown("#### 2️⃣ 옵션")
-    comp = st.radio("공종", ["단순", "보통", "복잡"], index=1, horizontal=True)
+    # ② 옵션
+    st.markdown('<div class="sec-title" style="margin-top:12px;">2 옵션 선택</div>', unsafe_allow_html=True)
+    comp = st.radio("공종", ["단순","보통","복잡"], index=1, horizontal=True, label_visibility="collapsed")
     chk_super   = st.checkbox("감독권한대행 등 건설사업관리 시행")
     chk_remodel = st.checkbox("리모델링 적용 (Kb × 1.1)")
     chk_bim     = st.checkbox("BIM 적용 (Kc × 1.1)")
 
-    st.divider()
+    # ③ 수량 조정
+    st.markdown('<div class="sec-title" style="margin-top:12px;">3 수량 미세 조정</div>', unsafe_allow_html=True)
+    if st.button("🔄 자동값 초기화", key="reset_q"):
+        for task, unit, *_ in DB:
+            st.session_state[f"q_{task}"] = default_q(task, unit, dur)
+
+    qty_vals = {}
+    for task, unit, std, ha, hb, hc, hD in DB:
+        dq = default_q(task, unit, dur)
+        qa, qb, qc = st.columns([3, 2, 2])
+        qa.caption(task)
+        qb.caption(f"({unit})")
+        qty_vals[task] = qc.number_input(
+            f"q_{task}", value=dq, step=0.1,
+            label_visibility="collapsed", key=f"q_{task}"
+        )
+
+    # 계산 버튼
     calc_btn = st.button("▶ 전체 계산 및 출력", type="primary", use_container_width=True)
 
-# ─── 메인 ───
-st.markdown(f"## 🏗️ {proj_name}")
-st.caption(f"📍 {proj_addr} &nbsp;|&nbsp; 국토교통부 고시 제2023-580호 · 건설엔지니어링 대가 등에 관한 기준")
+# ─────────────────── 우측 결과 패널 ───────────────────
+with right_col:
 
-# 수량 조정
-st.markdown("#### 3️⃣ 수량 미세 조정")
-st.caption("공사기간 기준 자동 계산값 — 필요 시 직접 수정하세요")
-
-qty_vals = {}
-cols_header = st.columns([3, 2, 2])
-cols_header[0].markdown("**업무항목**")
-cols_header[1].markdown("**단위**")
-cols_header[2].markdown("**수량**")
-
-for task, unit, std, ha, hb, hc, hD in DB:
-    dq = default_q(task, unit, dur)
-    c1, c2, c3 = st.columns([3, 2, 2])
-    c1.write(task)
-    c2.write(f"({unit})")
-    qty_vals[task] = c3.number_input(
-        f"q_{task}", value=dq, step=0.1, label_visibility="collapsed",
-        key=f"q_{task}"
-    )
-
-st.divider()
-
-# 계산 결과
-if calc_btn or "calc_done" in st.session_state:
-    st.session_state.calc_done = True
-
-    Ka = 0.9 if comp == "단순" else (1.1 if comp == "복잡" else 1.0)
+    Ka = 0.9 if comp=="단순" else (1.1 if comp=="복잡" else 1.0)
     Kb = 1.1 if chk_remodel else 1.0
     Kc = 1.1 if chk_bim     else 1.0
     D  = D_auto
 
-    # 로그 기록 (계산 버튼 누를 때)
     if calc_btn:
-        _log_usage(st.session_state.get("device_token", ""))
+        st.session_state.calc_done = True
+        _log_usage(st.session_state.get("device_token",""))
 
-    # 상세 산식 로그
-    avg_T  = get_avg_T(cost)
-    p_corr = (avg_T - dur) / avg_T * 0.1
-    s_ratio = min(struct/cost, 1.0) if cost > 0 else 0
-    C_unit  = cost / 10
-    cost_f  = 0.011*C_unit*(1-0.0025*C_unit) if C_unit <= 200 else 1.1+(C_unit-200)/250
+    # ④ 산식 로그
+    st.markdown('<div class="sec-title">4 상세 산식 검증 (Log)</div>', unsafe_allow_html=True)
+    if "calc_done" in st.session_state:
+        avg_T   = get_avg_T(cost)
+        p_corr  = (avg_T-dur)/avg_T*0.1
+        s_ratio = min(struct/cost,1.0) if cost>0 else 0
+        C_unit  = cost/10
+        cost_f  = 0.011*C_unit*(1-0.0025*C_unit) if C_unit<=200 else 1.1+(C_unit-200)/250
+        log_txt = (
+            f"══════════════════════════════════════════\n"
+            f"[STEP 1] 평균건설사업관리기간 (직선보간)\n"
+            f"  → 평균기간 = {avg_T:.4f} 개월\n\n"
+            f"[STEP 2] 기간보정계수\n"
+            f"  = ({avg_T:.4f} - {dur}) / {avg_T:.4f} × 0.1\n"
+            f"  = {p_corr:.5f}\n\n"
+            f"[STEP 3] 공사난이도 (D)\n"
+            f"  비용 = {cost_f:.4f} | 기간 = {p_corr:.4f}\n"
+            f"  골조 = {0.5*s_ratio:.4f} | 상수 = 0.2000\n"
+            f"  ─────────────────────────────────\n"
+            f"  산출 D = {cost_f+p_corr+0.5*s_ratio+0.2:.4f}  적용 D = {D}\n"
+            f"══════════════════════════════════════════"
+        )
+        st.markdown(f'<div class="log-box">{log_txt}</div>', unsafe_allow_html=True)
+    else:
+        st.markdown('<div class="log-box" style="color:#94a3b8;">계산 버튼을 누르면 상세 산식이 여기에 표시됩니다.</div>', unsafe_allow_html=True)
 
-    with st.expander("📋 상세 산식 검증 (Log)", expanded=False):
-        st.code(f"""
-[STEP 1] 평균건설사업관리기간 (직선보간)
-  → 평균기간 = {avg_T:.4f} 개월
+    # ⑤ 산출 내역서
+    st.markdown('<div class="sec-title" style="margin-top:14px;">5 최종 산출 내역서</div>', unsafe_allow_html=True)
 
-[STEP 2] 기간보정계수
-  = ({avg_T:.4f} - {dur}) / {avg_T:.4f} × 0.1
-  = {p_corr:.5f}
+    # 테이블 헤더
+    h0,h1,h2,h3,h4,h5,h6,h7 = st.columns([2.8,1,0.9,0.7,0.7,0.7,0.9,1.3])
+    for col, txt in zip([h0,h1,h2,h3,h4,h5,h6,h7],
+                        ["업무항목","수량","기준","a","b","c","난이도","산출(인일)"]):
+        col.markdown(f"<div style='font-size:11px;font-weight:700;color:#fff;background:#1d4ed8;"
+                     f"padding:5px 3px;text-align:center;border-radius:3px;'>{txt}</div>",
+                     unsafe_allow_html=True)
 
-[STEP 3] 공사난이도 (D)
-  비용 항목  = {cost_f:.4f}
-  기간 항목  = {p_corr:.4f}
-  골조 항목  = {0.5*s_ratio:.4f}  (골조비중 {s_ratio*100:.1f}%)
-  상수       = 0.2000
-  ─────────────────────────
-  산출 D     = {cost_f+p_corr+0.5*s_ratio+0.2:.4f}
-  적용 D     = {D}  (자동 산출)
-        """)
+    if "calc_done" in st.session_state:
+        total_md = 0.0
+        for task, unit, std, ha, hb, hc, hD in DB:
+            Q  = qty_vals.get(task, 0)
+            ka = Ka if ha else 1.0
+            kb = Kb if hb else 1.0
+            kc = Kc if hc else 1.0
+            k_final = ka*kb*kc
+            d_app = D if hD else 1.0
+            if task=="안전관리" and d_app<1.0: d_app=1.0
+            row_val = std*Q*k_final*d_app
+            warn = ""
+            if task=="안전관리" and k_final*d_app<1.0:
+                row_val=std*Q; warn="⚠️"
+            row_val = round(row_val,1)
+            total_md += row_val
 
-    # 결과 테이블
-    st.markdown("#### 4️⃣ 최종 산출 내역서")
-    header = st.columns([3, 1.2, 1, 0.8, 0.8, 0.8, 1, 1.5])
-    for h, t in zip(header, ["업무항목", "수량", "기준", "a", "b", "c", "난이도", "산출(인일)"]):
-        h.markdown(f"**{t}**")
-    st.divider()
+            c0,c1,c2,c3,c4,c5,c6,c7 = st.columns([2.8,1,0.9,0.7,0.7,0.7,0.9,1.3])
+            c0.markdown(f"<span style='font-size:12px;'>{task}</span>", unsafe_allow_html=True)
+            c1.markdown(f"<span style='font-size:12px;'>{Q:.1f}</span>", unsafe_allow_html=True)
+            c2.markdown(f"<span style='font-size:12px;'>{std}</span>", unsafe_allow_html=True)
+            c3.markdown(f"<span style='font-size:12px;color:#475569;'>{f'{ka:.2f}' if ha else '—'}</span>", unsafe_allow_html=True)
+            c4.markdown(f"<span style='font-size:12px;color:#475569;'>{f'{kb:.2f}' if hb else '—'}</span>", unsafe_allow_html=True)
+            c5.markdown(f"<span style='font-size:12px;color:#475569;'>{f'{kc:.2f}' if hc else '—'}</span>", unsafe_allow_html=True)
+            c6.markdown(f"<span style='font-size:12px;color:#475569;'>{f'{d_app:.3f}' if hD else '—'}</span>", unsafe_allow_html=True)
+            c7.markdown(f"<span style='font-size:12px;font-weight:700;color:#1d4ed8;'>{row_val:,.1f} {warn}</span>", unsafe_allow_html=True)
 
-    total_md = 0.0
-    for task, unit, std, ha, hb, hc, hD in DB:
-        Q  = qty_vals.get(task, 0)
-        ka = Ka if ha else 1.0
-        kb = Kb if hb else 1.0
-        kc = Kc if hc else 1.0
-        k_final = ka * kb * kc
-        d_app = D if hD else 1.0
-        if task == "안전관리" and d_app < 1.0:
-            d_app = 1.0
-        row_val = std * Q * k_final * d_app
-        warn = ""
-        if task == "안전관리" and k_final*d_app < 1.0:
-            row_val = std * Q
-            warn = " ⚠️Min"
-        row_val = round(row_val, 1)
-        total_md += row_val
+        # 최종 결과 요약
+        st.divider()
+        base_mm  = round(total_md/22, 3)
+        final_mm = base_mm if chk_super else round(base_mm*0.8, 3)
+        tech_ratio = 0.10 if comp=="단순" else (0.15 if comp=="보통" else 0.20)
+        tech_mm  = math.floor(final_mm*tech_ratio*1000)/1000
+        res_mm   = round(final_mm-tech_mm, 3)
 
-        cols = st.columns([3, 1.2, 1, 0.8, 0.8, 0.8, 1, 1.5])
-        cols[0].write(task)
-        cols[1].write(f"{Q:.1f}")
-        cols[2].write(f"{std}")
-        cols[3].write(f"{ka:.2f}" if ha else "—")
-        cols[4].write(f"{kb:.2f}" if hb else "—")
-        cols[5].write(f"{kc:.2f}" if hc else "—")
-        cols[6].write(f"{d_app:.3f}" if hD else "—")
-        cols[7].markdown(f"**{row_val:,.1f}{warn}**")
+        st.markdown("**■ 최종 결과**")
+        r1,r2,r3,r4 = st.columns(4)
+        for col, label, val, hl in [
+            (r1, "감독권한대행 기준", f"{base_mm:.3f}", False),
+            (r2, "최종 투입인월수",   f"{final_mm:.3f}", True),
+            (r3, "상주기술인",        f"{res_mm:.3f}", False),
+            (r4, f"기술지원({int(tech_ratio*100)}%)", f"{tech_mm:.3f}", False),
+        ]:
+            col.markdown(
+                f"<div class='sum-card {'highlight' if hl else ''}'>"
+                f"<div class='sum-label'>{label}</div>"
+                f"<div class='sum-value'>{val}</div>"
+                f"<div style='font-size:11px;color:#64748b;'>인ㆍ월수</div>"
+                f"</div>", unsafe_allow_html=True
+            )
 
-    st.divider()
+        if not chk_super:
+            st.warning("※ 감독권한대행 미해당 — 시공단계 투입인원수에서 20% 감산 적용")
 
-    # 최종 결과
-    base_mm  = round(total_md / 22, 3)
-    final_mm = base_mm if chk_super else round(base_mm * 0.8, 3)
-    tech_ratio = 0.10 if comp=="단순" else (0.15 if comp=="보통" else 0.20)
-    tech_mm  = math.floor(final_mm * tech_ratio * 1000) / 1000
-    res_mm   = round(final_mm - tech_mm, 3)
+        # CSV 저장
+        st.divider()
+        rows = [
+            ["건설사업관리 대가 산출 내역서"], ["(주)아이팝엔지니어링"],
+            ["작성일", datetime.now().strftime("%Y-%m-%d")], [],
+            ["용역명", proj_name, "대지위치", proj_addr],
+            ["연면적(㎡)", f"{area_m2}㎡", "연면적(평)", f"{area_py}평", "평당단가", f"{unit_price}만원/평"],
+            ["총공사비", f"{cost}억원", "골조공사비", f"{struct}억원", "골조비중", f"{struct_ratio}%"],
+            ["공사기간", f"{dur}개월", "난이도(D)", D, "공종", comp], [],
+            ["업무항목","단위","기준값","수량","a","b","c","난이도","산출(인일)"]
+        ]
+        for task, unit, std, ha, hb, hc, hD in DB:
+            Q = qty_vals.get(task,0)
+            ka=Ka if ha else 1.0; kb=Kb if hb else 1.0; kc=Kc if hc else 1.0
+            d_app=D if hD else 1.0
+            if task=="안전관리" and d_app<1.0: d_app=1.0
+            rv=round(std*Q*ka*kb*kc*d_app,1)
+            if task=="안전관리" and ka*kb*kc*d_app<1.0: rv=std*Q
+            rows.append([task,unit,std,f"{Q:.1f}",
+                         f"{ka:.2f}" if ha else "-", f"{kb:.2f}" if hb else "-",
+                         f"{kc:.2f}" if hc else "-", f"{d_app:.3f}" if hD else "-", f"{rv:.1f}"])
+        rows += [[],["[ 최종 결과 ]"],
+                 ["감독권한대행 기준",f"{base_mm:.3f} 인ㆍ월수"],
+                 ["최종 투입인월수",f"{final_mm:.3f} 인ㆍ월수"],
+                 ["상주기술인",f"{res_mm:.3f} 인ㆍ월수"],
+                 ["기술지원기술인",f"{tech_mm:.3f} 인ㆍ월수 ({int(tech_ratio*100)}%)"]]
+        csv = "\n".join(",".join(f'"{str(c).replace(chr(34),chr(34)*2)}"' for c in r) for r in rows)
+        c_dl1, c_dl2 = st.columns(2)
+        c_dl1.download_button(
+            "💾 CSV 저장",
+            data="\ufeff"+csv,
+            file_name=f"{datetime.now().strftime('%Y%m%d')}_{proj_name}_인월수산출.csv",
+            mime="text/csv;charset=utf-8", use_container_width=True
+        )
+        c_dl2.button("🖨️ 인쇄", use_container_width=True,
+                     help="브라우저 인쇄(Ctrl+P)를 이용해주세요")
+    else:
+        st.info("👈 좌측에서 정보 입력 후 **▶ 전체 계산 및 출력** 버튼을 눌러주세요.")
 
-    st.markdown("#### 5️⃣ 최종 결과")
-    rc1, rc2, rc3, rc4 = st.columns(4)
-    rc1.metric("감독권한대행 기준", f"{base_mm:.3f} 인ㆍ월수")
-    rc2.metric("최종 투입인월수",   f"{final_mm:.3f} 인ㆍ월수",
-               delta=None if chk_super else "20% 감산 적용")
-    rc3.metric("상주기술인",        f"{res_mm:.3f} 인ㆍ월수")
-    rc4.metric(f"기술지원기술인 ({int(tech_ratio*100)}%)", f"{tech_mm:.3f} 인ㆍ월수")
-
-    if not chk_super:
-        st.warning("※ 감독권한대행 등 건설사업관리가 아닌 경우에는 시공단계의 투입인원수에서 20%를 감하여 산정한다.")
-
-    # CSV 다운로드
-    st.divider()
-    rows = [
-        ["건설사업관리 대가 산출 내역서"],
-        ["(주)아이팝엔지니어링"],
-        ["작성일", datetime.now().strftime("%Y-%m-%d")],
-        [],
-        ["용역명", proj_name, "대지위치", proj_addr],
-        ["연면적(㎡)", f"{area_m2} ㎡", "연면적(평)", f"{area_py} 평", "평당단가", f"{unit_price} 만원/평"],
-        ["총공사비", f"{cost} 억원", "골조공사비", f"{struct} 억원", "골조비중", f"{struct_ratio}%"],
-        ["공사기간", f"{dur} 개월", "난이도(D)", D, "공종", comp],
-        [],
-        ["업무항목","단위","기준값","수량","a","b","c","난이도","산출(인일)"]
-    ]
-    for task, unit, std, ha, hb, hc, hD in DB:
-        Q  = qty_vals.get(task, 0)
-        ka = Ka if ha else 1.0; kb = Kb if hb else 1.0; kc = Kc if hc else 1.0
-        d_app = D if hD else 1.0
-        if task=="안전관리" and d_app<1.0: d_app=1.0
-        rv = round(std*Q*ka*kb*kc*d_app, 1)
-        if task=="안전관리" and ka*kb*kc*d_app<1.0: rv=std*Q
-        rows.append([task, unit, std, f"{Q:.1f}",
-                     f"{ka:.2f}" if ha else "-", f"{kb:.2f}" if hb else "-",
-                     f"{kc:.2f}" if hc else "-", f"{d_app:.3f}" if hD else "-", f"{rv:.1f}"])
-    rows += [[], ["[ 최종 결과 ]"],
-             ["감독권한대행 기준", f"{base_mm:.3f} 인ㆍ월수"],
-             ["최종 투입인월수",   f"{final_mm:.3f} 인ㆍ월수"],
-             ["상주기술인",        f"{res_mm:.3f} 인ㆍ월수"],
-             ["기술지원기술인",    f"{tech_mm:.3f} 인ㆍ월수 ({int(tech_ratio*100)}%)"]]
-
-    csv = "\n".join(",".join(f'"{str(c).replace(chr(34),chr(34)*2)}"' for c in r) for r in rows)
-    today_fn = datetime.now().strftime("%Y%m%d")
-    st.download_button(
-        "💾 CSV 저장 (엑셀 호환)",
-        data="\ufeff" + csv,
-        file_name=f"{today_fn}_{proj_name}_인월수산출.csv",
-        mime="text/csv;charset=utf-8",
-        use_container_width=True
-    )
-
-else:
-    st.info("👈 좌측 사이드바에서 정보 입력 후 **▶ 전체 계산 및 출력** 버튼을 눌러주세요.")
