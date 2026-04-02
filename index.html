@@ -377,7 +377,7 @@
     <div class="topbar-brand">
       <span class="topbar-company">(주)아이팝엔지니어링</span>
       <span class="topbar-title">건설사업관리 <span>인월수 산출</span></span>
-      <span class="topbar-ver">Ver 1.2 (Web)</span>
+      <span class="topbar-ver">Ver 1.2 (Web) &nbsp;·&nbsp; 최종 수정일 2026-04-02</span>
     </div>
     <div class="topbar-right">
       <button class="btn btn-sm btn-gray" onclick="showHelp()">? 사용설명서</button>
@@ -900,7 +900,7 @@ function resetQ() {
   const T = fv('dur') || 42;
   DB.forEach(([task, unit]) => {
     let val;
-    if      (task.includes("시공계획") || task.includes("기술검토"))                         val = 20.0;
+    if      (task.includes("시공계획") || task.includes("기술검토"))                         val = T;
     else if (task.includes("설계변경") || task.includes("시공인터페이스") || task.includes("예산검증")) val = 1.0;
     else if (task.includes("일반행정"))                                                       val = T * 22;
     else if (task.includes("사용자재") || task.includes("품질시험") || task.includes("기성검사")) val = T / 6;
