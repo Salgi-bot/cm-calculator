@@ -812,9 +812,9 @@
                 </td>
                 <td><input type="text" class="dep-date-input" id="dep_start_res_arch" placeholder="YYMM" maxlength="8" oninput="onArchStartInput(this)" onfocus="onDepDateFocus(this)" onblur="onDepDateBlur(this)"></td>
                 <td><input type="text" class="dep-date-input" id="dep_end_res_arch"   placeholder="YYMM" maxlength="8" oninput="onArchEndInput(this)"  onfocus="onDepDateFocus(this)" onblur="onDepDateBlur(this)"></td>
-                <td><input type="text" class="dep-dur-input" id="dep_dur_res_arch" placeholder="자동" title="개월수 또는 일수 직접입력 (예: 6, 90일)" style="width:52px;font-size:11px;" oninput="onDurInput(this,'res_arch')"></td>
+                <td style="text-align:center;font-family:var(--mono);font-size:11px;font-weight:600;color:var(--accent);" id="dep_dur_res_arch" title="공사기간과 동일">-</td>
                 <td class="dep-num" id="dep_mm_res_arch">-</td>
-                <td style="text-align:center;"><button title="자동으로 복원" style="background:none;border:none;cursor:pointer;color:#6b7280;font-size:13px;padding:0 2px;line-height:1;" onclick="resetDepRow('res_arch')">↺</button></td>
+                <td></td>
               </tr>
               <!-- 상주 토목 (종료일 변경 시 기계 시작일 자동) -->
               <tr data-dep-key="res_civil">
