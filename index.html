@@ -1441,7 +1441,7 @@ function updateNonArchDates() {
   const actualEnd   = endEl?.value   || archEnd;
   const dur = calcMonthsDep(actualStart, actualEnd);
   const durEl = document.getElementById('dep_dur_non_arch');
-  if (durEl) durEl.textContent = dur > 0 ? dur + '개월' : '-';
+  if (durEl) durEl.textContent = dur > 0 ? (+dur).toFixed(2) + '개월' : '-';
 }
 
 function onNonArchManualInput() {
@@ -1451,7 +1451,7 @@ function onNonArchManualInput() {
   if (endEl)   endEl.dataset.manual   = '1';
   const dur = calcMonthsDep(startEl?.value || '', endEl?.value || '');
   const durEl = document.getElementById('dep_dur_non_arch');
-  if (durEl) durEl.textContent = dur > 0 ? dur + '개월' : '-';
+  if (durEl) durEl.textContent = dur > 0 ? (+dur).toFixed(2) + '개월' : '-';
   updateDeployMM();
 }
 
