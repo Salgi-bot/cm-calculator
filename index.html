@@ -988,26 +988,32 @@
           </div>
         </div>
 
-        <!-- 이윤 / 계약금액 -->
-        <div class="section">
-          <div class="section-title">이윤 및 계약금액 (단위: 천원)</div>
-          <div style="display:flex;align-items:center;gap:6px;padding:4px 0;flex-wrap:nowrap;">
-            <label style="font-size:11px;color:var(--text2);white-space:nowrap;flex-shrink:0;">이윤 <span style="color:var(--text3);font-size:10px;">(T×10,000)</span></label>
-            <input type="text" inputmode="numeric" id="fin_profit" value="0" class="is-manual" style="width:110px;flex-shrink:0;" oninput="calcFinance()" onblur="fmtFinInput(this)">
-            <span style="font-size:11px;color:var(--text3);white-space:nowrap;flex-shrink:0;">천원</span>
-            <span style="color:#d1d5db;margin:0 2px;flex-shrink:0;">│</span>
-            <label style="font-size:11px;color:var(--text2);white-space:nowrap;flex-shrink:0;">계약금액</label>
-            <input type="text" inputmode="numeric" id="fin_contract" value="0" class="is-manual" style="width:110px;flex-shrink:0;" oninput="g_contract_manual=true;calcFinance()" onblur="fmtFinInput(this)">
-            <span style="font-size:11px;color:var(--text3);white-space:nowrap;flex-shrink:0;">천원</span>
-            <button id="btn_contract_reset" title="자동(필요계약금액 백만원 올림)으로 복원" style="background:none;border:none;cursor:pointer;color:#6b7280;font-size:13px;padding:0 2px;line-height:1;display:none;flex-shrink:0;" onclick="g_contract_manual=false;document.getElementById('btn_contract_reset').style.display='none';calcFinance()">↺</button>
-          </div>
-        </div>
-
         <!-- 수지 요약 -->
         <div id="finance-summary" style="padding:14px 16px;background:#eff6ff;border-top:2px solid var(--accent);display:none;">
           <div style="font-size:11px;font-weight:700;color:var(--accent);margin-bottom:10px;">■ 수지 요약</div>
           <div style="display:grid;grid-template-columns:repeat(4,1fr);gap:8px;margin-bottom:10px;" id="finance-summary-grid"></div>
           <div style="display:grid;grid-template-columns:repeat(3,1fr);gap:8px;" id="finance-summary-result"></div>
+        </div>
+
+        <!-- 이윤 / 계약금액 (수지요약 아래) -->
+        <div id="fin-input-area" style="padding:10px 16px 14px;background:#eff6ff;border-top:1px solid #bfdbfe;display:none;">
+          <div style="display:grid;grid-template-columns:repeat(2,1fr);gap:8px;">
+            <div class="fin-sum-card">
+              <div class="fin-sum-label">이윤 <span style="color:var(--text3);font-size:10px;">(T×10,000)</span></div>
+              <div style="display:flex;align-items:center;gap:4px;justify-content:center;margin-top:4px;">
+                <input type="text" inputmode="numeric" id="fin_profit" value="0" class="is-manual fin-num-input" style="width:90px;text-align:right;" oninput="calcFinance()" onblur="fmtFinInput(this)">
+                <span style="font-size:11px;color:var(--text3);">천원</span>
+              </div>
+            </div>
+            <div class="fin-sum-card">
+              <div class="fin-sum-label">계약금액</div>
+              <div style="display:flex;align-items:center;gap:4px;justify-content:center;margin-top:4px;">
+                <input type="text" inputmode="numeric" id="fin_contract" value="0" class="is-manual fin-num-input" style="width:90px;text-align:right;" oninput="g_contract_manual=true;calcFinance()" onblur="fmtFinInput(this)">
+                <span style="font-size:11px;color:var(--text3);">천원</span>
+                <button id="btn_contract_reset" title="자동(필요계약금액 백만원 올림)으로 복원" style="background:none;border:none;cursor:pointer;color:#6b7280;font-size:13px;padding:0 2px;line-height:1;display:none;flex-shrink:0;" onclick="g_contract_manual=false;document.getElementById('btn_contract_reset').style.display='none';calcFinance()">↺</button>
+              </div>
+            </div>
+          </div>
         </div>
 
       </div><!-- /tab-finance-content -->
