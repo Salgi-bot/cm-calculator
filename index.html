@@ -2181,7 +2181,7 @@ function calcFinance() {
   // 계약금액 자동: 필요계약금액을 십만원(=100천원) 단위로 올림
   const resetBtn = document.getElementById('btn_contract_reset');
   if (!g_contract_manual) {
-    const autoContract = required > 0 ? Math.ceil(required / 100) * 100 : 0;
+    const autoContract = required > 0 ? Math.ceil(required / 1000) * 1000 : 0;
     const contractEl = document.getElementById('fin_contract');
     if (contractEl) contractEl.value = autoContract > 0 ? autoContract.toLocaleString('ko-KR') : '0';
     if (resetBtn) resetBtn.style.display = 'none';
