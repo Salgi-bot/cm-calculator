@@ -16,8 +16,9 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>건설사업관리 인월수 산출 Ver 1.2 | (주)아이팝엔지니어링</title>
+<title>건설사업관리 인월수 산출 Ver 1.3 Beta | (주)아이팝엔지니어링</title>
 <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+KR:wght@300;400;500;700;900&family=JetBrains+Mono:wght@400;600&display=swap" rel="stylesheet">
+<script src="https://cdn.jsdelivr.net/npm/xlsx@0.18.5/dist/xlsx.full.min.js"></script>
 <style>
   :root {
     --bg: #dde6f2;
@@ -55,38 +56,64 @@
   }
 
   /* ── LAYOUT ── */
-  #app { display: grid; grid-template-rows: 52px 1fr 32px; height: 100vh; }
+  #app { display: grid; grid-template-rows: 46px 1fr 26px; height: 100vh; }
 
   /* ── TOPBAR ── */
   #topbar {
     display: flex; align-items: center; justify-content: space-between;
-    padding: 0 20px; background: var(--accent); border-bottom: 3px solid #1e40af;
+    padding: 0 16px; background: var(--accent); border-bottom: 2px solid #1e40af;
     position: sticky; top: 0; z-index: 100; gap: 12px;
     box-shadow: 0 2px 12px rgba(29,78,216,0.25);
   }
-  .topbar-brand { display: flex; align-items: baseline; gap: 10px; flex-shrink: 0; }
+  .topbar-brand { display: flex; align-items: baseline; gap: 8px; flex-shrink: 0; }
   .topbar-company {
-    font-size: 13px; font-weight: 700; color: #fff;
-    border: 1px solid rgba(255,255,255,0.5); border-radius: 4px; padding: 2px 8px;
+    font-size: 12px; font-weight: 700; color: #fff;
+    border: 1px solid rgba(255,255,255,0.5); border-radius: 4px; padding: 1px 7px;
     letter-spacing: 0.3px; background: rgba(255,255,255,0.15);
   }
-  .topbar-title { font-size: 15px; font-weight: 700; color: #fff; letter-spacing: -0.3px; }
+  .topbar-title { font-size: 14px; font-weight: 700; color: #fff; letter-spacing: -0.3px; }
   .topbar-title span { color: #bfdbfe; }
-  .topbar-ver { font-size: 11px; color: rgba(255,255,255,0.6); font-weight: 400; }
+  .topbar-ver { font-size: 10px; color: rgba(255,255,255,0.6); font-weight: 400; }
   .topbar-right { display: flex; align-items: center; gap: 8px; flex-shrink: 0; }
 
   /* ── MAIN LAYOUT ── */
-  #main { display: grid; grid-template-columns: 370px 1fr; overflow: hidden; }
-  #left-panel { overflow-y: auto; border-right: 1px solid var(--border); background: var(--surface); box-shadow: 2px 0 8px rgba(29,78,216,0.06); }
-  #right-panel { display: grid; grid-template-rows: 230px 1fr; overflow: hidden; background: var(--surface2); }
-  #log-panel { border-bottom: 1px solid var(--border); overflow: hidden; display: flex; flex-direction: column; }
-  #result-panel { overflow: hidden; display: flex; flex-direction: column; }
+  #main { display: grid; grid-template-columns: 340px 5px 1fr; overflow: hidden; height: 100%; min-height: 0; }
+  #left-panel { overflow-y: auto; background: var(--surface); box-shadow: 2px 0 8px rgba(29,78,216,0.06); min-height: 0; }
+  #right-panel { display: flex; flex-direction: column; overflow: hidden; background: var(--surface2); min-height: 0; height: 100%; }
+  #log-panel { overflow: hidden; display: flex; flex-direction: column; min-height: 0; }
+  #result-panel { overflow: hidden; display: flex; flex-direction: column; min-height: 0; }
+
+  /* ── RESIZE HANDLES ── */
+  .resize-h {
+    width: 5px; cursor: col-resize; background: var(--border);
+    transition: background 0.15s; position: relative; z-index: 20; flex-shrink: 0;
+  }
+  .resize-h:hover, .resize-h.dragging { background: var(--accent); }
+  .resize-h::after {
+    content: ''; position: absolute; top: 50%; left: 50%;
+    transform: translate(-50%, -50%);
+    width: 1px; height: 30px; background: var(--border2);
+    border-radius: 1px;
+  }
+  .resize-h:hover::after, .resize-h.dragging::after { background: #fff; }
+  .resize-v {
+    height: 5px; cursor: row-resize; background: var(--border);
+    transition: background 0.15s; position: relative; z-index: 20; flex-shrink: 0;
+  }
+  .resize-v:hover, .resize-v.dragging { background: var(--accent); }
+  .resize-v::after {
+    content: ''; position: absolute; top: 50%; left: 50%;
+    transform: translate(-50%, -50%);
+    height: 1px; width: 30px; background: var(--border2);
+    border-radius: 1px;
+  }
+  .resize-v:hover::after, .resize-v.dragging::after { background: #fff; }
 
   /* ── FOOTER ── */
   #footer {
     display: flex; align-items: center; justify-content: space-between;
-    padding: 0 20px; background: #1e3a8a; border-top: 1px solid #1e40af;
-    font-size: 11px; color: rgba(255,255,255,0.6);
+    padding: 0 16px; background: #1e3a8a; border-top: 1px solid #1e40af;
+    font-size: 10px; color: rgba(255,255,255,0.6);
   }
 
   /* ── SCROLLBAR ── */
@@ -293,6 +320,84 @@
   /* ── PRINT OVERVIEW (hidden on screen) ── */
   #print-overview { display: none; }
 
+  /* ── RIGHT TABS (Beta) ── */
+  #right-tab-nav {
+    display: flex; align-items: center; gap: 2px;
+    padding: 4px 10px 0; background: #e8eef8;
+    border-bottom: 2px solid var(--accent); flex-shrink: 0;
+  }
+  .rtab {
+    padding: 6px 14px; font-size: 12px; font-weight: 600;
+    border: 1.5px solid var(--border2); border-bottom: none;
+    background: #f4f7fc; color: var(--text3);
+    border-radius: 6px 6px 0 0; cursor: pointer;
+    font-family: var(--sans); transition: all 0.15s;
+  }
+  .rtab:hover { background: #dbeafe; color: var(--accent); }
+  .rtab.active { background: #fff; color: var(--accent); border-color: var(--accent); font-weight: 700; }
+  .beta-badge {
+    margin-left: 8px; font-size: 10px; font-weight: 700;
+    background: #f59e0b; color: #fff;
+    padding: 2px 7px; border-radius: 10px; letter-spacing: 0.5px;
+  }
+  .rtab-content { flex: 1; overflow: hidden; display: none; min-height: 0; }
+  .rtab-content.active { display: flex; flex-direction: column; }
+  #tab-result-content.active { display: grid; grid-template-rows: 100px 5px 1fr; }
+
+  /* ── DEPLOY PANEL ── */
+  .dep-table { width: 100%; border-collapse: collapse; font-size: 13px; }
+  .dep-table th { background: #1d4ed8; color: #fff; padding: 7px 10px; font-size: 11px; font-weight: 600; text-align: center; }
+  .dep-table th:first-child { text-align: left; padding-left: 14px; }
+  .dep-table td { padding: 5px 10px; border-bottom: 1px solid #e2e8f0; text-align: center; color: var(--text2); }
+  .dep-table td:first-child { text-align: left; padding-left: 14px; }
+  .dep-table tr:hover td { background: #eff6ff; }
+  .dep-num { font-family: var(--mono); color: var(--accent); font-weight: 700; }
+  .dep-dur-input {
+    width: 70px; text-align: center; padding: 3px 6px;
+    border: 1.5px solid var(--border2); border-radius: 5px;
+    font-size: 13px; font-family: var(--mono);
+    background: #fff; color: var(--text); outline: none;
+  }
+  .dep-dur-input:focus { border-color: var(--accent); box-shadow: 0 0 0 2px var(--accent-glow); }
+  .dep-date-input {
+    width: 68px; padding: 2px 5px; text-align: center;
+    border: 1.5px solid var(--border2); border-radius: 5px;
+    font-size: 11px; font-family: var(--mono);
+    background: #fff; color: var(--text); outline: none;
+  }
+  .dep-date-input:focus { border-color: var(--accent); box-shadow: 0 0 0 2px var(--accent-glow); }
+  .dep-select {
+    padding: 3px 6px; border: 1.5px solid var(--border2); border-radius: 5px;
+    font-size: 13px; font-family: var(--sans); background: #fff; outline: none; cursor: pointer;
+  }
+  .dep-select:focus { border-color: var(--accent); }
+  .status-ok { background: #d1fae5; color: #065f46; font-weight: 700; padding: 3px 10px; border-radius: 12px; font-size: 12px; }
+  .status-warn { background: #fef3c7; color: #92400e; font-weight: 700; padding: 3px 10px; border-radius: 12px; font-size: 12px; }
+  .status-err { background: #fee2e2; color: #dc2626; font-weight: 700; padding: 3px 10px; border-radius: 12px; font-size: 12px; }
+
+  /* ── FINANCE PANEL ── */
+  .fin-table { width: 100%; border-collapse: collapse; font-size: 12px; }
+  .fin-table th { background: #1d4ed8; color: #fff; padding: 6px 8px; font-size: 11px; font-weight: 600; text-align: center; white-space: nowrap; }
+  .fin-table td { padding: 4px 8px; border-bottom: 1px solid #e2e8f0; text-align: center; color: var(--text2); }
+  .fin-table tr:hover td { background: #eff6ff; }
+  .fin-num-input {
+    width: 90px; text-align: right; padding: 3px 6px;
+    border: 1.5px solid var(--border2); border-radius: 5px;
+    font-size: 12px; font-family: var(--mono);
+    background: #fff; color: var(--text); outline: none;
+  }
+  .fin-num-input:focus { border-color: var(--accent); box-shadow: 0 0 0 2px var(--accent-glow); }
+  .fin-subtotal { font-family: var(--mono); font-weight: 700; color: #92400e; }
+  .fin-sum-card {
+    background: #fff; border-radius: 8px; padding: 10px 14px;
+    border: 1px solid #bfdbfe; text-align: center;
+  }
+  .fin-sum-card.total { border-color: var(--accent); background: #dbeafe; }
+  .fin-sum-card.profit { border-color: #059669; background: #d1fae5; }
+  .fin-sum-card.loss { border-color: #dc2626; background: #fee2e2; }
+  .fin-sum-label { font-size: 11px; color: var(--text3); margin-bottom: 4px; }
+  .fin-sum-value { font-family: var(--mono); font-size: 17px; font-weight: 700; color: #0f172a; }
+
   /* ══════════════════════════════
      RESPONSIVE — MOBILE
   ══════════════════════════════ */
@@ -312,7 +417,7 @@
     #left-panel { display: none; border: none; height: 100%; }
     #right-panel { display: none; height: 100%; grid-template-rows: 200px 1fr; }
     #left-panel.tab-active { display: block; overflow-y: auto; }
-    #right-panel.tab-active { display: grid; }
+    #right-panel.tab-active { display: flex; }
     .summary-grid { grid-template-columns: repeat(2, 1fr) !important; }
     .topbar-company { display: none; }
     .topbar-title { font-size: 13px; }
@@ -377,7 +482,7 @@
     <div class="topbar-brand">
       <span class="topbar-company">(주)아이팝엔지니어링</span>
       <span class="topbar-title">건설사업관리 <span>인월수 산출</span></span>
-      <span class="topbar-ver">Ver 1.2 (Web) &nbsp;·&nbsp; 최종 수정일 2026-04-02</span>
+      <span class="topbar-ver">Ver 1.3 Beta &nbsp;·&nbsp; 배치계획·수지분석 추가</span>
     </div>
     <div class="topbar-right">
       <button class="btn btn-sm btn-gray" onclick="showHelp()">? 사용설명서</button>
@@ -518,85 +623,394 @@
       <button class="btn btn-primary btn-calc" onclick="calculate()">▶ 전체 계산 및 출력</button>
     </div><!-- /left-panel -->
 
+    <!-- LEFT/RIGHT RESIZE HANDLE -->
+    <div id="handle-lr" class="resize-h"></div>
+
     <!-- RIGHT PANEL -->
     <div id="right-panel">
 
-      <!-- 인쇄용 프로젝트 개요 (화면에서는 숨김) -->
-      <div id="print-overview"></div>
-
-      <!-- LOG -->
-      <div id="log-panel">
-        <div class="panel-header">
-          <span class="panel-title">4 상세 산식 검증 (Log)</span>
-        </div>
-        <div id="log-content" class="empty">계산 버튼을 누르면 상세 산식이 여기에 표시됩니다.</div>
+      <!-- ── RIGHT TAB NAV ── -->
+      <div id="right-tab-nav">
+        <button class="rtab active" id="rtab-result"  onclick="switchRightTab('result')">산출결과</button>
+        <button class="rtab"        id="rtab-deploy"  onclick="switchRightTab('deploy')">배치계획</button>
+        <button class="rtab"        id="rtab-finance" onclick="switchRightTab('finance')">수지분석</button>
+        <span class="beta-badge">BETA</span>
       </div>
 
-      <!-- RESULT -->
-      <div id="result-panel">
-        <div class="panel-header">
-          <span class="panel-title">5 최종 산출 내역서</span>
-          <div id="result-buttons" style="display:none;gap:6px;">
-            <button class="btn btn-sm btn-yellow" onclick="saveCSV()">💾 CSV 저장</button>
-            <button class="btn btn-sm btn-green" onclick="printReport()">🖨️ 인쇄 / PDF</button>
+      <!-- ══ TAB 1: 산출결과 ══ -->
+      <div id="tab-result-content" class="rtab-content active">
+
+        <!-- 인쇄용 프로젝트 개요 (화면에서는 숨김) -->
+        <div id="print-overview"></div>
+
+        <!-- LOG -->
+        <div id="log-panel">
+          <div class="panel-header">
+            <span class="panel-title">4 상세 산식 검증 (Log)</span>
+          </div>
+          <div id="log-content" class="empty">계산 버튼을 누르면 상세 산식이 여기에 표시됩니다.</div>
+        </div>
+
+        <!-- LOG/RESULT RESIZE HANDLE -->
+        <div id="handle-tb" class="resize-v"></div>
+
+        <!-- RESULT -->
+        <div id="result-panel">
+          <div class="panel-header">
+            <span class="panel-title">5 최종 산출 내역서</span>
+            <div id="result-buttons" style="display:none;gap:6px;">
+              <button class="btn btn-sm btn-yellow" onclick="saveCSV()">💾 CSV 저장</button>
+              <button class="btn btn-sm btn-green" onclick="printReport()">🖨️ 인쇄 / PDF</button>
+            </div>
+          </div>
+          <div id="result-scroll">
+            <table class="res-table">
+              <thead>
+                <tr>
+                  <th style="width:170px;">업무항목</th>
+                  <th>수량</th>
+                  <th>기준</th>
+                  <th data-tip="공종보정계수 (단순0.9/보통1.0/복잡1.1)">a</th>
+                  <th data-tip="리모델링 보정계수 (1.1)">b</th>
+                  <th data-tip="BIM 적용 보정계수 (1.1)">c</th>
+                  <th>난이도</th>
+                  <th>산출 <span class="th-unit">(인ㆍ일)</span></th>
+                </tr>
+              </thead>
+              <tbody id="res-tbody">
+                <tr>
+                  <td colspan="8" style="text-align:center;padding:50px;color:var(--text3);font-size:13px;">
+                    좌측 입력 후 계산 버튼을 누르세요
+                  </td>
+                </tr>
+              </tbody>
+            </table>
+          </div>
+
+          <!-- 요약 -->
+          <div id="summary-box">
+            <div class="sum-title">■ 최종 산출 결과</div>
+            <div class="summary-grid" id="summary-grid"></div>
+            <div class="sum-note" id="summary-note"></div>
+            <div id="reduction-info" style="display:none; margin-top:12px; padding:10px 14px; background:#f8faff; border:1px solid #bfdbfe; border-radius:6px; font-size:12px; color:#334155; line-height:1.8;">
+              <div style="font-weight:700; color:#1d4ed8; margin-bottom:6px; font-size:11px; letter-spacing:0.4px;">■ 법적 감액 배치 근거 (발주처 협의 적용 시)</div>
+              <table style="width:100%; border-collapse:collapse;">
+                <tr>
+                  <td style="padding:2px 6px; color:#64748b; width:55%;">① 감독권한대행 기준 (100%)</td>
+                  <td style="padding:2px 6px; font-weight:600; color:#0f172a;" id="ri-base"></td>
+                  <td style="padding:2px 6px; color:#64748b; font-size:11px;">[별표 2] 건축분야 기준</td>
+                </tr>
+                <tr>
+                  <td style="padding:2px 6px; color:#64748b;">② 감독권한대행 미적용 20% 감산 (×0.8)</td>
+                  <td style="padding:2px 6px; font-weight:600; color:#0f172a;" id="ri-auth"></td>
+                  <td style="padding:2px 6px; color:#64748b; font-size:11px;">[별표 2] 비고 · 제7조③②</td>
+                </tr>
+                <tr style="background:#fef3c7;">
+                  <td style="padding:3px 6px; color:#92400e; font-weight:600;">③ 제8조② 추가 20% 감액 (×0.8) → <b>최소 배치</b></td>
+                  <td style="padding:3px 6px; font-weight:700; color:#dc2626; font-size:13px;" id="ri-min"></td>
+                  <td style="padding:3px 6px; color:#92400e; font-size:11px;">업무수행지침 제8조②</td>
+                </tr>
+              </table>
+              <div style="margin-top:6px; font-size:11px; color:#64748b; border-top:1px solid #e2e8f0; padding-top:6px;">
+                ※ ②와 ③은 근거가 다른 별개 조항으로 중복 적용 가능. 기준인원 × 0.8 × 0.8 = <b>64%</b>가 법적 최소 배치 인원.<br>
+                ※ 감액 대상은 <b>총 인월수(배치 인원수)만</b> 해당 — 업무범위([별표 2] 전 항목)는 그대로 유지되며, 적은 인원이 동일 업무를 수행함.<br>
+                ※ 제8조②(업무수행지침)는 발주청(공공공사)에 적용되는 기준이며, 민간건설공사는 발주처와의 협의로 조정 가능.
+              </div>
+            </div>
+          </div>
+        </div><!-- /result-panel -->
+
+      </div><!-- /tab-result-content -->
+
+      <!-- ══ TAB 2: 배치계획 ══ -->
+      <div id="tab-deploy-content" class="rtab-content" style="overflow-y:auto;">
+
+        <!-- Panel Header: 비교 기준 선택 -->
+        <div class="panel-header" style="flex-shrink:0;padding:6px 14px;">
+          <span class="panel-title">6 감리원 배치계획</span>
+          <div style="display:flex;align-items:center;gap:8px;">
+            <span style="font-size:11px;color:var(--text3);white-space:nowrap;">비교 기준:</span>
+            <select id="dep-legal-mode" onchange="updateDeployMM()"
+              style="padding:2px 8px;border:1.5px solid var(--border2);border-radius:5px;font-size:12px;font-family:var(--sans);background:#fff;cursor:pointer;outline:none;">
+              <option value="final" selected>최종 투입인월수</option>
+              <option value="min">최소 배치인월수</option>
+              <option value="auth">감독 권한대행</option>
+            </select>
           </div>
         </div>
-        <div id="result-scroll">
-          <table class="res-table">
+
+        <!-- 등급별 환산비 설정 (KECA 연도별 자동) -->
+        <div style="padding:4px 16px;background:#f8faff;border-bottom:1px solid var(--border);display:flex;align-items:center;gap:8px;flex-shrink:0;flex-wrap:wrap;">
+          <div style="display:flex;align-items:center;gap:5px;flex-shrink:0;">
+            <span style="font-size:11px;font-weight:700;color:var(--accent);">KECA 등급환산비</span>
+            <select id="keca-year-select" onchange="loadKecaForYear(this.value)"
+              style="font-size:11px;padding:2px 8px;border:1.5px solid var(--border2);border-radius:4px;background:#fff;cursor:pointer;color:var(--accent);font-weight:700;outline:none;">
+              <option value="2024">2024년도</option>
+              <option value="2025">2025년도</option>
+              <option value="2026" selected>2026년도</option>
+            </select>
+          </div>
+          <div style="display:flex;align-items:center;gap:6px;flex-wrap:wrap;">
+            <label style="display:flex;align-items:center;gap:3px;font-size:11px;color:var(--text2);">특급
+              <input type="number" id="keca-특급" value="1.061" min="0" step="0.001"
+                style="width:72px;padding:2px 5px;border:1.5px solid var(--border2);border-radius:4px;font-size:12px;font-family:var(--mono);text-align:center;outline:none;"
+                oninput="g_keca['특급']=parseFloat(this.value)||1;updateDeployMM()">
+            </label>
+            <label style="display:flex;align-items:center;gap:3px;font-size:11px;color:var(--text2);">고급
+              <input type="number" id="keca-고급" value="1.000" min="0" step="0.001"
+                style="width:72px;padding:2px 5px;border:1.5px solid var(--border2);border-radius:4px;font-size:12px;font-family:var(--mono);text-align:center;outline:none;"
+                oninput="g_keca['고급']=parseFloat(this.value)||1;updateDeployMM()">
+            </label>
+            <label style="display:flex;align-items:center;gap:3px;font-size:11px;color:var(--text2);">중급
+              <input type="number" id="keca-중급" value="0.931" min="0" step="0.001"
+                style="width:72px;padding:2px 5px;border:1.5px solid var(--border2);border-radius:4px;font-size:12px;font-family:var(--mono);text-align:center;outline:none;"
+                oninput="g_keca['중급']=parseFloat(this.value)||1;updateDeployMM()">
+            </label>
+            <label style="display:flex;align-items:center;gap:3px;font-size:11px;color:var(--text2);">초급
+              <input type="number" id="keca-초급" value="0.764" min="0" step="0.001"
+                style="width:72px;padding:2px 5px;border:1.5px solid var(--border2);border-radius:4px;font-size:12px;font-family:var(--mono);text-align:center;outline:none;"
+                oninput="g_keca['초급']=parseFloat(this.value)||1;updateDeployMM()">
+            </label>
+          </div>
+          <span style="font-size:10px;color:var(--text3);">고급=1.000 기준 · 임의 수정 가능</span>
+        </div>
+
+        <!-- 통합 배치 테이블 (기본 + 추가 동일 컬럼) -->
+        <div class="section" style="padding-bottom:4px;overflow-x:auto;">
+          <table class="dep-table" id="unified-deploy-table" style="min-width:580px;">
             <thead>
               <tr>
-                <th style="width:170px;">업무항목</th>
-                <th>수량</th>
-                <th>기준</th>
-                <th data-tip="공종보정계수 (단순0.9/보통1.0/복잡1.1)">a</th>
-                <th data-tip="리모델링 보정계수 (1.1)">b</th>
-                <th data-tip="BIM 적용 보정계수 (1.1)">c</th>
-                <th>난이도</th>
-                <th>산출 <span class="th-unit">(인ㆍ일)</span></th>
+                <th style="width:44px;">구분</th>
+                <th style="width:38px;">분야</th>
+                <th style="width:26px;">배치</th>
+                <th style="width:52px;">등급</th>
+                <th style="width:74px;">시작</th>
+                <th style="width:74px;">종료</th>
+                <th style="width:54px;">배치기간</th>
+                <th style="width:58px;">인월수</th>
+                <th style="width:22px;"></th>
               </tr>
             </thead>
-            <tbody id="res-tbody">
-              <tr>
-                <td colspan="8" style="text-align:center;padding:50px;color:var(--text3);font-size:13px;">
-                  좌측 입력 후 계산 버튼을 누르세요
+            <tbody id="unified-deploy-tbody">
+              <!-- 기본 배치 헤더 -->
+              <tr style="background:#e8eef8;">
+                <td colspan="9" style="padding:4px 10px;font-size:10px;font-weight:700;letter-spacing:0.8px;color:var(--accent);text-transform:uppercase;">기본 배치</td>
+              </tr>
+              <!-- 상주 건축 (기준 행: 시작일 변경 시 토목·기계 동기화) -->
+              <tr data-dep-key="res_arch">
+                <td>상주</td><td>건축</td>
+                <td style="text-align:center;">
+                  <label class="chk-row" style="justify-content:center;margin:0;">
+                    <input type="checkbox" id="dep_chk_res_arch" checked onchange="updateDeployMM()">
+                    <div class="chk-box"></div>
+                  </label>
                 </td>
+                <td>
+                  <select class="dep-select" id="dep_grade_res_arch" style="width:50px;font-size:11px;" onchange="updateDeployMM()">
+                    <option selected>특급</option><option>고급</option><option>중급</option><option>초급</option>
+                  </select>
+                </td>
+                <td><input type="text" class="dep-date-input" id="dep_start_res_arch" placeholder="YYMM" maxlength="8" oninput="onArchStartInput(this)" onfocus="onDepDateFocus(this)" onblur="onDepDateBlur(this)"></td>
+                <td><input type="text" class="dep-date-input" id="dep_end_res_arch"   placeholder="YYMM" maxlength="8" oninput="onArchEndInput(this)"  onfocus="onDepDateFocus(this)" onblur="onDepDateBlur(this)"></td>
+                <td><input type="text" class="dep-dur-input" id="dep_dur_res_arch" placeholder="자동" title="개월수 또는 일수 직접입력 (예: 6, 90일)" style="width:52px;font-size:11px;" oninput="onDurInput(this,'res_arch')"></td>
+                <td class="dep-num" id="dep_mm_res_arch">-</td>
+                <td></td>
+              </tr>
+              <!-- 상주 토목 (종료일 변경 시 기계 시작일 자동) -->
+              <tr data-dep-key="res_civil">
+                <td>상주</td><td>토목</td>
+                <td style="text-align:center;">
+                  <label class="chk-row" style="justify-content:center;margin:0;">
+                    <input type="checkbox" id="dep_chk_res_civil" checked onchange="updateDeployMM()">
+                    <div class="chk-box"></div>
+                  </label>
+                </td>
+                <td>
+                  <select class="dep-select" id="dep_grade_res_civil" style="width:50px;font-size:11px;" onchange="updateDeployMM()">
+                    <option selected>특급</option><option>고급</option><option>중급</option><option>초급</option>
+                  </select>
+                </td>
+                <td><input type="text" class="dep-date-input" id="dep_start_res_civil" placeholder="YYMM" maxlength="8" oninput="onDepInput(this,'res_civil','start',false)" onfocus="onDepDateFocus(this)" onblur="onDepDateBlur(this)"></td>
+                <td><input type="text" class="dep-date-input" id="dep_end_res_civil"   placeholder="YYMM" maxlength="8" oninput="onCivilEndInput(this)" onfocus="onDepDateFocus(this)" onblur="onDepDateBlur(this)"></td>
+                <td><input type="text" class="dep-dur-input" id="dep_dur_res_civil" placeholder="자동" title="개월수 또는 일수 직접입력 (예: 6, 90일)" style="width:52px;font-size:11px;" oninput="onDurInput(this,'res_civil')"></td>
+                <td class="dep-num" id="dep_mm_res_civil">-</td>
+                <td></td>
+              </tr>
+              <!-- 상주 기계 (시작=토목 종료+1일, 종료=건축 종료 기본) -->
+              <tr data-dep-key="res_mech">
+                <td>상주</td><td>기계</td>
+                <td style="text-align:center;">
+                  <label class="chk-row" style="justify-content:center;margin:0;">
+                    <input type="checkbox" id="dep_chk_res_mech" checked onchange="updateDeployMM()">
+                    <div class="chk-box"></div>
+                  </label>
+                </td>
+                <td>
+                  <select class="dep-select" id="dep_grade_res_mech" style="width:50px;font-size:11px;" onchange="updateDeployMM()">
+                    <option selected>특급</option><option>고급</option><option>중급</option><option>초급</option>
+                  </select>
+                </td>
+                <td><input type="text" class="dep-date-input" id="dep_start_res_mech" placeholder="YYMM" maxlength="8" oninput="onDepInput(this,'res_mech','start',false)" onfocus="onDepDateFocus(this)" onblur="onDepDateBlur(this)"></td>
+                <td><input type="text" class="dep-date-input" id="dep_end_res_mech"   placeholder="YYMM" maxlength="8" oninput="onDepInput(this,'res_mech','end',true)" onfocus="onDepDateFocus(this)" onblur="onDepDateBlur(this)"></td>
+                <td><input type="text" class="dep-dur-input" id="dep_dur_res_mech" placeholder="자동" title="개월수 또는 일수 직접입력 (예: 6, 90일)" style="width:52px;font-size:11px;" oninput="onDurInput(this,'res_mech')"></td>
+                <td class="dep-num" id="dep_mm_res_mech">-</td>
+                <td></td>
+              </tr>
+              <!-- 비상주 건축 (인월수 = 산출결과 기술지원기술인 고정, 기간 자동 표시) -->
+              <tr data-dep-key="non_arch" style="background:#f8faff;">
+                <td>비상주</td><td>건축</td>
+                <td style="text-align:center;">
+                  <label class="chk-row" style="justify-content:center;margin:0;">
+                    <input type="checkbox" id="dep_chk_non_arch" checked onchange="updateDeployMM()">
+                    <div class="chk-box"></div>
+                  </label>
+                </td>
+                <td style="font-size:10px;color:var(--text3);text-align:center;">자동</td>
+                <td><input type="text" class="dep-date-input" id="dep_start_non_arch" placeholder="자동" maxlength="8"
+                  oninput="onNonArchManualInput()" onfocus="onDepDateFocus(this)" onblur="onDepDateBlur(this)"></td>
+                <td><input type="text" class="dep-date-input" id="dep_end_non_arch" placeholder="자동" maxlength="8"
+                  oninput="onNonArchManualInput()" onfocus="onDepDateFocus(this)" onblur="onDepDateBlur(this)"></td>
+                <td style="text-align:center;font-family:var(--mono);font-size:11px;font-weight:600;" id="dep_dur_non_arch">-</td>
+                <td class="dep-num" id="dep_mm_non_arch">-</td>
+                <td></td>
+              </tr>
+              <!-- 추가 감리원 헤더 -->
+              <tr style="background:#e8eef8;" id="extra-section-header">
+                <td colspan="8" style="padding:4px 10px;font-size:10px;font-weight:700;letter-spacing:0.8px;color:var(--accent);text-transform:uppercase;">추가 감리원</td>
+                <td style="text-align:center;padding:2px 4px;">
+                  <button class="btn btn-xs btn-primary" onclick="addExtraRow()" style="padding:0 8px;height:22px;font-size:11px;">+</button>
+                </td>
+              </tr>
+              <!-- 추가 감리원 rows (dynamic) -->
+              <tr id="extra-empty-row">
+                <td colspan="9" style="padding:12px;text-align:center;color:var(--text3);font-size:12px;">추가 감리원 없음 — 우측 + 버튼으로 추가</td>
               </tr>
             </tbody>
           </table>
         </div>
 
-        <!-- 요약 -->
-        <div id="summary-box">
-          <div class="sum-title">■ 최종 산출 결과</div>
-          <div class="summary-grid" id="summary-grid"></div>
-          <div class="sum-note" id="summary-note"></div>
-          <div id="reduction-info" style="display:none; margin-top:12px; padding:10px 14px; background:#f8faff; border:1px solid #bfdbfe; border-radius:6px; font-size:12px; color:#334155; line-height:1.8;">
-            <div style="font-weight:700; color:#1d4ed8; margin-bottom:6px; font-size:11px; letter-spacing:0.4px;">■ 법적 감액 배치 근거 (발주처 협의 적용 시)</div>
-            <table style="width:100%; border-collapse:collapse;">
-              <tr>
-                <td style="padding:2px 6px; color:#64748b; width:55%;">① 감독권한대행 기준 (100%)</td>
-                <td style="padding:2px 6px; font-weight:600; color:#0f172a;" id="ri-base"></td>
-                <td style="padding:2px 6px; color:#64748b; font-size:11px;">[별표 2] 건축분야 기준</td>
-              </tr>
-              <tr>
-                <td style="padding:2px 6px; color:#64748b;">② 감독권한대행 미적용 20% 감산 (×0.8)</td>
-                <td style="padding:2px 6px; font-weight:600; color:#0f172a;" id="ri-auth"></td>
-                <td style="padding:2px 6px; color:#64748b; font-size:11px;">[별표 2] 비고 · 제7조③②</td>
-              </tr>
-              <tr style="background:#fef3c7;">
-                <td style="padding:3px 6px; color:#92400e; font-weight:600;">③ 제8조② 추가 20% 감액 (×0.8) → <b>최소 배치</b></td>
-                <td style="padding:3px 6px; font-weight:700; color:#dc2626; font-size:13px;" id="ri-min"></td>
-                <td style="padding:3px 6px; color:#92400e; font-size:11px;">업무수행지침 제8조②</td>
-              </tr>
-            </table>
-            <div style="margin-top:6px; font-size:11px; color:#64748b; border-top:1px solid #e2e8f0; padding-top:6px;">
-              ※ ②와 ③은 근거가 다른 별개 조항으로 중복 적용 가능. 기준인원 × 0.8 × 0.8 = <b>64%</b>가 법적 최소 배치 인원.<br>
-              ※ 감액 대상은 <b>총 인월수(배치 인원수)만</b> 해당 — 업무범위([별표 2] 전 항목)는 그대로 유지되며, 적은 인원이 동일 업무를 수행함.<br>
-              ※ 제8조②(업무수행지침)는 발주청(공공공사)에 적용되는 기준이며, 민간건설공사는 발주처와의 협의로 조정 가능.
+        <!-- 합계 + 법적 기준 vs 배치 현황 통합 한 줄 -->
+        <div style="padding:6px 16px;background:#eff6ff;border-top:2px solid var(--accent);display:flex;align-items:center;gap:0;flex-shrink:0;">
+          <div style="flex:0 0 auto;padding-right:16px;border-right:1px solid #bfdbfe;margin-right:16px;">
+            <div style="font-size:10px;color:var(--text3);">합계 배치</div>
+            <span id="deploy-total-mm" style="font-family:var(--mono);color:var(--accent);font-size:18px;font-weight:700;">-</span>
+            <span style="font-size:10px;color:var(--text3);margin-left:2px;">인ㆍ월</span>
+          </div>
+          <div id="deploy-legal-compare" style="flex:1;display:grid;grid-template-columns:1fr 1fr 1fr;gap:6px;">
+            <div style="text-align:center;">
+              <div style="font-size:10px;color:var(--text3);" id="d-legal-label">법적 필요</div>
+              <span style="font-family:var(--mono);font-size:15px;font-weight:700;color:var(--accent);" id="d-legal-mm">-</span>
+              <span style="font-size:10px;color:var(--text3);"> 인ㆍ월</span>
+            </div>
+            <div style="text-align:center;">
+              <div style="font-size:10px;color:var(--text3);">현재 배치</div>
+              <span style="font-family:var(--mono);font-size:15px;font-weight:700;color:#059669;" id="d-placed-mm">-</span>
+              <span style="font-size:10px;color:var(--text3);"> 인ㆍ월</span>
+            </div>
+            <div style="text-align:center;">
+              <div style="font-size:10px;color:var(--text3);">차이</div>
+              <span id="d-diff-value" style="font-family:var(--mono);font-size:15px;font-weight:700;">-</span>
+              <div id="deploy-status-chip" style="display:inline-block;margin-top:1px;font-size:10px;padding:1px 8px;border-radius:10px;background:#f1f5f9;color:#64748b;font-weight:700;">-</div>
             </div>
           </div>
         </div>
-      </div><!-- /result-panel -->
+
+        <!-- 법적 근거 (접기/펼치기) -->
+        <details style="flex-shrink:0;background:#f8faff;border-top:1px solid var(--border);">
+          <summary style="padding:6px 16px;font-size:11px;font-weight:700;color:var(--text3);cursor:pointer;list-style:none;display:flex;align-items:center;gap:4px;">
+            <span>▶</span> 산출 근거
+          </summary>
+          <div style="padding:6px 16px 8px;font-size:11px;color:#64748b;line-height:1.7;">
+            ※ 기간(월) = 시작월~종료월 달력 월수 (일수 직접입력 시 ÷30 자동환산) / 인월수 = 기간(월) × 해당등급 환산비<br>
+            ※ 비상주 건축: 기술지원기술인 인월수 = 최종투입인월수 × 기술지원 비율 (산출 결과 자동 연동)<br>
+            ※ 법적 필요 인월수: 국토교통부 고시 제2023-580호 「건설엔지니어링 대가 등에 관한 기준」 [별표 2]<br>
+            ※ 최소 배치인월수: 업무수행지침 제8조② 추가 20% 감액 적용 (기준인원 × 0.8 × 0.8 = 64%)
+          </div>
+        </details>
+
+        <!-- 배치계획표 Bar Chart -->
+        <div id="gantt-section" style="padding:8px 16px 10px;background:#fff;border-top:1px solid var(--border);flex-shrink:0;">
+          <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:6px;flex-wrap:wrap;gap:4px;">
+            <div style="font-weight:700;color:var(--text2);font-size:11px;">■ 배치계획표 (Bar Chart)</div>
+            <div style="display:flex;gap:6px;">
+              <button class="btn btn-xs btn-green" onclick="exportGanttExcel()">⬇ XLSX</button>
+              <button class="btn btn-xs" style="background:#f0fdf4;color:#059669;border:1px solid #bbf7d0;" onclick="exportGanttCSV()">⬇ CSV</button>
+            </div>
+          </div>
+          <div id="gantt-chart" style="overflow-x:auto;font-size:11px;"></div>
+        </div>
+
+      </div><!-- /tab-deploy-content -->
+
+      <!-- ══ TAB 3: 수지분석 ══ -->
+      <div id="tab-finance-content" class="rtab-content" style="overflow-y:auto;">
+
+        <div class="panel-header" style="flex-shrink:0;">
+          <span class="panel-title">7 수지분석</span>
+          <button class="btn btn-sm btn-primary" onclick="calcFinance()">수지 계산</button>
+        </div>
+
+        <!-- 감리원별 비용 입력 -->
+        <div class="section">
+          <div class="section-title">감리원별 비용 입력 (단위: 천원)</div>
+          <div style="font-size:11px;color:var(--text3);margin-bottom:6px;">배치계획 탭 작성 후 자동으로 인원 목록이 채워집니다. · 연봉 입력 시 월급여(÷13) 및 배치전/종료후 비용 자동 산정</div>
+          <!-- 연봉 프리셋 선택 -->
+          <div style="margin-bottom:10px;padding:8px 10px;background:#f0f9ff;border:1px solid #bae6fd;border-radius:6px;display:flex;align-items:center;gap:8px;flex-wrap:wrap;">
+            <span style="font-size:11px;font-weight:700;color:var(--accent);white-space:nowrap;">연봉 프리셋</span>
+            <div style="display:flex;gap:4px;flex-wrap:wrap;">
+              <button onclick="applyAnnualPreset(70000,65000)" style="font-size:11px;padding:3px 10px;border:1.5px solid #3b82f6;border-radius:4px;background:#fff;color:#1d4ed8;font-weight:700;cursor:pointer;">7,000만</button>
+              <button onclick="applyAnnualPreset(65000,60000)" style="font-size:11px;padding:3px 10px;border:1.5px solid #3b82f6;border-radius:4px;background:#fff;color:#1d4ed8;font-weight:700;cursor:pointer;">6,500만</button>
+              <button onclick="applyAnnualPreset(60000,55000)" style="font-size:11px;padding:3px 10px;border:1.5px solid #3b82f6;border-radius:4px;background:#fff;color:#1d4ed8;font-weight:700;cursor:pointer;">6,000만</button>
+              <button onclick="applyAnnualPreset(55000,50000)" style="font-size:11px;padding:3px 10px;border:1.5px solid #3b82f6;border-radius:4px;background:#fff;color:#1d4ed8;font-weight:700;cursor:pointer;">5,500만</button>
+              <button onclick="applyAnnualPreset(50000,45000)" style="font-size:11px;padding:3px 10px;border:1.5px solid #3b82f6;border-radius:4px;background:#fff;color:#1d4ed8;font-weight:700;cursor:pointer;">5,000만</button>
+            </div>
+            <span style="font-size:10px;color:var(--text3);">상주건축 기준, 나머지 -500만원 자동 적용</span>
+          </div>
+          <div style="overflow-x:auto;">
+            <table class="fin-table" id="finance-person-table">
+              <thead>
+                <tr>
+                  <th style="text-align:left;min-width:80px;">구분/분야</th>
+                  <th>배치<br>기간</th>
+                  <th>연봉<br>(퇴직금포함)</th>
+                  <th>월급여<br>(자동)</th>
+                  <th>주재비<br>/월</th>
+                  <th>세금<br>/월</th>
+                  <th>배치전<br>1개월</th>
+                  <th>종료후<br>1개월</th>
+                  <th>소계</th>
+                </tr>
+              </thead>
+              <tbody id="finance-person-tbody">
+                <tr><td colspan="8" style="padding:20px;text-align:center;color:var(--text3);">배치계획 탭에서 인원을 먼저 배치하세요</td></tr>
+              </tbody>
+            </table>
+          </div>
+        </div>
+
+        <!-- 이윤 / 계약금액 -->
+        <div class="section">
+          <div class="section-title">이윤 및 계약금액 (단위: 천원)</div>
+          <div class="field">
+            <label>이윤 (기본: T×10,000천원)</label>
+            <input type="text" inputmode="numeric" id="fin_profit" value="0" class="is-manual" style="flex:1;max-width:160px;" oninput="calcFinance()" onblur="fmtFinInput(this)">
+            <span class="unit">천원</span>
+          </div>
+          <div class="field">
+            <label>계약금액</label>
+            <input type="text" inputmode="numeric" id="fin_contract" value="0" class="is-manual" style="flex:1;max-width:160px;" oninput="calcFinance()" onblur="fmtFinInput(this)">
+            <span class="unit">천원</span>
+          </div>
+        </div>
+
+        <!-- 수지 요약 -->
+        <div id="finance-summary" style="padding:14px 16px;background:#eff6ff;border-top:2px solid var(--accent);display:none;">
+          <div style="font-size:11px;font-weight:700;color:var(--accent);margin-bottom:10px;">■ 수지 요약</div>
+          <div style="display:grid;grid-template-columns:repeat(4,1fr);gap:8px;margin-bottom:10px;" id="finance-summary-grid"></div>
+          <div style="display:grid;grid-template-columns:repeat(3,1fr);gap:8px;" id="finance-summary-result"></div>
+        </div>
+
+      </div><!-- /tab-finance-content -->
 
     </div><!-- /right-panel -->
   </div><!-- /main -->
@@ -679,9 +1093,969 @@ const DB = [
 ];
 
 // ═══════════════════════════════════════════
+// ═══════════════════════════════════════════
+// GLOBAL STATE (Beta)
+// ═══════════════════════════════════════════
+let g_final_mm = 0, g_min_mm = 0, g_base_mm = 0, g_T = 0, g_tech_mm = 0;
+let g_extra_rows = []; // [{type, field, grade, start, end, dur, mm, active}]
+
+// KECA 등급별 환산비 연도별 테이블 (고급=1.000 기준)
+// ※ 한국건설엔지니어링협회 건설사업관리기술인 노임가격 공표치 기준
+// ※ 환산비 = 해당등급 일당 ÷ 고급 일당
+const KECA_RATES = {
+  2024: { 특급: 1.092, 고급: 1.000, 중급: 0.925, 초급: 0.707 }, // 391,590 / 358,628 / 331,723 / 253,599원
+  2025: { 특급: 1.070, 고급: 1.000, 중급: 0.920, 초급: 0.714 }, // 396,707 / 370,635 / 341,029 / 264,639원
+  2026: { 특급: 1.061, 고급: 1.000, 중급: 0.931, 초급: 0.764 }, // 399,247 / 376,400 / 350,580 / 287,724원
+};
+let g_keca_year = new Date().getFullYear();
+let g_keca = { ...(KECA_RATES[g_keca_year] || KECA_RATES[Math.max(...Object.keys(KECA_RATES).map(Number))]) };
+
+function loadKecaForYear(year) {
+  g_keca_year = parseInt(year);
+  const rates = KECA_RATES[g_keca_year] || KECA_RATES[Math.max(...Object.keys(KECA_RATES).map(Number))];
+  g_keca = { ...rates };
+  ['특급','고급','중급','초급'].forEach(g => {
+    const el = document.getElementById('keca-' + g);
+    if (el) el.value = g_keca[g].toFixed(3);
+  });
+  const selEl = document.getElementById('keca-year-select');
+  if (selEl) selEl.value = g_keca_year;
+  updateDeployMM();
+}
+
+// ═══════════════════════════════════════════
+// RIGHT TAB SWITCH (Beta)
+// ═══════════════════════════════════════════
+function switchRightTab(tab) {
+  ['result','deploy','finance'].forEach(t => {
+    document.getElementById('tab-' + t + '-content').classList.remove('active');
+    document.getElementById('rtab-' + t).classList.remove('active');
+  });
+  document.getElementById('tab-' + tab + '-content').classList.add('active');
+  document.getElementById('rtab-' + tab).classList.add('active');
+  if (tab === 'deploy') updateDeployMM();
+  if (tab === 'finance') syncFinanceFromDeploy();
+}
+
+// ═══════════════════════════════════════════
+// DEPLOY — 배치계획 (Beta)
+// ═══════════════════════════════════════════
+const BASIC_KEYS = [
+  { id:'res_arch',  type:'상주',  field:'건축' },
+  { id:'res_civil', type:'상주',  field:'토목' },
+  { id:'res_mech',  type:'상주',  field:'기계' },
+  { id:'non_arch',  type:'비상주', field:'건축', fixed: true }, // 인월수 = 산출결과 고정
+];
+
+// 수동으로 수정된 날짜 필드를 추적
+const g_dep_manual = new Set();
+
+// ─── 날짜 유틸 (YY.MM.DD 텍스트 포맷) ───────────────────
+// YY.MM.DD → Date
+function parseDepDate(str) {
+  if (!str) return null;
+  const d = str.replace(/\D/g, '');
+  if (d.length !== 6) return null;
+  const dt = new Date(2000+parseInt(d.slice(0,2)), parseInt(d.slice(2,4))-1, parseInt(d.slice(4,6)));
+  return isNaN(dt.getTime()) ? null : dt;
+}
+
+// Date → YY.MM.DD
+function fmtDepDate(dt) {
+  if (!dt || isNaN(dt.getTime())) return '';
+  return String(dt.getFullYear()).slice(2) + '.' +
+    String(dt.getMonth()+1).padStart(2,'0') + '.' +
+    String(dt.getDate()).padStart(2,'0');
+}
+
+// YY.MM.DD 기준 다음날
+function nextDepDay(str) {
+  const d = parseDepDate(str);
+  if (!d) return '';
+  d.setDate(d.getDate() + 1);
+  return fmtDepDate(d);
+}
+
+// 4자리(YYMM) → YY.MM.01(시작) or YY.MM.말일(종료) / 6자리(YYMMDD) → YY.MM.DD
+function autoFmtDepInput(val, isEnd) {
+  const d = val.replace(/\D/g, '');
+  if (d.length < 4) return val;
+  const yy = d.slice(0,2), mm = d.slice(2,4);
+  if (d.length <= 5) {
+    if (isEnd) {
+      const last = new Date(2000+parseInt(yy), parseInt(mm), 0).getDate();
+      return `${yy}.${mm}.${String(last).padStart(2,'0')}`;
+    }
+    return `${yy}.${mm}.01`;
+  }
+  return `${yy}.${mm}.${d.slice(4,6)}`;
+}
+
+// YY.MM.DD 기간(월) 계산 (달력 월 기준, 시작월~종료월 포함)
+function calcMonthsDep(startStr, endStr) {
+  const s = parseDepDate(startStr), e = parseDepDate(endStr);
+  if (!s || !e || e < s) return 0;
+  return (e.getFullYear() - s.getFullYear()) * 12 + (e.getMonth() - s.getMonth()) + 1;
+}
+
+// 시작(YY.MM.DD) + T개월 → 종료(YY.MM.DD)
+function endDateFromStart(startStr, T) {
+  const s = parseDepDate(startStr);
+  if (!s) return '';
+  const d = new Date(s);
+  d.setMonth(d.getMonth() + Math.floor(T));
+  d.setDate(d.getDate() - 1);
+  return fmtDepDate(d);
+}
+
+function setDepVal(id, val) {
+  const el = document.getElementById(id);
+  if (el) el.value = val;
+}
+
+// 4자리 이상 입력되면 자동 포맷
+function tryAutoFmt(el, isEnd) {
+  const d = el.value.replace(/\D/g, '');
+  if (d.length >= 4) el.value = autoFmtDepInput(el.value, isEnd);
+}
+
+// ─── 날짜 포커스/블러: 포커스 시 빈칸, 블러 시 원래값 복원 ──
+function onDepDateFocus(el) {
+  el.dataset.prevVal = el.value;
+  el.value = '';
+}
+function onDepDateBlur(el) {
+  if (!el.value.trim()) el.value = el.dataset.prevVal || '';
+}
+
+// ─── 기간(월) 직접입력: "90일" → 3.000개월, "3.5" → 3.500개월 ──
+const g_dep_dur_manual = new Set(); // 수동 입력된 기간(월) 키 추적
+
+function parseDurInput(val) {
+  if (!val || val === '-') return 0;
+  const s = val.replace(/\s/g, '');
+  const dayMatch = s.match(/^(\d+\.?\d*)일$/);
+  if (dayMatch) return Math.floor(parseFloat(dayMatch[1]) / 30 * 1000) / 1000;
+  const n = parseFloat(s);
+  return isNaN(n) ? 0 : Math.floor(n * 1000) / 1000;
+}
+
+function onDurInput(el, key) {
+  if (el.value.trim()) {
+    g_dep_dur_manual.add(key);
+    el.classList.add('is-manual');
+  } else {
+    g_dep_dur_manual.delete(key);
+    el.classList.remove('is-manual');
+  }
+  calcBasicDur(key);
+  updateDeployMM();
+}
+
+function onExtraDurInput(el, idx) {
+  if (el.value.trim()) {
+    if (g_extra_rows[idx]) g_extra_rows[idx]._manualDur = true;
+    el.classList.add('is-manual');
+  } else {
+    if (g_extra_rows[idx]) g_extra_rows[idx]._manualDur = false;
+    el.classList.remove('is-manual');
+  }
+  calcExtraDate(idx);
+}
+
+function getKecaFactor(grade) {
+  return g_keca[grade] || 1.000;
+}
+
+// ─── 초기화 ─────────────────────────────────────────────
+function initDeployFromCalc(T) {
+  g_dep_manual.clear();
+  const today = new Date();
+  const startStr  = fmtDepDate(today);
+  const endStr    = endDateFromStart(startStr, T);
+  const halfT     = Math.max(1, Math.floor(T / 2));
+  const civilEnd  = endDateFromStart(startStr, halfT);
+  const mechStart = nextDepDay(civilEnd);
+
+  setDepVal('dep_start_res_arch',  startStr);
+  setDepVal('dep_end_res_arch',    endStr);
+  calcBasicDur('res_arch');
+
+  setDepVal('dep_start_res_civil', startStr);
+  setDepVal('dep_end_res_civil',   civilEnd);
+  calcBasicDur('res_civil');
+
+  setDepVal('dep_start_res_mech',  mechStart);
+  setDepVal('dep_end_res_mech',    endStr);
+  calcBasicDur('res_mech');
+
+  updateNonArchDates();
+
+  updateDeployMM();
+}
+
+// ─── 기간 계산 (디스플레이) ──────────────────────────────
+function calcBasicDur(key) {
+  const durEl = document.getElementById('dep_dur_' + key);
+  // 수동 입력 모드: parseDurInput으로 읽어서 반환
+  if (g_dep_dur_manual.has(key)) {
+    return durEl ? parseDurInput(durEl.value) : 0;
+  }
+  const startStr = document.getElementById('dep_start_' + key)?.value || '';
+  const endStr   = document.getElementById('dep_end_' + key)?.value   || '';
+  const dur = calcMonthsDep(startStr, endStr);
+  if (durEl) {
+    if (durEl.tagName === 'INPUT') durEl.value = dur > 0 ? dur + '' : '';
+    else durEl.textContent = dur > 0 ? dur + '개월' : '-';
+  }
+  return dur;
+}
+
+// ─── 비상주 기간 표시 ────────────────────────────────────
+function updateNonArchDates() {
+  const archStart = document.getElementById('dep_start_res_arch')?.value || '';
+  const archEnd   = document.getElementById('dep_end_res_arch')?.value   || '';
+  const startEl = document.getElementById('dep_start_non_arch');
+  const endEl   = document.getElementById('dep_end_non_arch');
+  // 수동 입력이 없을 때만 건축 기간 자동 반영
+  if (startEl && !startEl.dataset.manual) startEl.value = archStart;
+  if (endEl   && !endEl.dataset.manual)   endEl.value   = archEnd;
+  const actualStart = startEl?.value || archStart;
+  const actualEnd   = endEl?.value   || archEnd;
+  const dur = calcMonthsDep(actualStart, actualEnd);
+  const durEl = document.getElementById('dep_dur_non_arch');
+  if (durEl) durEl.textContent = dur > 0 ? dur + '개월' : '-';
+}
+
+function onNonArchManualInput() {
+  const startEl = document.getElementById('dep_start_non_arch');
+  const endEl   = document.getElementById('dep_end_non_arch');
+  if (startEl) startEl.dataset.manual = '1';
+  if (endEl)   endEl.dataset.manual   = '1';
+  const dur = calcMonthsDep(startEl?.value || '', endEl?.value || '');
+  const durEl = document.getElementById('dep_dur_non_arch');
+  if (durEl) durEl.textContent = dur > 0 ? dur + '개월' : '-';
+  updateDeployMM();
+}
+
+// ─── 추가 감리원 기간 계산 ───────────────────────────────
+function calcExtraDate(idx) {
+  const durEl = document.getElementById('extra_dur_' + idx);
+  let dur;
+  if (g_extra_rows[idx]?._manualDur) {
+    dur = parseDurInput(durEl?.value || '');
+  } else {
+    const startStr = document.getElementById('extra_start_' + idx)?.value || '';
+    const endStr   = document.getElementById('extra_end_'   + idx)?.value || '';
+    dur = calcMonthsDep(startStr, endStr);
+    if (durEl) {
+      if (durEl.tagName === 'INPUT') durEl.value = dur > 0 ? dur + '' : '';
+      else durEl.textContent = dur > 0 ? dur + '개월' : '-';
+    }
+  }
+  if (g_extra_rows[idx]) g_extra_rows[idx].dur = dur;
+  updateDeployMM();
+}
+
+// ─── 이벤트 핸들러 ──────────────────────────────────────
+// 건축 시작 변경 → 건축 종료 자동 + 토목/기계 동기화
+function onArchStartInput(el) {
+  tryAutoFmt(el, false);
+  if (el.value.replace(/\D/g,'').length < 6) return;
+  const startStr = el.value;
+  if (!g_T) { calcBasicDur('res_arch'); updateDeployMM(); return; }
+
+  const endStr = endDateFromStart(startStr, g_T);
+  setDepVal('dep_end_res_arch', endStr);
+  calcBasicDur('res_arch');
+
+  // 토목: 수동 수정 없으면 건축 시작 따라감
+  if (!g_dep_manual.has('res_civil_start')) setDepVal('dep_start_res_civil', startStr);
+  if (!g_dep_manual.has('res_civil_end')) {
+    const halfT    = Math.max(1, Math.floor(g_T / 2));
+    const civilEnd = endDateFromStart(startStr, halfT);
+    setDepVal('dep_end_res_civil', civilEnd);
+    if (!g_dep_manual.has('res_mech_start')) setDepVal('dep_start_res_mech', nextDepDay(civilEnd));
+  }
+  calcBasicDur('res_civil');
+
+  // 기계 종료 = 건축 종료
+  if (!g_dep_manual.has('res_mech_end')) setDepVal('dep_end_res_mech', endStr);
+  calcBasicDur('res_mech');
+
+  // 추가 감리원 동기화
+  g_extra_rows.forEach((row, i) => {
+    if (row._removed) return;
+    if (!row._manualStart) setDepVal('extra_start_' + i, startStr);
+    if (!row._manualEnd)   setDepVal('extra_end_'   + i, endStr);
+    calcExtraDate(i);
+  });
+
+  updateNonArchDates();
+  updateDeployMM();
+}
+
+// 건축 종료 변경 → 기계 종료 동기화
+function onArchEndInput(el) {
+  tryAutoFmt(el, true);
+  if (el.value.replace(/\D/g,'').length < 6) return;
+  g_dep_manual.add('res_arch_end');
+  const endStr = el.value;
+  calcBasicDur('res_arch');
+
+  if (!g_dep_manual.has('res_mech_end')) {
+    setDepVal('dep_end_res_mech', endStr);
+    calcBasicDur('res_mech');
+  }
+  g_extra_rows.forEach((row, i) => {
+    if (row._removed) return;
+    if (!row._manualEnd) { setDepVal('extra_end_' + i, endStr); calcExtraDate(i); }
+  });
+  updateNonArchDates();
+  updateDeployMM();
+}
+
+// 토목 종료 변경 → 기계 시작 자동
+function onCivilEndInput(el) {
+  tryAutoFmt(el, true);
+  if (el.value.replace(/\D/g,'').length < 6) return;
+  g_dep_manual.add('res_civil_end');
+  const civilEnd = el.value;
+  calcBasicDur('res_civil');
+
+  if (!g_dep_manual.has('res_mech_start')) {
+    setDepVal('dep_start_res_mech', nextDepDay(civilEnd));
+    calcBasicDur('res_mech');
+  }
+  updateDeployMM();
+}
+
+// 그 외 날짜 수동 변경
+function onDepInput(el, key, field, isEnd) {
+  tryAutoFmt(el, isEnd);
+  if (el.value.replace(/\D/g,'').length < 6) return;
+  g_dep_manual.add(key + '_' + field);
+  calcBasicDur(key);
+  updateDeployMM();
+}
+
+function getBasicPersons() {
+  return BASIC_KEYS.map(k => {
+    const chk = document.getElementById('dep_chk_' + k.id);
+    const active = chk ? chk.checked : false;
+    if (k.fixed) {
+      // 비상주 건축: 인월수 = 산출결과 기술지원기술인
+      const mm = active ? (g_tech_mm || 0) : 0;
+      return { ...k, dur: mm, mm, active, grade: '고급' };
+    }
+    const gradeEl = document.getElementById('dep_grade_' + k.id);
+    const grade = gradeEl?.value || '고급';
+    const dur = active ? calcBasicDur(k.id) : 0;
+    const factor = getKecaFactor(grade);
+    const mm = Math.floor(dur * factor * 1000) / 1000;
+    return { ...k, dur, mm, active, grade };
+  });
+}
+
+function getLegalMM() {
+  const mode = document.getElementById('dep-legal-mode')?.value || 'final';
+  if (mode === 'min') return g_min_mm;
+  if (mode === 'auth') return g_base_mm;
+  return g_final_mm;
+}
+
+function updateDeployMM() {
+  // 기본 배치 인월수 업데이트
+  const basics = getBasicPersons();
+  basics.forEach(p => {
+    const mmEl = document.getElementById('dep_mm_' + p.id);
+    if (!mmEl) return;
+    if (p.active) {
+      mmEl.textContent = p.mm.toFixed(3);
+    } else {
+      mmEl.textContent = '-';
+    }
+  });
+
+  // 추가 감리원 인월수 업데이트
+  g_extra_rows.forEach((row, i) => {
+    if (row._removed) return;
+    if (!row.active) {
+      const mmEl = document.getElementById('extra_mm_' + i);
+      if (mmEl) mmEl.textContent = '-';
+      return;
+    }
+    const gradeEl = document.getElementById('extra_grade_' + i);
+    const grade = gradeEl?.value || '고급';
+    const factor = getKecaFactor(grade);
+    const mm = Math.floor((row.dur || 0) * factor * 1000) / 1000;
+    row.mm = mm;
+    const mmEl = document.getElementById('extra_mm_' + i);
+    if (mmEl) mmEl.textContent = mm.toFixed(3);
+  });
+
+  // 합계
+  const placed = getPlacedMM();
+  const legal  = getLegalMM();
+  const diff   = placed - legal;
+
+  document.getElementById('deploy-total-mm').textContent = placed.toFixed(3) + ' 인ㆍ월';
+  document.getElementById('d-placed-mm').textContent = placed.toFixed(3);
+
+  // 법적 기준 레이블
+  const mode = document.getElementById('dep-legal-mode')?.value || 'final';
+  const legalLabelMap = { final:'법적 필요 (최종 투입)', min:'법적 필요 (최소 배치)', auth:'법적 필요 (감독 권한대행)' };
+  const legalEl = document.getElementById('d-legal-label');
+  if (legalEl) legalEl.textContent = legalLabelMap[mode] || '법적 필요';
+  document.getElementById('d-legal-mm').textContent = legal > 0 ? legal.toFixed(3) : '-';
+
+  // 차이 및 상태
+  const diffEl = document.getElementById('d-diff-value');
+  const chipEl = document.getElementById('deploy-status-chip');
+  if (legal > 0) {
+    if (diff >= 0) {
+      diffEl.textContent = '+' + diff.toFixed(3);
+      diffEl.style.color = '#059669';
+      chipEl.className = 'status-ok';
+      chipEl.textContent = '충족';
+    } else {
+      diffEl.textContent = diff.toFixed(3);
+      diffEl.style.color = '#dc2626';
+      chipEl.className = 'status-err';
+      chipEl.textContent = '부족 — 추가 배치 필요';
+    }
+  } else {
+    diffEl.textContent = '-'; chipEl.className = ''; chipEl.textContent = '-';
+  }
+  renderGantt();
+}
+
+function getPlacedMM() {
+  let total = 0;
+  getBasicPersons().forEach(p => { if (p.active) total += p.mm || 0; });
+  g_extra_rows.forEach(r => { if (!r._removed && r.active) total += r.mm || 0; });
+  // 소수점 3째 자리 미만 버림 (floor at 2 decimals)
+  return Math.floor(total * 100) / 100;
+}
+
+function getAllPersons() {
+  const list = [];
+  getBasicPersons().forEach(p => {
+    if (p.active && (p.mm || 0) > 0)
+      list.push({ label: p.type + ' ' + p.field, type: p.type, field: p.field, dur: p.mm, grade: p.grade });
+  });
+  g_extra_rows.forEach((r, i) => {
+    if (!r._removed && r.active && (r.mm || 0) > 0) {
+      const gradeEl = document.getElementById('extra_grade_' + i);
+      list.push({ label: r.type + ' ' + r.field + '(추가)', type: r.type, field: r.field, dur: r.mm, grade: gradeEl?.value || '고급' });
+    }
+  });
+  return list;
+}
+
+function addExtraRow() {
+  const emptyRow = document.getElementById('extra-empty-row');
+  if (emptyRow) emptyRow.remove();
+
+  const idx = g_extra_rows.length;
+  const defStart = document.getElementById('dep_start_res_arch')?.value || '';
+  const defEnd   = document.getElementById('dep_end_res_arch')?.value   || '';
+  g_extra_rows.push({ type: '상주', field: '건축', grade: '특급', dur: 0, mm: 0, active: true, _manualStart: false, _manualEnd: false });
+
+  const sectionHeader = document.getElementById('extra-section-header');
+  const tr = document.createElement('tr');
+  tr.id = 'extra-row-' + idx;
+  tr.innerHTML = `
+    <td>
+      <select class="dep-select" id="extra_type_${idx}" style="width:56px;font-size:11px;"
+        onchange="g_extra_rows[${idx}].type=this.value;updateDeployMM()">
+        <option>상주</option><option>비상주</option>
+      </select>
+    </td>
+    <td>
+      <select class="dep-select" id="extra_field_${idx}" style="width:54px;font-size:11px;"
+        onchange="g_extra_rows[${idx}].field=this.value;updateDeployMM()">
+        <option>건축</option><option>기계</option><option>토목</option>
+      </select>
+    </td>
+    <td style="text-align:center;">
+      <label class="chk-row" style="justify-content:center;margin:0;">
+        <input type="checkbox" id="extra_chk_${idx}" checked onchange="g_extra_rows[${idx}].active=this.checked;updateDeployMM()">
+        <div class="chk-box"></div>
+      </label>
+    </td>
+    <td>
+      <select class="dep-select" id="extra_grade_${idx}" style="width:50px;font-size:11px;"
+        onchange="updateDeployMM()">
+        <option selected>특급</option><option>고급</option><option>중급</option><option>초급</option>
+      </select>
+    </td>
+    <td><input type="text" class="dep-date-input" id="extra_start_${idx}" value="${defStart}" placeholder="YYMM" maxlength="8"
+      oninput="tryAutoFmt(this,false);g_extra_rows[${idx}]._manualStart=true;calcExtraDate(${idx})"
+      onfocus="onDepDateFocus(this)" onblur="onDepDateBlur(this)"></td>
+    <td><input type="text" class="dep-date-input" id="extra_end_${idx}"   value="${defEnd}"   placeholder="YYMM" maxlength="8"
+      oninput="tryAutoFmt(this,true);g_extra_rows[${idx}]._manualEnd=true;calcExtraDate(${idx})"
+      onfocus="onDepDateFocus(this)" onblur="onDepDateBlur(this)"></td>
+    <td><input type="text" class="dep-dur-input" id="extra_dur_${idx}" placeholder="자동" title="개월수 또는 일수 직접입력 (예: 6, 90일)" style="width:52px;font-size:11px;" oninput="onExtraDurInput(this,${idx})"></td>
+    <td class="dep-num" id="extra_mm_${idx}">-</td>
+    <td style="text-align:center;">
+      <button style="background:none;border:none;cursor:pointer;color:#dc2626;font-size:15px;padding:0 2px;line-height:1;"
+        onclick="removeExtraRow(${idx})">✕</button>
+    </td>
+  `;
+  sectionHeader.insertAdjacentElement('afterend', tr);
+  calcExtraDate(idx);
+}
+
+function removeExtraRow(idx) {
+  g_extra_rows[idx]._removed = true;
+  const tr = document.getElementById('extra-row-' + idx);
+  if (tr) tr.remove();
+
+  const hasActive = g_extra_rows.some(r => !r._removed);
+  if (!hasActive) {
+    const sectionHeader = document.getElementById('extra-section-header');
+    const emptyTr = document.createElement('tr');
+    emptyTr.id = 'extra-empty-row';
+    emptyTr.innerHTML = '<td colspan="9" style="padding:12px;text-align:center;color:var(--text3);font-size:12px;">추가 감리원 없음 — 우측 + 버튼으로 추가</td>';
+    sectionHeader.insertAdjacentElement('afterend', emptyTr);
+  }
+  updateDeployMM();
+}
+
+// ═══════════════════════════════════════════
+// GANTT — 배치계획표 Bar Chart
+// ═══════════════════════════════════════════
+function getAllPersonsWithDates() {
+  const list = [];
+  BASIC_KEYS.forEach(k => {
+    const chk = document.getElementById('dep_chk_' + k.id);
+    if (!chk?.checked) return;
+    if (k.fixed) {
+      const startStr = document.getElementById('dep_start_non_arch')?.value || document.getElementById('dep_start_res_arch')?.value || '';
+      const endStr   = document.getElementById('dep_end_non_arch')?.value   || document.getElementById('dep_end_res_arch')?.value   || '';
+      const dur = calcMonthsDep(startStr, endStr);
+      const mm = g_tech_mm || 0;
+      if (mm > 0 && startStr && endStr) list.push({ label: k.type + ' ' + k.field, type: k.type, field: k.field, grade: '고급', dur: dur || mm, mm, startStr, endStr });
+      return;
+    }
+    const gradeEl = document.getElementById('dep_grade_' + k.id);
+    const grade = gradeEl?.value || '고급';
+    const startStr = document.getElementById('dep_start_' + k.id)?.value || '';
+    const endStr   = document.getElementById('dep_end_' + k.id)?.value   || '';
+    const dur = calcBasicDur(k.id);
+    if (dur <= 0 || !startStr || !endStr) return;
+    const factor = getKecaFactor(grade);
+    const mm = Math.floor(dur * factor * 1000) / 1000;
+    list.push({ label: k.type + ' ' + k.field, type: k.type, field: k.field, grade, dur, mm, startStr, endStr });
+  });
+  g_extra_rows.forEach((row, i) => {
+    if (row._removed || !row.active) return;
+    const startStr = document.getElementById('extra_start_' + i)?.value || '';
+    const endStr   = document.getElementById('extra_end_'   + i)?.value || '';
+    if (!startStr || !endStr) return;
+    const gradeEl = document.getElementById('extra_grade_' + i);
+    const typeEl  = document.getElementById('extra_type_'  + i);
+    const fieldEl = document.getElementById('extra_field_' + i);
+    const grade = gradeEl?.value || '고급';
+    const type  = typeEl?.value  || '상주';
+    const field = fieldEl?.value || '건축';
+    const dur = row.dur || 0;
+    if (dur <= 0) return;
+    const factor = getKecaFactor(grade);
+    const mm = Math.floor(dur * factor * 1000) / 1000;
+    list.push({ label: type + ' ' + field + '(추가)', type, field, grade, dur, mm, startStr, endStr });
+  });
+  return list;
+}
+
+const GANTT_COLORS = {
+  '상주 건축': '#3b82f6', '상주 토목': '#10b981', '상주 기계': '#f59e0b',
+  '비상주 건축': '#8b5cf6'
+};
+
+function renderGantt() {
+  const container = document.getElementById('gantt-chart');
+  if (!container) return;
+  const persons = getAllPersonsWithDates();
+  if (persons.length === 0) {
+    container.innerHTML = '<div style="padding:10px;text-align:center;color:var(--text3);">배치계획을 먼저 작성하세요</div>';
+    return;
+  }
+  let minDate = null, maxDate = null;
+  persons.forEach(p => {
+    const s = parseDepDate(p.startStr), e = parseDepDate(p.endStr);
+    if (s && (!minDate || s < minDate)) minDate = s;
+    if (e && (!maxDate || e > maxDate)) maxDate = e;
+  });
+  if (!minDate || !maxDate) { container.innerHTML = '<div style="padding:10px;text-align:center;color:var(--text3);">날짜를 먼저 입력하세요</div>'; return; }
+
+  const months = [];
+  const cur = new Date(minDate.getFullYear(), minDate.getMonth(), 1);
+  const last = new Date(maxDate.getFullYear(), maxDate.getMonth(), 1);
+  while (cur <= last) {
+    months.push({ year: cur.getFullYear(), month: cur.getMonth() + 1 });
+    cur.setMonth(cur.getMonth() + 1);
+  }
+
+  // 년도 그룹핑 (colspan 병합용)
+  const yearGroups = [];
+  months.forEach(m => {
+    const last = yearGroups[yearGroups.length - 1];
+    if (last && last.year === m.year) last.count++;
+    else yearGroups.push({ year: m.year, count: 1 });
+  });
+
+  const COL_W = 30;
+  const TH_BASE = 'background:#e8eef8;border:1px solid #d1d5db;font-size:10px;text-align:center;';
+  let html = `<table style="border-collapse:collapse;">`;
+
+  // 헤더 행1: 인원(rowspan2) | 배치기간(rowspan2) | 인월수(rowspan2) | 년도(colspan) | 비고(rowspan2)
+  html += `<thead><tr>`;
+  html += `<th rowspan="2" style="min-width:96px;padding:3px 6px;${TH_BASE}text-align:left;">인원</th>`;
+  html += `<th rowspan="2" style="width:52px;padding:3px 2px;${TH_BASE}">배치<br>기간</th>`;
+  html += `<th rowspan="2" style="width:52px;padding:3px 2px;${TH_BASE}">인월수</th>`;
+  yearGroups.forEach(yg => {
+    html += `<th colspan="${yg.count}" style="padding:3px 2px;${TH_BASE}font-weight:700;">${yg.year}년</th>`;
+  });
+  html += `<th rowspan="2" style="min-width:60px;padding:3px 4px;${TH_BASE}">비고</th>`;
+  html += `</tr>`;
+
+  // 헤더 행2: 월
+  html += `<tr>`;
+  months.forEach(m => {
+    html += `<th style="width:${COL_W}px;padding:2px 0;${TH_BASE}font-size:9px;">${m.month}월</th>`;
+  });
+  html += `</tr></thead><tbody>`;
+
+  persons.forEach(p => {
+    const pS = parseDepDate(p.startStr), pE = parseDepDate(p.endStr);
+    const color = GANTT_COLORS[p.type + ' ' + p.field] || '#64748b';
+    html += `<tr>`;
+    html += `<td style="padding:3px 6px;border:1px solid #e5e7eb;font-weight:600;white-space:nowrap;font-size:11px;">${p.label}<br><span style="font-size:9px;color:var(--text3);font-weight:400;">${p.grade}</span></td>`;
+    html += `<td style="padding:3px 2px;border:1px solid #e5e7eb;text-align:center;font-family:var(--mono);font-size:11px;color:var(--text2);">${p.dur}개월</td>`;
+    html += `<td style="padding:3px 2px;border:1px solid #e5e7eb;text-align:center;font-family:var(--mono);font-size:11px;color:var(--accent);font-weight:600;">${p.mm.toFixed(3)}</td>`;
+    months.forEach(m => {
+      const mS = new Date(m.year, m.month - 1, 1);
+      const mE = new Date(m.year, m.month, 0);
+      const active = pS && pE && pS <= mE && pE >= mS;
+      html += `<td style="border:1px solid #e5e7eb;height:22px;background:${active ? color : 'transparent'};"></td>`;
+    });
+    html += `<td style="border:1px solid #e5e7eb;min-width:60px;"></td>`;
+    html += `</tr>`;
+  });
+
+  // 하단 비교행
+  const totalMM = persons.reduce((s, p) => s + p.mm, 0);
+  const legalMMText = document.getElementById('d-legal-mm')?.textContent || '-';
+  const legalMM = parseFloat(legalMMText) || 0;
+  const diff = legalMM > 0 ? totalMM - legalMM : null;
+  const ok = diff !== null && diff >= 0;
+  const rowBg = diff === null ? '#f8faff' : (ok ? '#f0fdf4' : '#fef2f2');
+  const statusColor = diff === null ? '#64748b' : (ok ? '#059669' : '#dc2626');
+  const statusText = diff === null
+    ? '법적 인월수를 먼저 산출하세요'
+    : ok
+      ? `✔ 이상 없음  (+${diff.toFixed(3)} 인월 초과)`
+      : `✘ 배치 인원 부족  (${diff.toFixed(3)} 인월 미달)`;
+
+  html += `<tr style="background:${rowBg};border-top:2px solid var(--accent);">`;
+  html += `<td style="padding:4px 6px;border:1px solid #d1d5db;font-size:10px;font-weight:700;color:var(--text2);white-space:nowrap;">합계</td>`;
+  html += `<td style="border:1px solid #d1d5db;"></td>`;
+  html += `<td style="padding:3px 2px;border:1px solid #d1d5db;text-align:center;font-family:var(--mono);font-size:11px;font-weight:700;color:var(--accent);">${totalMM.toFixed(3)}</td>`;
+  months.forEach(() => html += `<td style="border:1px solid #d1d5db;background:${rowBg};"></td>`);
+  html += `<td style="border:1px solid #d1d5db;background:${rowBg};"></td>`;
+  html += `</tr>`;
+  html += `<tr style="background:${rowBg};">`;
+  html += `<td colspan="${3 + months.length + 1}" style="padding:5px 10px;border:1px solid #d1d5db;font-size:11px;font-weight:700;color:${statusColor};">`;
+  html += `법적 배치인월수: ${legalMM > 0 ? legalMM.toFixed(3) : '-'} 인월 &nbsp;|&nbsp; 배치 인월수: ${totalMM.toFixed(3)} 인월 &nbsp;|&nbsp; ${statusText}`;
+  html += `</td></tr>`;
+
+  html += `</tbody></table>`;
+  container.innerHTML = html;
+}
+
+function exportGanttExcel() {
+  if (typeof XLSX === 'undefined') { alert('엑셀 라이브러리 로드 중입니다. 잠시 후 다시 시도해주세요.'); return; }
+  const persons = getAllPersonsWithDates();
+  if (persons.length === 0) { alert('배치계획을 먼저 작성하세요.'); return; }
+
+  let minDate = null, maxDate = null;
+  persons.forEach(p => {
+    const s = parseDepDate(p.startStr), e = parseDepDate(p.endStr);
+    if (s && (!minDate || s < minDate)) minDate = s;
+    if (e && (!maxDate || e > maxDate)) maxDate = e;
+  });
+
+  const months = [];
+  if (minDate && maxDate) {
+    const cur = new Date(minDate.getFullYear(), minDate.getMonth(), 1);
+    const last = new Date(maxDate.getFullYear(), maxDate.getMonth(), 1);
+    while (cur <= last) {
+      months.push({ year: cur.getFullYear(), month: cur.getMonth() + 1,
+        label: String(cur.getFullYear()).slice(2) + '.' + String(cur.getMonth()+1).padStart(2,'0') });
+      cur.setMonth(cur.getMonth() + 1);
+    }
+  }
+
+  // 헤더: 년도 행 + 월 행
+  const yearGroups = [];
+  months.forEach(m => {
+    const last = yearGroups[yearGroups.length - 1];
+    if (last && last.year === m.year) last.count++;
+    else yearGroups.push({ year: m.year, count: 1 });
+  });
+  const yearHeaderRow = ['구분/분야', '등급', '배치기간', '인월수'];
+  yearGroups.forEach(yg => { yearHeaderRow.push(yg.year + '년'); for (let i = 1; i < yg.count; i++) yearHeaderRow.push(''); });
+  yearHeaderRow.push('비고');
+  const monthHeaderRow = ['', '', '', ''];
+  months.forEach(m => monthHeaderRow.push(m.month + '월'));
+  monthHeaderRow.push('');
+  const ws_data = [yearHeaderRow, monthHeaderRow];
+
+  persons.forEach(p => {
+    const pS = parseDepDate(p.startStr), pE = parseDepDate(p.endStr);
+    const row = [p.label, p.grade, p.dur + '개월', p.mm.toFixed(3)];
+    months.forEach(m => {
+      const mS = new Date(m.year, m.month - 1, 1), mE = new Date(m.year, m.month, 0);
+      row.push((pS && pE && pS <= mE && pE >= mS) ? '■' : '');
+    });
+    row.push(''); // 비고
+    ws_data.push(row);
+  });
+
+  // 합계 + 비교 행
+  const totalMM = persons.reduce((s, p) => s + p.mm, 0);
+  const legalMM = parseFloat(document.getElementById('d-legal-mm')?.textContent) || 0;
+  const diff = legalMM > 0 ? totalMM - legalMM : null;
+  const statusText = diff === null ? '' : diff >= 0 ? `이상 없음 (+${diff.toFixed(3)})` : `부족 (${diff.toFixed(3)})`;
+  const totalRow = ['합계', '', '', totalMM.toFixed(3)];
+  months.forEach(() => totalRow.push(''));
+  totalRow.push('');
+  ws_data.push(totalRow);
+  const compareRow = [`법적: ${legalMM > 0 ? legalMM.toFixed(3) : '-'} 인월 | 배치: ${totalMM.toFixed(3)} 인월 | ${statusText}`, '', '', ''];
+  months.forEach(() => compareRow.push(''));
+  compareRow.push('');
+  ws_data.push(compareRow);
+
+  const ws = XLSX.utils.aoa_to_sheet(ws_data);
+  const wb = XLSX.utils.book_new();
+  XLSX.utils.book_append_sheet(wb, ws, '배치계획표');
+  const projName = document.getElementById('proj_name')?.value || '감리원배치계획';
+  XLSX.writeFile(wb, projName + '_배치계획표.xlsx');
+}
+
+function exportGanttCSV() {
+  const persons = getAllPersonsWithDates();
+  if (persons.length === 0) { alert('배치계획을 먼저 작성하세요.'); return; }
+
+  let minDate = null, maxDate = null;
+  persons.forEach(p => {
+    const s = parseDepDate(p.startStr), e = parseDepDate(p.endStr);
+    if (s && (!minDate || s < minDate)) minDate = s;
+    if (e && (!maxDate || e > maxDate)) maxDate = e;
+  });
+
+  const months = [];
+  if (minDate && maxDate) {
+    const cur = new Date(minDate.getFullYear(), minDate.getMonth(), 1);
+    const last = new Date(maxDate.getFullYear(), maxDate.getMonth(), 1);
+    while (cur <= last) {
+      months.push({ year: cur.getFullYear(), month: cur.getMonth() + 1 });
+      cur.setMonth(cur.getMonth() + 1);
+    }
+  }
+
+  const esc = v => '"' + String(v).replace(/"/g, '""') + '"';
+  const rows = [];
+  rows.push(['구분/분야', '등급', '배치기간', '인월수', ...months.map(m => m.year + '.' + String(m.month).padStart(2,'0')), '비고'].map(esc).join(','));
+  persons.forEach(p => {
+    const pS = parseDepDate(p.startStr), pE = parseDepDate(p.endStr);
+    const row = [p.label, p.grade, p.dur + '개월', p.mm.toFixed(3)];
+    months.forEach(m => {
+      const mS = new Date(m.year, m.month - 1, 1), mE = new Date(m.year, m.month, 0);
+      row.push((pS && pE && pS <= mE && pE >= mS) ? '■' : '');
+    });
+    row.push('');
+    rows.push(row.map(esc).join(','));
+  });
+  const totalMM = persons.reduce((s, p) => s + p.mm, 0);
+  const legalMM = parseFloat(document.getElementById('d-legal-mm')?.textContent) || 0;
+  const diff = legalMM > 0 ? totalMM - legalMM : null;
+  const statusText = diff === null ? '' : diff >= 0 ? `이상 없음 (+${diff.toFixed(3)})` : `부족 (${diff.toFixed(3)})`;
+  rows.push([`합계`, '', '', totalMM.toFixed(3), ...months.map(() => ''), ''].map(esc).join(','));
+  rows.push([`법적: ${legalMM > 0 ? legalMM.toFixed(3) : '-'} 인월 | 배치: ${totalMM.toFixed(3)} 인월 | ${statusText}`, '', '', '', ...months.map(() => ''), ''].map(esc).join(','));
+
+  const bom = '\uFEFF';
+  const blob = new Blob([bom + rows.join('\n')], { type: 'text/csv;charset=utf-8;' });
+  const url = URL.createObjectURL(blob);
+  const a = document.createElement('a');
+  a.href = url;
+  a.download = (document.getElementById('proj_name')?.value || '감리원배치계획') + '_배치계획표.csv';
+  a.click();
+  URL.revokeObjectURL(url);
+}
+
+// ═══════════════════════════════════════════
+// FINANCE — 수지분석 (Beta)
+// ═══════════════════════════════════════════
+function syncFinanceFromDeploy() {
+  const persons = getAllPersons();
+  if (persons.length === 0) return;
+
+  // 기존 저장된 입력값 보존 (연봉·주재비·세금)
+  const saved = {};
+  document.querySelectorAll('#finance-person-tbody tr[data-fin-idx]').forEach(tr => {
+    const i = tr.dataset.finIdx;
+    saved[i] = {
+      annual:  parseFinVal('fin_annual_'+i),
+      housing: parseFinVal('fin_housing_'+i),
+      tax:     parseFinVal('fin_tax_'+i),
+    };
+  });
+
+  const tbody = document.getElementById('finance-person-tbody');
+  tbody.innerHTML = '';
+  persons.forEach((p, i) => {
+    const sv = saved[i] || { annual: 0, housing: 700, tax: 300 };
+    // 처음 생성 시 기본값 적용
+    if (!saved[i]) { sv.housing = 700; sv.tax = 300; }
+    const monthly = sv.annual > 0 ? Math.round(sv.annual / 13) : 0;
+    const startCost = monthly + sv.tax;
+    const endCost   = monthly;
+
+    const tr = document.createElement('tr');
+    tr.dataset.finIdx = i;
+    tr.dataset.dur = p.dur;
+    tr.dataset.label = p.label;
+    const fmtV = n => n > 0 ? Math.round(n).toLocaleString('ko-KR') : '';
+    tr.innerHTML = `
+      <td style="text-align:left;font-weight:600;">${p.label}</td>
+      <td style="font-family:var(--mono);text-align:center;">${p.dur}개월</td>
+      <td><input type="text" inputmode="numeric" class="fin-num-input" id="fin_annual_${i}" value="${fmtV(sv.annual)}" placeholder="연봉" oninput="calcFinance()" onblur="fmtFinInput(this)"></td>
+      <td id="fin_monthly_${i}" style="font-family:var(--mono);text-align:right;color:var(--accent);font-weight:600;">${monthly.toLocaleString('ko-KR')}</td>
+      <td><input type="text" inputmode="numeric" class="fin-num-input" id="fin_housing_${i}" value="${fmtV(sv.housing)}" placeholder="주재비" oninput="calcFinance()" onblur="fmtFinInput(this)"></td>
+      <td><input type="text" inputmode="numeric" class="fin-num-input" id="fin_tax_${i}" value="${fmtV(sv.tax)}" placeholder="세금" oninput="calcFinance()" onblur="fmtFinInput(this)"></td>
+      <td id="fin_start_${i}" style="font-family:var(--mono);text-align:right;color:var(--text2);">${startCost.toLocaleString('ko-KR')}</td>
+      <td id="fin_end_${i}"   style="font-family:var(--mono);text-align:right;color:var(--text2);">${endCost.toLocaleString('ko-KR')}</td>
+      <td class="fin-subtotal" id="fin_sub_${i}">-</td>
+    `;
+    tbody.appendChild(tr);
+  });
+
+  // 이윤 기본값: T × 10,000 천원 (= T × 1,000만원)
+  if (g_T > 0) {
+    const profitEl = document.getElementById('fin_profit');
+    const curVal = parseFloat((profitEl?.value || '').replace(/,/g,'')) || 0;
+    if (profitEl && curVal === 0) {
+      profitEl.value = (g_T * 10000).toLocaleString('ko-KR');
+    }
+  }
+  calcFinance();
+}
+
+// 수지분석 입력값 콤마 포맷 헬퍼
+function parseFinVal(id) {
+  const el = document.getElementById(id);
+  if (!el) return 0;
+  return parseFloat((el.value || '').replace(/,/g, '')) || 0;
+}
+function fmtFinInput(el) {
+  const raw = (el.value || '').replace(/,/g, '');
+  const n = parseFloat(raw);
+  if (!isNaN(n) && raw !== '') el.value = Math.round(n).toLocaleString('ko-KR');
+  calcFinance();
+}
+
+// 연봉 프리셋 일괄 적용 (단위: 천원)
+// archAnnual: 상주건축 연봉, otherAnnual: 나머지 연봉
+function applyAnnualPreset(archAnnual, otherAnnual) {
+  const rows = document.querySelectorAll('#finance-person-tbody tr[data-fin-idx]');
+  if (rows.length === 0) { alert('배치계획 탭에서 인원을 먼저 배치하세요.'); return; }
+  rows.forEach(tr => {
+    const label = tr.dataset.label || '';
+    const annual = (label === '상주 건축') ? archAnnual : otherAnnual;
+    const el = document.getElementById('fin_annual_' + tr.dataset.finIdx);
+    if (el) el.value = annual.toLocaleString('ko-KR');
+  });
+  calcFinance();
+}
+
+function calcFinance() {
+  const rows = document.querySelectorAll('#finance-person-tbody tr[data-fin-idx]');
+  if (rows.length === 0) return;
+
+  const fmt = n => Math.round(n).toLocaleString('ko-KR'); // 천원 단위 콤마 포맷
+
+  let totalMonthly = 0, totalHousing = 0, totalTax = 0, totalStart = 0, totalEnd = 0;
+
+  rows.forEach(tr => {
+    const i = tr.dataset.finIdx;
+    const dur     = parseFloat(tr.dataset.dur) || 0;
+    const annual  = parseFinVal('fin_annual_'  + i);
+    const housing = parseFinVal('fin_housing_' + i);
+    const tax     = parseFinVal('fin_tax_'     + i);
+
+    // 월급여 = 연봉 / 13 (자동 산정)
+    const monthly = annual > 0 ? Math.round(annual / 13) : 0;
+
+    // 배치 1개월 전: 월급여 + 세금
+    const startCost = monthly + tax;
+    // 종료 후 1개월: 월급여만
+    const endCost = monthly;
+
+    // 자동 산정값 표시 업데이트
+    const monthlyEl = document.getElementById('fin_monthly_' + i);
+    const startEl   = document.getElementById('fin_start_'   + i);
+    const endEl     = document.getElementById('fin_end_'     + i);
+    if (monthlyEl) monthlyEl.textContent = fmt(monthly);
+    if (startEl)   startEl.textContent   = fmt(startCost);
+    if (endEl)     endEl.textContent     = fmt(endCost);
+
+    // 소계 = (월급여 + 주재비 + 세금) × 배치기간 + 배치전1개월 + 종료후1개월
+    const sub = (monthly + housing + tax) * dur + startCost + endCost;
+    const subEl = document.getElementById('fin_sub_' + i);
+    if (subEl) subEl.textContent = fmt(sub) + ' 천원';
+
+    totalMonthly += monthly * dur;
+    totalHousing += housing * dur;
+    totalTax     += tax * dur;
+    totalStart   += startCost;
+    totalEnd     += endCost;
+  });
+
+  const totalCost = totalMonthly + totalHousing + totalTax + totalStart + totalEnd;
+  const profit    = parseFinVal('fin_profit');
+  const contract  = parseFinVal('fin_contract');
+  const required  = totalCost + profit;
+  const netPnL    = contract - totalCost;
+  const margin    = contract > 0 ? (netPnL / contract * 100) : 0;
+
+  const sumBox = document.getElementById('finance-summary');
+  sumBox.style.display = 'block';
+
+  document.getElementById('finance-summary-grid').innerHTML = `
+    <div class="fin-sum-card"><div class="fin-sum-label">인건비 합계</div><div class="fin-sum-value">${fmt(totalMonthly)}<small style="font-size:12px;"> 천원</small></div></div>
+    <div class="fin-sum-card"><div class="fin-sum-label">주재비 합계</div><div class="fin-sum-value">${fmt(totalHousing)}<small style="font-size:12px;"> 천원</small></div></div>
+    <div class="fin-sum-card"><div class="fin-sum-label">세금 합계</div><div class="fin-sum-value">${fmt(totalTax)}<small style="font-size:12px;"> 천원</small></div></div>
+    <div class="fin-sum-card"><div class="fin-sum-label">배치전/종료후비</div><div class="fin-sum-value">${fmt(totalStart+totalEnd)}<small style="font-size:12px;"> 천원</small></div></div>
+  `;
+
+  const pnlClass = netPnL >= 0 ? 'profit' : 'loss';
+  const pnlSign  = netPnL >= 0 ? '+' : '';
+  document.getElementById('finance-summary-result').innerHTML = `
+    <div class="fin-sum-card total"><div class="fin-sum-label">총 원가</div><div class="fin-sum-value" style="color:#1d4ed8;">${fmt(totalCost)}<small style="font-size:12px;"> 천원</small></div></div>
+    <div class="fin-sum-card"><div class="fin-sum-label">이윤 + 필요 계약금액</div><div class="fin-sum-value">${fmt(profit)} + <span style="color:#1d4ed8;">${fmt(required)}</span><small style="font-size:12px;"> 천원</small></div></div>
+    <div class="fin-sum-card ${pnlClass}"><div class="fin-sum-label">실제 손익 (계약금액 기준)</div><div class="fin-sum-value">${pnlSign}${fmt(netPnL)}<small style="font-size:12px;"> 천원</small>${contract>0?`<div style="font-size:11px;color:var(--text3);">이익률 ${margin.toFixed(1)}%</div>`:''}</div></div>
+  `;
+}
+
 // INIT
 // ═══════════════════════════════════════════
 window.addEventListener('DOMContentLoaded', () => {
+  // KECA 연도 select 초기화
+  const kecaSelEl = document.getElementById('keca-year-select');
+  if (kecaSelEl) kecaSelEl.value = g_keca_year;
   buildQtyTable();
   // area_m2 초기값: 기본 평값(3000)에서 ㎡ 계산
   const initPyeong = fv('area');
@@ -1058,6 +2432,17 @@ function calculate(silent = false) {
   const res_mm   = Math.round((final_mm - tech_mm) * 1000) / 1000;
 
   const avg_persons = T > 0 ? Math.round(final_mm / T * 100) / 100 : 0;
+
+  // ── 전역 저장 (Beta: 배치계획/수지분석 연동) ──
+  const _auth_mm = Math.round(base_mm * 0.8 * 1000) / 1000;
+  const _min_mm  = Math.round(base_mm * 0.64 * 1000) / 1000;
+  g_final_mm = final_mm;
+  g_min_mm   = _min_mm;
+  g_base_mm  = base_mm;
+  g_tech_mm  = tech_mm;
+  g_T = T;
+  initDeployFromCalc(T);
+
   document.getElementById('summary-box').classList.add('visible');
   document.getElementById('summary-grid').innerHTML = `
     <div class="sum-card">
@@ -1322,7 +2707,7 @@ document.getElementById('help-modal').addEventListener('click', e => {
 
 // 1. 도메인 잠금 - 허가된 도메인 외 실행 차단
 (function() {
-  const ALLOWED = ['salgi-bot.github.io', 'localhost', '127.0.0.1', ''];
+  const ALLOWED = ['salgi-bot.github.io', 'localhost', '127.0.0.1', '', '0.0.0.0'];
   const host = location.hostname;
   if (!ALLOWED.some(d => host === d || host.endsWith('.' + d))) {
     document.body.innerHTML = `
@@ -1357,6 +2742,118 @@ renderFooter();
   if (!f) return;
   const obs = new MutationObserver(() => renderFooter());
   obs.observe(f, { childList: true, subtree: true, characterData: true });
+})();
+
+// ── PANEL RESIZE ──────────────────────────────────────────────
+(function() {
+  const LS_LR = 'cm-panel-lr';   // 좌우 분할 (px)
+  const LS_TB = 'cm-panel-tb';   // 상하 분할 (px)
+  const LR_MIN = 180, LR_MAX = 700;
+  const TB_MIN = 60,  TB_MAX = 600;
+
+  // ── 저장된 크기 복원 ──
+  function restoreSizes() {
+    const main = document.getElementById('main');
+    const tabResult = document.getElementById('tab-result-content');
+    const lr = parseInt(localStorage.getItem(LS_LR));
+    const tb = parseInt(localStorage.getItem(LS_TB));
+    if (lr && lr >= LR_MIN && lr <= LR_MAX) {
+      main.style.gridTemplateColumns = lr + 'px 5px 1fr';
+    }
+    if (tb && tb >= TB_MIN && tb <= TB_MAX) {
+      tabResult.style.gridTemplateRows = tb + 'px 5px 1fr';
+    }
+  }
+  restoreSizes();
+
+  // ── 공통 드래그 팩토리 ──
+  function makeDragger(handleId, opts) {
+    const handle = document.getElementById(handleId);
+    if (!handle) return;
+    let dragging = false, startPos, startSize;
+
+    handle.addEventListener('mousedown', e => {
+      e.preventDefault();
+      dragging = true;
+      startPos = opts.isH ? e.clientX : e.clientY;
+      startSize = opts.getSize();
+      handle.classList.add('dragging');
+      document.body.style.cursor = opts.isH ? 'col-resize' : 'row-resize';
+      document.body.style.userSelect = 'none';
+      // 드래그 중 iframe / 다른 요소 이벤트 방지용 오버레이
+      overlay.style.display = 'block';
+      overlay.style.cursor  = opts.isH ? 'col-resize' : 'row-resize';
+    });
+
+    document.addEventListener('mousemove', e => {
+      if (!dragging) return;
+      const delta = (opts.isH ? e.clientX : e.clientY) - startPos;
+      const newSize = Math.max(opts.min, Math.min(opts.max, startSize + delta));
+      opts.setSize(newSize);
+    });
+
+    document.addEventListener('mouseup', () => {
+      if (!dragging) return;
+      dragging = false;
+      handle.classList.remove('dragging');
+      document.body.style.cursor = '';
+      document.body.style.userSelect = '';
+      overlay.style.display = 'none';
+      opts.save();
+    });
+  }
+
+  // 드래그 오버레이 (드래그 중 텍스트 선택·이벤트 차단)
+  const overlay = document.createElement('div');
+  Object.assign(overlay.style, {
+    display: 'none', position: 'fixed', inset: '0',
+    zIndex: '9999', background: 'transparent'
+  });
+  document.body.appendChild(overlay);
+
+  // ── 좌우 핸들 (left ↔ right) ──
+  const main = document.getElementById('main');
+  makeDragger('handle-lr', {
+    isH: true,
+    min: LR_MIN, max: LR_MAX,
+    getSize() {
+      return parseInt(getComputedStyle(main).gridTemplateColumns.split(' ')[0]);
+    },
+    setSize(px) {
+      main.style.gridTemplateColumns = px + 'px 5px 1fr';
+    },
+    save() {
+      const px = parseInt(getComputedStyle(main).gridTemplateColumns.split(' ')[0]);
+      localStorage.setItem(LS_LR, px);
+    }
+  });
+
+  // ── 상하 핸들 (log ↔ result, 산출결과 탭 안) ──
+  const tabResult = document.getElementById('tab-result-content');
+  makeDragger('handle-tb', {
+    isH: false,
+    min: TB_MIN, max: TB_MAX,
+    getSize() {
+      return parseInt(getComputedStyle(tabResult).gridTemplateRows.split(' ')[0]);
+    },
+    setSize(px) {
+      tabResult.style.gridTemplateRows = px + 'px 5px 1fr';
+    },
+    save() {
+      const px = parseInt(getComputedStyle(tabResult).gridTemplateRows.split(' ')[0]);
+      localStorage.setItem(LS_TB, px);
+    }
+  });
+
+  // ── 더블클릭으로 기본값 리셋 ──
+  document.getElementById('handle-lr').addEventListener('dblclick', () => {
+    main.style.gridTemplateColumns = '340px 5px 1fr';
+    localStorage.removeItem(LS_LR);
+  });
+  document.getElementById('handle-tb').addEventListener('dblclick', () => {
+    tabResult.style.gridTemplateRows = '100px 5px 1fr';
+    localStorage.removeItem(LS_TB);
+  });
 })();
 </script>
 </body>
