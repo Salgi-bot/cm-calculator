@@ -2245,7 +2245,11 @@ function fmtFinInput(el) {
 // archAnnual: 상주건축 연봉, otherAnnual: 나머지 연봉
 function applyAnnualPreset(archAnnual, otherAnnual) {
   const rows = document.querySelectorAll('#finance-person-tbody tr[data-fin-idx]');
-  if (rows.length === 0) { alert('배치계획 탭에서 인원을 먼저 배치하세요.'); return; }
+  if (rows.length === 0) {
+    const hint = document.getElementById('fin-preset-hint');
+    if (hint) { hint.style.display = 'inline'; setTimeout(() => hint.style.display = 'none', 3000); }
+    return;
+  }
   rows.forEach(tr => {
     const label = tr.dataset.label || '';
     const annual = (label === '상주 건축') ? archAnnual : otherAnnual;
