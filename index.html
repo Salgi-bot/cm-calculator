@@ -1515,13 +1515,28 @@ function onArchStartInput(el) {
   updateDeployMM();
 }
 
-// 건축 종료 변경 → 기계 종료 동기화
+// 건축 종료 변경 → 토목/기계 종료 클램프 + 기계 종료 동기화
 function onArchEndInput(el) {
   tryAutoFmt(el, true);
   if (el.value.replace(/\D/g,'').length < 6) return;
   g_dep_manual.add('res_arch_end');
   const endStr = el.value;
   calcBasicDur('res_arch');
+
+  // 토목 종료가 새 건축 종료를 초과하면 클램프 → 기계 시작 연동
+  const civilEndEl = document.getElementById('dep_end_res_civil');
+  if (civilEndEl && civilEndEl.value) {
+    const archE = parseDepDate(endStr);
+    const civE  = parseDepDate(civilEndEl.value);
+    if (archE && civE && civE > archE) {
+      setDepVal('dep_end_res_civil', endStr);
+      calcBasicDur('res_civil');
+      if (!g_dep_manual.has('res_mech_start')) {
+        setDepVal('dep_start_res_mech', clampToArchRange(nextDepDay(endStr), false));
+        calcBasicDur('res_mech');
+      }
+    }
+  }
 
   if (!g_dep_manual.has('res_mech_end')) {
     setDepVal('dep_end_res_mech', endStr);
