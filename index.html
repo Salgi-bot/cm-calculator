@@ -1256,15 +1256,21 @@ function onDurInput(el, key) {
   if (el.value.trim()) {
     g_dep_dur_manual.add(key);
     el.classList.add('is-manual');
-    // 종료일 자동 갱신: 시작 + 입력 개월수
+    // 종료일 자동 갱신: 시작 + 입력 개월수 (건축 범위 클램프)
     const dur = parseDurInput(el.value);
     if (dur > 0) {
       const startStr = document.getElementById('dep_start_' + key)?.value || '';
       if (startStr.replace(/\D/g,'').length >= 6) {
-        const newEnd = endDateFromStart(startStr, dur);
+        const rawEnd = endDateFromStart(startStr, dur);
+        const newEnd = rawEnd ? clampToArchRange(rawEnd, true) : '';
         if (newEnd) {
           setDepVal('dep_end_' + key, newEnd);
-          g_dep_manual.add(key + '_end'); // 자동 override 방지
+          g_dep_manual.add(key + '_end');
+          // 토목 종료 변경 시 기계 시작 연동 (기계 시작이 수동이 아닐 때)
+          if (key === 'res_civil' && !g_dep_manual.has('res_mech_start')) {
+            setDepVal('dep_start_res_mech', clampToArchRange(nextDepDay(newEnd), false));
+            calcBasicDur('res_mech');
+          }
         }
       }
     }
@@ -1277,8 +1283,15 @@ function onDurInput(el, key) {
     if (startStr.replace(/\D/g,'').length >= 6 && g_T > 0) {
       let autoEnd = '';
       if (key === 'res_arch') autoEnd = endDateFromStart(startStr, g_T);
-      else if (key === 'res_civil') autoEnd = endDateFromStart(startStr, Math.max(1, Math.floor(g_T / 2)));
-      else if (key === 'res_mech')  autoEnd = document.getElementById('dep_end_res_arch')?.value || '';
+      else if (key === 'res_civil') {
+        autoEnd = endDateFromStart(startStr, Math.max(1, Math.floor(g_T / 2)));
+        // 토목 종료 복원 시 기계 시작도 복원
+        if (autoEnd && !g_dep_manual.has('res_mech_start')) {
+          setDepVal('dep_start_res_mech', clampToArchRange(nextDepDay(autoEnd), false));
+          calcBasicDur('res_mech');
+        }
+      }
+      else if (key === 'res_mech') autoEnd = document.getElementById('dep_end_res_arch')?.value || '';
       if (autoEnd) setDepVal('dep_end_' + key, autoEnd);
     }
   }
