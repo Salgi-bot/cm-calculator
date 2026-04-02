@@ -1278,9 +1278,26 @@ function onExtraDurInput(el, idx) {
   if (el.value.trim()) {
     if (g_extra_rows[idx]) g_extra_rows[idx]._manualDur = true;
     el.classList.add('is-manual');
+    const dur = parseDurInput(el.value);
+    if (dur > 0 && g_extra_rows[idx]) {
+      const startStr = document.getElementById('extra_start_' + idx)?.value || '';
+      if (startStr.replace(/\D/g,'').length >= 6) {
+        const newEnd = endDateFromStart(startStr, dur);
+        if (newEnd) {
+          setDepVal('extra_end_' + idx, newEnd);
+          g_extra_rows[idx]._manualEnd = true;
+        }
+      }
+    }
   } else {
-    if (g_extra_rows[idx]) g_extra_rows[idx]._manualDur = false;
+    if (g_extra_rows[idx]) {
+      g_extra_rows[idx]._manualDur = false;
+      g_extra_rows[idx]._manualEnd = false;
+    }
     el.classList.remove('is-manual');
+    // 개월 지웠을 때 종료일 복원 (건축 종료 기준)
+    const archEnd = document.getElementById('dep_end_res_arch')?.value || '';
+    if (archEnd) setDepVal('extra_end_' + idx, archEnd);
   }
   calcExtraDate(idx);
 }
