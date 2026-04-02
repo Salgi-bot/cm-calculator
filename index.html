@@ -48,10 +48,10 @@
     font-size: 14px;
     background-color: #cfd9ea;
     background-image:
-      linear-gradient(rgba(61,124,197,0.07) 1px, transparent 1px),
-      linear-gradient(90deg, rgba(61,124,197,0.07) 1px, transparent 1px),
-      linear-gradient(rgba(61,124,197,0.025) 1px, transparent 1px),
-      linear-gradient(90deg, rgba(61,124,197,0.025) 1px, transparent 1px);
+      linear-gradient(rgba(45,107,175,0.07) 1px, transparent 1px),
+      linear-gradient(90deg, rgba(45,107,175,0.07) 1px, transparent 1px),
+      linear-gradient(rgba(45,107,175,0.025) 1px, transparent 1px),
+      linear-gradient(90deg, rgba(45,107,175,0.025) 1px, transparent 1px);
     background-size: 80px 80px, 80px 80px, 20px 20px, 20px 20px;
   }
 
@@ -63,7 +63,7 @@
     display: flex; align-items: center; justify-content: space-between;
     padding: 0 16px; background: var(--accent); border-bottom: 2px solid #2e6194;
     position: sticky; top: 0; z-index: 100; gap: 12px;
-    box-shadow: 0 2px 12px rgba(61,124,197,0.25);
+    box-shadow: 0 2px 12px rgba(45,107,175,0.25);
   }
   .topbar-brand { display: flex; align-items: baseline; gap: 8px; flex-shrink: 0; }
   .topbar-company {
@@ -78,7 +78,7 @@
 
   /* ── MAIN LAYOUT ── */
   #main { display: grid; grid-template-columns: 340px 5px 1fr; overflow: hidden; height: 100%; min-height: 0; }
-  #left-panel { overflow-y: auto; background: var(--surface); box-shadow: 2px 0 8px rgba(61,124,197,0.06); min-height: 0; }
+  #left-panel { overflow-y: auto; background: var(--surface); box-shadow: 2px 0 8px rgba(45,107,175,0.06); min-height: 0; }
   #right-panel { display: flex; flex-direction: column; overflow: hidden; background: var(--surface2); min-height: 0; height: 100%; }
   #log-panel { overflow: hidden; display: flex; flex-direction: column; min-height: 0; }
   #result-panel { overflow: hidden; display: flex; flex-direction: column; min-height: 0; }
@@ -178,7 +178,7 @@
     border-radius: 6px; cursor: pointer; transition: all 0.15s;
   }
   .seg-btn:hover { border-color: var(--accent); color: var(--accent); background: #edf4fb; }
-  .seg-btn.active { background: var(--accent); border-color: var(--accent); color: #fff; font-weight: 700; box-shadow: 0 2px 8px rgba(61,124,197,0.3); }
+  .seg-btn.active { background: var(--accent); border-color: var(--accent); color: #fff; font-weight: 700; box-shadow: 0 2px 8px rgba(45,107,175,0.3); }
 
   /* ── CHECKBOX ── */
   .chk-row { display: flex; align-items: center; gap: 8px; margin-bottom: 6px; cursor: pointer; user-select: none; }
@@ -283,9 +283,9 @@
   .summary-grid { display: grid; grid-template-columns: repeat(5, 1fr); gap: 10px; margin-bottom: 10px; }
   .sum-card {
     background: #fff; border-radius: 8px; padding: 10px 12px;
-    border: 1px solid #c5d9ef; box-shadow: 0 1px 4px rgba(61,124,197,0.08);
+    border: 1px solid #c5d9ef; box-shadow: 0 1px 4px rgba(45,107,175,0.08);
   }
-  .sum-card.highlight { border-color: var(--accent); background: #dce9f5; box-shadow: 0 2px 8px rgba(61,124,197,0.15); }
+  .sum-card.highlight { border-color: var(--accent); background: #dce9f5; box-shadow: 0 2px 8px rgba(45,107,175,0.15); }
   .sum-card-label { font-size: 11px; color: var(--text3); margin-bottom: 4px; }
   .sum-card-value { font-family: var(--mono); font-size: 18px; font-weight: 700; color: #92400e; line-height: 1.2; }
   .sum-card.highlight .sum-card-value { color: #3d7cc5; }
@@ -419,7 +419,7 @@
       color: var(--text2); font-family: var(--sans); font-size: 12px; font-weight: 600;
       border-radius: 6px; cursor: pointer; transition: all 0.15s;
     }
-    .tab-btn.active { background: var(--accent); border-color: var(--accent); color: #fff; box-shadow: 0 2px 8px rgba(61,124,197,0.25); }
+    .tab-btn.active { background: var(--accent); border-color: var(--accent); color: #fff; box-shadow: 0 2px 8px rgba(45,107,175,0.25); }
     #left-panel { display: none; border: none; height: 100%; }
     #right-panel { display: none; height: 100%; grid-template-rows: 200px 1fr; }
     #left-panel.tab-active { display: block; overflow-y: auto; }
@@ -1039,7 +1039,7 @@
      HELP MODAL
 ══════════════════════════════ -->
 <div id="help-modal" style="display:none;position:fixed;inset:0;background:rgba(15,23,42,0.6);z-index:999;align-items:center;justify-content:center;">
-  <div style="background:#fff;border:1px solid #c5d9ef;border-radius:12px;width:min(560px,92vw);max-height:85vh;overflow-y:auto;padding:28px;position:relative;box-shadow:0 20px 60px rgba(61,124,197,0.2);">
+  <div style="background:#fff;border:1px solid #c5d9ef;border-radius:12px;width:min(560px,92vw);max-height:85vh;overflow-y:auto;padding:28px;position:relative;box-shadow:0 20px 60px rgba(45,107,175,0.2);">
     <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:18px;">
       <span style="font-size:16px;font-weight:700;color:#0f172a;">사용설명서</span>
       <button onclick="closeHelp()" style="background:#f1f5f9;border:1px solid #e2e8f0;color:#64748b;font-size:18px;cursor:pointer;line-height:1;width:32px;height:32px;border-radius:6px;">✕</button>
