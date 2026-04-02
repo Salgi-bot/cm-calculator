@@ -1981,7 +1981,7 @@ function exportGanttExcel() {
 
   persons.forEach(p => {
     const pS = parseDepDate(p.startStr), pE = parseDepDate(p.endStr);
-    const row = [p.label, p.grade, p.dur + '개월', p.mm.toFixed(3)];
+    const row = [p.label, p.grade, (+p.dur).toFixed(2) + '개월', p.mm.toFixed(3)];
     months.forEach(m => {
       const mS = new Date(m.year, m.month - 1, 1), mE = new Date(m.year, m.month, 0);
       row.push((pS && pE && pS <= mE && pE >= mS) ? '■' : '');
@@ -2037,7 +2037,7 @@ function exportGanttCSV() {
   rows.push(['구분/분야', '등급', '배치기간', '인월수', ...months.map(m => m.year + '.' + String(m.month).padStart(2,'0')), '비고'].map(esc).join(','));
   persons.forEach(p => {
     const pS = parseDepDate(p.startStr), pE = parseDepDate(p.endStr);
-    const row = [p.label, p.grade, p.dur + '개월', p.mm.toFixed(3)];
+    const row = [p.label, p.grade, (+p.dur).toFixed(2) + '개월', p.mm.toFixed(3)];
     months.forEach(m => {
       const mS = new Date(m.year, m.month - 1, 1), mE = new Date(m.year, m.month, 0);
       row.push((pS && pE && pS <= mE && pE >= mS) ? '■' : '');
