@@ -1209,6 +1209,17 @@ function endDateFromStart(startStr, T) {
   return fmtDepDate(d);
 }
 
+// 날짜를 상주 건축 기간 범위로 클램프
+function clampToArchRange(dateStr, isEnd) {
+  const d = parseDepDate(dateStr);
+  if (!d) return dateStr;
+  const archS = parseDepDate(document.getElementById('dep_start_res_arch')?.value || '');
+  const archE = parseDepDate(document.getElementById('dep_end_res_arch')?.value   || '');
+  if (!isEnd && archS && d < archS) return fmtDepDate(archS);
+  if (isEnd  && archE && d > archE) return fmtDepDate(archE);
+  return dateStr;
+}
+
 function setDepVal(id, val) {
   const el = document.getElementById(id);
   if (el) el.value = val;
