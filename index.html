@@ -1343,6 +1343,15 @@ function getKecaFactor(grade) {
   return g_keca[grade] || 1.000;
 }
 
+// ─── 비상주 건축 초기화 (↺ 버튼) ────────────────────────
+function resetNonArch() {
+  const startEl = document.getElementById('dep_start_non_arch');
+  const endEl   = document.getElementById('dep_end_non_arch');
+  if (startEl) { startEl.value = ''; delete startEl.dataset.manual; }
+  if (endEl)   { endEl.value   = ''; delete endEl.dataset.manual; }
+  updateNonArchDates();
+}
+
 // ─── 배치 행 초기화 (↺ 버튼) ────────────────────────────
 function resetDepRow(key) {
   // 수동 플래그 해제
@@ -1350,7 +1359,7 @@ function resetDepRow(key) {
   g_dep_manual.delete(key + '_end');
   g_dep_dur_manual.delete(key);
   const durEl = document.getElementById('dep_dur_' + key);
-  if (durEl) { durEl.value = ''; durEl.classList.remove('is-manual'); }
+  if (durEl && durEl.tagName === 'INPUT') { durEl.value = ''; durEl.classList.remove('is-manual'); }
 
   if (!g_T) { calcBasicDur(key); updateDeployMM(); return; }
   const archStart = document.getElementById('dep_start_res_arch')?.value || '';
