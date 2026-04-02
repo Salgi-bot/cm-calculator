@@ -998,8 +998,9 @@
           </div>
           <div class="field">
             <label>계약금액</label>
-            <input type="text" inputmode="numeric" id="fin_contract" value="0" class="is-manual" style="flex:1;max-width:160px;" oninput="calcFinance()" onblur="fmtFinInput(this)">
+            <input type="text" inputmode="numeric" id="fin_contract" value="0" class="is-manual" style="flex:1;max-width:160px;" oninput="g_contract_manual=true;calcFinance()" onblur="fmtFinInput(this)">
             <span class="unit">천원</span>
+            <button id="btn_contract_reset" title="자동(필요계약금액 십만원 올림)으로 복원" style="background:none;border:none;cursor:pointer;color:#6b7280;font-size:13px;padding:0 2px;line-height:1;display:none;" onclick="g_contract_manual=false;document.getElementById('btn_contract_reset').style.display='none';calcFinance()">↺</button>
           </div>
         </div>
 
