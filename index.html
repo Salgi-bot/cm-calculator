@@ -1306,6 +1306,37 @@ function getKecaFactor(grade) {
   return g_keca[grade] || 1.000;
 }
 
+// ─── 배치 행 초기화 (↺ 버튼) ────────────────────────────
+function resetDepRow(key) {
+  // 수동 플래그 해제
+  g_dep_manual.delete(key + '_start');
+  g_dep_manual.delete(key + '_end');
+  g_dep_dur_manual.delete(key);
+  const durEl = document.getElementById('dep_dur_' + key);
+  if (durEl) { durEl.value = ''; durEl.classList.remove('is-manual'); }
+
+  if (!g_T) { calcBasicDur(key); updateDeployMM(); return; }
+  const archStart = document.getElementById('dep_start_res_arch')?.value || '';
+
+  if (key === 'res_arch') {
+    if (archStart) setDepVal('dep_end_res_arch', endDateFromStart(archStart, g_T));
+  } else if (key === 'res_civil') {
+    g_dep_manual.delete('res_civil_start');
+    setDepVal('dep_start_res_civil', archStart);
+    const halfT = Math.max(1, Math.floor(g_T / 2));
+    const civilEnd = endDateFromStart(archStart, halfT);
+    setDepVal('dep_end_res_civil', civilEnd);
+    g_dep_manual.delete('res_mech_start');
+    setDepVal('dep_start_res_mech', nextDepDay(civilEnd));
+    calcBasicDur('res_mech');
+  } else if (key === 'res_mech') {
+    const archEnd = document.getElementById('dep_end_res_arch')?.value || '';
+    if (archEnd) setDepVal('dep_end_res_mech', archEnd);
+  }
+  calcBasicDur(key);
+  updateDeployMM();
+}
+
 // ─── 초기화 ─────────────────────────────────────────────
 function initDeployFromCalc(T) {
   g_dep_manual.clear();
