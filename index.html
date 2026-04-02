@@ -1404,29 +1404,54 @@ function onArchStartInput(el) {
   const startStr = el.value;
   if (!g_T) { calcBasicDur('res_arch'); updateDeployMM(); return; }
 
-  const endStr = endDateFromStart(startStr, g_T);
-  setDepVal('dep_end_res_arch', endStr);
+  // 건축 종료: ① dur 수동 → start+dur  ② end 수동 → 그대로  ③ 자동 → start+g_T
+  if (g_dep_dur_manual.has('res_arch')) {
+    const dur = parseDurInput(document.getElementById('dep_dur_res_arch')?.value || '');
+    if (dur > 0) setDepVal('dep_end_res_arch', endDateFromStart(startStr, dur));
+  } else if (!g_dep_manual.has('res_arch_end')) {
+    setDepVal('dep_end_res_arch', endDateFromStart(startStr, g_T));
+  }
   calcBasicDur('res_arch');
+  const endStr = document.getElementById('dep_end_res_arch')?.value || endDateFromStart(startStr, g_T);
 
   // 토목: 수동 수정 없으면 건축 시작 따라감
   if (!g_dep_manual.has('res_civil_start')) setDepVal('dep_start_res_civil', startStr);
   if (!g_dep_manual.has('res_civil_end')) {
-    const halfT    = Math.max(1, Math.floor(g_T / 2));
-    const civilEnd = endDateFromStart(startStr, halfT);
-    setDepVal('dep_end_res_civil', civilEnd);
-    if (!g_dep_manual.has('res_mech_start')) setDepVal('dep_start_res_mech', nextDepDay(civilEnd));
+    if (g_dep_dur_manual.has('res_civil')) {
+      // 토목 개월 수동: 토목시작+dur → 토목종료
+      const civilStart = document.getElementById('dep_start_res_civil')?.value || startStr;
+      const dur = parseDurInput(document.getElementById('dep_dur_res_civil')?.value || '');
+      if (dur > 0) {
+        const civilEnd = endDateFromStart(civilStart, dur);
+        setDepVal('dep_end_res_civil', civilEnd);
+        if (!g_dep_manual.has('res_mech_start')) setDepVal('dep_start_res_mech', nextDepDay(civilEnd));
+      }
+    } else {
+      const halfT    = Math.max(1, Math.floor(g_T / 2));
+      const civilEnd = endDateFromStart(startStr, halfT);
+      setDepVal('dep_end_res_civil', civilEnd);
+      if (!g_dep_manual.has('res_mech_start')) setDepVal('dep_start_res_mech', nextDepDay(civilEnd));
+    }
   }
   calcBasicDur('res_civil');
 
-  // 기계 종료 = 건축 종료
-  if (!g_dep_manual.has('res_mech_end')) setDepVal('dep_end_res_mech', endStr);
+  // 기계 종료: dur 수동이면 기계시작+dur, 아니면 건축 종료와 동기
+  if (!g_dep_manual.has('res_mech_end')) {
+    if (g_dep_dur_manual.has('res_mech')) {
+      const mechStart = document.getElementById('dep_start_res_mech')?.value || '';
+      const dur = parseDurInput(document.getElementById('dep_dur_res_mech')?.value || '');
+      if (dur > 0 && mechStart) setDepVal('dep_end_res_mech', endDateFromStart(mechStart, dur));
+    } else {
+      setDepVal('dep_end_res_mech', endStr);
+    }
+  }
   calcBasicDur('res_mech');
 
   // 추가 감리원 동기화
   g_extra_rows.forEach((row, i) => {
     if (row._removed) return;
     if (!row._manualStart) setDepVal('extra_start_' + i, startStr);
-    if (!row._manualEnd)   setDepVal('extra_end_'   + i, endStr);
+    if (!row._manualEnd && !row._manualDur) setDepVal('extra_end_' + i, endStr);
     calcExtraDate(i);
   });
 
