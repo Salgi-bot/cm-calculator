@@ -1235,13 +1235,21 @@ function tryAutoFmt(el, isEnd) {
   if (d.length >= 4) el.value = autoFmtDepInput(el.value, isEnd);
 }
 
-// ─── 날짜 포커스/블러: 포커스 시 빈칸, 블러 시 원래값 복원 ──
+// ─── 날짜 포커스/블러: 포커스 시 전체 선택(편집 가능), 블러 시 포맷/복원 ──
 function onDepDateFocus(el) {
   el.dataset.prevVal = el.value;
-  el.value = '';
+  // 전체 선택 → 새로 입력하거나 커서 이동해 일자만 수정 가능
+  setTimeout(() => el.select(), 0);
 }
 function onDepDateBlur(el) {
-  if (!el.value.trim()) el.value = el.dataset.prevVal || '';
+  const raw = el.value.replace(/\D/g, '');
+  if (raw.length >= 6) {
+    // 6자리 이상: id 기준으로 시작/종료 판별해 재포맷
+    const isEnd = el.id.includes('_end');
+    el.value = autoFmtDepInput(el.value, isEnd);
+  } else {
+    el.value = el.dataset.prevVal || '';
+  }
 }
 
 // ─── 기간(월) 직접입력: "90일" → 3.000개월, "3.5" → 3.500개월 ──
