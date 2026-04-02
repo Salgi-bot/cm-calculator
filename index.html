@@ -786,7 +786,7 @@
                 oninput="g_keca['초급']=parseFloat(this.value)||1;updateDeployMM()">
             </label>
           </div>
-          <span style="font-size:10px;color:var(--text3);">고급=1.000 기준 · 임의 수정 가능</span>
+          <span style="font-size:11px;color:var(--text3);">고급=1.000 기준 · 임의 수정 가능</span>
         </div>
 
         <!-- 통합 배치 테이블 (기본 + 추가 동일 컬럼) -->
@@ -808,7 +808,7 @@
             <tbody id="unified-deploy-tbody">
               <!-- 기본 배치 헤더 -->
               <tr style="background:#e8eef8;">
-                <td colspan="9" style="padding:4px 10px;font-size:10px;font-weight:700;letter-spacing:0.8px;color:var(--accent);text-transform:uppercase;">기본 배치</td>
+                <td colspan="9" style="padding:4px 10px;font-size:11px;font-weight:700;letter-spacing:0.8px;color:var(--accent);text-transform:uppercase;">기본 배치</td>
               </tr>
               <!-- 상주 건축 (기준 행: 시작일 변경 시 토목·기계 동기화) -->
               <tr data-dep-key="res_arch">
@@ -879,7 +879,7 @@
                     <div class="chk-box"></div>
                   </label>
                 </td>
-                <td style="font-size:10px;color:var(--text3);text-align:center;">자동</td>
+                <td style="font-size:11px;color:var(--text3);text-align:center;">자동</td>
                 <td style="padding:2px;"><div style="display:flex;align-items:center;gap:1px;"><input type="text" class="dep-date-input" id="dep_start_non_arch" placeholder="자동" maxlength="8" oninput="onNonArchManualInput()" onfocus="onDepDateFocus(this)" onblur="onDepDateBlur(this)"><div style="display:flex;flex-direction:column;gap:1px;"><button class="dep-date-spin" onclick="adjustDepDate('dep_start_non_arch',1)">▲</button><button class="dep-date-spin" onclick="adjustDepDate('dep_start_non_arch',-1)">▼</button></div></div></td>
                 <td style="padding:2px;"><div style="display:flex;align-items:center;gap:1px;"><input type="text" class="dep-date-input" id="dep_end_non_arch" placeholder="자동" maxlength="8" oninput="onNonArchManualInput()" onfocus="onDepDateFocus(this)" onblur="onDepDateBlur(this)"><div style="display:flex;flex-direction:column;gap:1px;"><button class="dep-date-spin" onclick="adjustDepDate('dep_end_non_arch',1)">▲</button><button class="dep-date-spin" onclick="adjustDepDate('dep_end_non_arch',-1)">▼</button></div></div></td>
                 <td style="text-align:center;font-family:var(--mono);font-size:11px;font-weight:600;" id="dep_dur_non_arch">-</td>
@@ -888,7 +888,7 @@
               </tr>
               <!-- 추가 감리원 헤더 -->
               <tr style="background:#e8eef8;" id="extra-section-header">
-                <td colspan="8" style="padding:4px 10px;font-size:10px;font-weight:700;letter-spacing:0.8px;color:var(--accent);text-transform:uppercase;">추가 감리원</td>
+                <td colspan="8" style="padding:4px 10px;font-size:11px;font-weight:700;letter-spacing:0.8px;color:var(--accent);text-transform:uppercase;">추가 감리원</td>
                 <td style="text-align:center;padding:2px 4px;">
                   <button class="btn btn-xs btn-primary" onclick="addExtraRow()" style="padding:0 8px;height:22px;font-size:11px;">+</button>
                 </td>
@@ -904,25 +904,25 @@
         <!-- 합계 + 법적 기준 vs 배치 현황 통합 한 줄 -->
         <div style="padding:6px 16px;background:#edf4fb;border-top:2px solid var(--accent);display:flex;align-items:center;gap:0;flex-shrink:0;">
           <div style="flex:0 0 auto;padding-right:16px;border-right:1px solid #c5d9ef;margin-right:16px;">
-            <div style="font-size:10px;color:var(--text3);">합계 배치</div>
+            <div style="font-size:11px;color:var(--text3);">합계 배치</div>
             <span id="deploy-total-mm" style="font-family:var(--mono);color:var(--accent);font-size:18px;font-weight:700;">-</span>
-            <span style="font-size:10px;color:var(--text3);margin-left:2px;">인ㆍ월</span>
+            <span style="font-size:11px;color:var(--text3);margin-left:2px;">인ㆍ월</span>
           </div>
           <div id="deploy-legal-compare" style="flex:1;display:grid;grid-template-columns:1fr 1fr 1fr;gap:6px;">
             <div style="text-align:center;">
-              <div style="font-size:10px;color:var(--text3);" id="d-legal-label">법적 필요</div>
+              <div style="font-size:11px;color:var(--text3);" id="d-legal-label">법적 필요</div>
               <span style="font-family:var(--mono);font-size:15px;font-weight:700;color:var(--accent);" id="d-legal-mm">-</span>
-              <span style="font-size:10px;color:var(--text3);"> 인ㆍ월</span>
+              <span style="font-size:11px;color:var(--text3);"> 인ㆍ월</span>
             </div>
             <div style="text-align:center;">
-              <div style="font-size:10px;color:var(--text3);">현재 배치</div>
+              <div style="font-size:11px;color:var(--text3);">현재 배치</div>
               <span style="font-family:var(--mono);font-size:15px;font-weight:700;color:#059669;" id="d-placed-mm">-</span>
-              <span style="font-size:10px;color:var(--text3);"> 인ㆍ월</span>
+              <span style="font-size:11px;color:var(--text3);"> 인ㆍ월</span>
             </div>
             <div style="text-align:center;">
-              <div style="font-size:10px;color:var(--text3);">차이</div>
+              <div style="font-size:11px;color:var(--text3);">차이</div>
               <span id="d-diff-value" style="font-family:var(--mono);font-size:15px;font-weight:700;">-</span>
-              <div id="deploy-status-chip" style="display:inline-block;margin-top:1px;font-size:10px;padding:1px 8px;border-radius:10px;background:#f1f5f9;color:#64748b;font-weight:700;">-</div>
+              <div id="deploy-status-chip" style="display:inline-block;margin-top:1px;font-size:11px;padding:1px 8px;border-radius:10px;background:#f1f5f9;color:#64748b;font-weight:700;">-</div>
             </div>
           </div>
         </div>
@@ -1896,7 +1896,7 @@ function renderGantt() {
   });
 
   const COL_W = 30;
-  const TH_BASE = 'background:#e8eef8;border:1px solid #d1d5db;font-size:10px;text-align:center;';
+  const TH_BASE = 'background:#e8eef8;border:1px solid #d1d5db;font-size:11px;text-align:center;';
   let html = `<table style="border-collapse:collapse;">`;
 
   // 헤더 행1: 인원(rowspan2) | 배치기간(rowspan2) | 인월수(rowspan2) | 년도(colspan) | 비고(rowspan2)
@@ -1949,7 +1949,7 @@ function renderGantt() {
       : `✘ 배치 인원 부족  (${diff.toFixed(3)} 인월 미달)`;
 
   html += `<tr style="background:${rowBg};border-top:2px solid var(--accent);">`;
-  html += `<td style="padding:4px 6px;border:1px solid #d1d5db;font-size:10px;font-weight:700;color:var(--text2);white-space:nowrap;">합계</td>`;
+  html += `<td style="padding:4px 6px;border:1px solid #d1d5db;font-size:11px;font-weight:700;color:var(--text2);white-space:nowrap;">합계</td>`;
   html += `<td style="border:1px solid #d1d5db;"></td>`;
   html += `<td style="padding:3px 2px;border:1px solid #d1d5db;text-align:center;font-family:var(--mono);font-size:11px;font-weight:700;color:var(--accent);">${totalMM.toFixed(3)}</td>`;
   months.forEach(() => html += `<td style="border:1px solid #d1d5db;background:${rowBg};"></td>`);
