@@ -1482,14 +1482,9 @@ function onArchStartInput(el) {
   const startStr = el.value;
   if (!g_T) { calcBasicDur('res_arch'); updateDeployMM(); return; }
 
-  // 건축 종료: dur 수동이면 start+dur, 그 외 항상 start+g_T (공사기간 기준)
-  if (g_dep_dur_manual.has('res_arch')) {
-    const dur = parseDurInput(document.getElementById('dep_dur_res_arch')?.value || '');
-    if (dur > 0) setDepVal('dep_end_res_arch', endDateFromStart(startStr, dur));
-  } else {
-    setDepVal('dep_end_res_arch', endDateFromStart(startStr, g_T));
-    g_dep_manual.delete('res_arch_end'); // 시작 변경 시 end 수동 플래그 해제
-  }
+  // 건축 종료: 항상 start+g_T (공사기간 기준) — 상주건축 배치기간은 공사기간과 동일
+  setDepVal('dep_end_res_arch', endDateFromStart(startStr, g_T));
+  g_dep_manual.delete('res_arch_end');
   calcBasicDur('res_arch');
   const endStr = document.getElementById('dep_end_res_arch')?.value || endDateFromStart(startStr, g_T);
 
