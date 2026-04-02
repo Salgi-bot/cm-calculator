@@ -1366,6 +1366,7 @@ function resetDepRow(key) {
 // ─── 초기화 ─────────────────────────────────────────────
 function initDeployFromCalc(T) {
   g_dep_manual.clear();
+  g_contract_manual = false;
   const today = new Date();
   const startStr  = fmtDepDate(today);
   const endStr    = endDateFromStart(startStr, T);
