@@ -623,7 +623,15 @@
           <div class="section-title" style="margin-bottom:0;">3 수량 미세 조정</div>
           <button class="btn btn-xs btn-reset" onclick="resetQ()">🔄 자동값 초기화</button>
         </div>
-        <table class="qty-table" id="qty-table"></table>
+        <table class="qty-table" id="qty-table">
+          <thead>
+            <tr>
+              <th style="text-align:left;font-size:11px;font-weight:600;color:var(--text3);padding:3px 2px 4px;border-bottom:1px solid var(--border);">업무항목</th>
+              <th style="font-size:11px;font-weight:600;color:var(--text3);padding:3px 2px 4px;text-align:center;border-bottom:1px solid var(--border);">단위</th>
+              <th style="font-size:11px;font-weight:600;color:var(--text3);padding:3px 2px 4px;text-align:right;border-bottom:1px solid var(--border);width:80px;">수량</th>
+            </tr>
+          </thead>
+        </table>
       </div>
 
       <button class="btn btn-primary btn-calc" onclick="calculate()">▶ 전체 계산 및 출력</button>
