@@ -2367,9 +2367,9 @@ function buildQtyTable() {
       <td class="unit-label">(${unit})</td>
       <td style="text-align:right;"><input type="number" id="q_${escId(task)}" step="0.1" value="0" min="0"></td>
     `;
-    tb.appendChild(tr);
+    tbody.appendChild(tr);
   });
-  tb.addEventListener('input', e => {
+  tbody.addEventListener('input', e => {
     if (e.target.matches('input[type=number]')) scheduleAutoCalc();
   });
 }
