@@ -1228,8 +1228,9 @@ function setDepVal(id, val) {
   if (el) el.value = val;
 }
 
-// 4자리 이상 입력되면 자동 포맷
+// 4자리 이상 입력되면 자동 포맷 (이미 점이 있으면 편집 중이므로 건너뜀)
 function tryAutoFmt(el, isEnd) {
+  if (el.value.includes('.')) return; // 편집 중인 기존 날짜 — 건드리지 않음
   const d = el.value.replace(/\D/g, '');
   if (d.length >= 4) el.value = autoFmtDepInput(el.value, isEnd);
 }
