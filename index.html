@@ -1192,11 +1192,14 @@ function autoFmtDepInput(val, isEnd) {
   return `${yy}.${mm}.${d.slice(4,6)}`;
 }
 
-// YY.MM.DD 기간(월) 계산 (달력 월 기준, 시작월~종료월 포함)
+// YY.MM.DD 기간(월) 계산 — endDateFromStart의 역함수
+// 종료일이 시작일 day보다 작으면 완전한 월, 같거나 크면 +1월
 function calcMonthsDep(startStr, endStr) {
   const s = parseDepDate(startStr), e = parseDepDate(endStr);
   if (!s || !e || e < s) return 0;
-  return (e.getFullYear() - s.getFullYear()) * 12 + (e.getMonth() - s.getMonth()) + 1;
+  let m = (e.getFullYear() - s.getFullYear()) * 12 + (e.getMonth() - s.getMonth());
+  if (e.getDate() >= s.getDate()) m += 1;
+  return m;
 }
 
 // 시작(YY.MM.DD) + T개월 → 종료(YY.MM.DD)
