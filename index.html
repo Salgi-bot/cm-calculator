@@ -2216,6 +2216,8 @@ function calcFinance() {
 
   const sumBox = document.getElementById('finance-summary');
   sumBox.style.display = 'block';
+  const finInputArea = document.getElementById('fin-input-area');
+  if (finInputArea) finInputArea.style.display = 'block';
 
   document.getElementById('finance-summary-grid').innerHTML = `
     <div class="fin-sum-card"><div class="fin-sum-label">인건비 합계</div><div class="fin-sum-value">${fmt(totalMonthly)}<small style="font-size:12px;"> 천원</small></div></div>
