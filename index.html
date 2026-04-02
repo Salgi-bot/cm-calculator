@@ -1466,7 +1466,7 @@ function calcExtraDate(idx) {
     const endStr   = document.getElementById('extra_end_'   + idx)?.value || '';
     dur = calcMonthsDep(startStr, endStr);
     if (durEl) {
-      if (durEl.tagName === 'INPUT') durEl.value = dur > 0 ? dur + '' : '';
+      if (durEl.tagName === 'INPUT') durEl.value = dur > 0 ? (+dur).toFixed(2) : '';
       else durEl.textContent = dur > 0 ? (+dur).toFixed(2) + '개월' : '-';
     }
   }
