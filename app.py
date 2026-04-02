@@ -727,9 +727,8 @@ def calc_difficulty(C, S, T):
     return round(max(0.6, min(D, 2.0)), 3)
 
 def default_q(task, unit, T):
-    if any(k in task for k in ["시공계획","기술검토"]): return 20.0
+    if any(k in task for k in ["시공계획","기술검토"]): return T
     if any(k in task for k in ["설계변경","시공인터페이스","예산검증"]): return 1.0
-    if "일반행정" in task: return 0.0
     if any(k in task for k in ["사용자재","품질시험","기성검사"]): return round(T/6,1)
     if unit == "공사개월": return T
     if unit in ["공사일수","용역일수"]: return T*22
@@ -743,7 +742,7 @@ def default_q(task, unit, T):
 # ══════════════════════════════════════════════
 top_l, top_r = st.columns([3,1])
 with top_l:
-    st.markdown("### 🏗️ 건설사업관리 인월수 산출 &nbsp;<span style='font-size:13px;color:#94a3b8;font-weight:400;'>Ver 1.1</span>", unsafe_allow_html=True)
+    st.markdown("### 🏗️ 건설사업관리 인월수 산출 &nbsp;<span style='font-size:13px;color:#94a3b8;font-weight:400;'>Ver 1.1 &nbsp;·&nbsp; 최종 수정일 2026-04-02</span>", unsafe_allow_html=True)
     st.caption("국토교통부 고시 제2023-580호 · 건설엔지니어링 대가 등에 관한 기준 &nbsp;|&nbsp; (주)아이팝엔지니어링")
 
 # ══════════════════════════════════════════════
