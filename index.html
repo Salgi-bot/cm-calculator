@@ -1423,7 +1423,7 @@ function calcBasicDur(key) {
   const dur = calcMonthsDep(startStr, endStr);
   if (durEl) {
     if (durEl.tagName === 'INPUT') durEl.value = dur > 0 ? dur + '' : '';
-    else durEl.textContent = dur > 0 ? dur + '개월' : '-';
+    else durEl.textContent = dur > 0 ? (+dur).toFixed(2) + '개월' : '-';
   }
   return dur;
 }
@@ -1467,7 +1467,7 @@ function calcExtraDate(idx) {
     dur = calcMonthsDep(startStr, endStr);
     if (durEl) {
       if (durEl.tagName === 'INPUT') durEl.value = dur > 0 ? dur + '' : '';
-      else durEl.textContent = dur > 0 ? dur + '개월' : '-';
+      else durEl.textContent = dur > 0 ? (+dur).toFixed(2) + '개월' : '-';
     }
   }
   if (g_extra_rows[idx]) g_extra_rows[idx].dur = dur;
