@@ -1535,16 +1535,19 @@ function onArchEndInput(el) {
   updateDeployMM();
 }
 
-// 토목 종료 변경 → 기계 시작 자동
+// 토목 종료 변경 → 기계 시작 자동 (건축 범위 클램프)
 function onCivilEndInput(el) {
   tryAutoFmt(el, true);
   if (el.value.replace(/\D/g,'').length < 6) return;
+  // 건축 종료 범위로 클램프
+  const clamped = clampToArchRange(el.value, true);
+  if (clamped !== el.value) el.value = clamped;
   g_dep_manual.add('res_civil_end');
   const civilEnd = el.value;
   calcBasicDur('res_civil');
 
   if (!g_dep_manual.has('res_mech_start')) {
-    setDepVal('dep_start_res_mech', nextDepDay(civilEnd));
+    setDepVal('dep_start_res_mech', clampToArchRange(nextDepDay(civilEnd), false));
     calcBasicDur('res_mech');
   }
   updateDeployMM();
