@@ -1553,11 +1553,21 @@ function onCivilEndInput(el) {
   updateDeployMM();
 }
 
-// 그 외 날짜 수동 변경
+// 그 외 날짜 수동 변경 (건축 범위 클램프)
 function onDepInput(el, key, field, isEnd) {
   tryAutoFmt(el, isEnd);
   if (el.value.replace(/\D/g,'').length < 6) return;
+  // 건축(res_arch) 자체는 클램프 제외, 나머지는 범위 내로 제한
+  if (key !== 'res_arch') {
+    const clamped = clampToArchRange(el.value, isEnd);
+    if (clamped !== el.value) el.value = clamped;
+  }
   g_dep_manual.add(key + '_' + field);
+  // 토목 종료 직접 입력 시 기계 시작 연동 (기계 시작 수동이 아닐 때)
+  if (key === 'res_civil' && field === 'end' && !g_dep_manual.has('res_mech_start')) {
+    setDepVal('dep_start_res_mech', clampToArchRange(nextDepDay(el.value), false));
+    calcBasicDur('res_mech');
+  }
   calcBasicDur(key);
   updateDeployMM();
 }
