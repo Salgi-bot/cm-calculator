@@ -1009,8 +1009,8 @@
             <div class="fin-sum-card fin-input" style="grid-column:span 2;text-align:center;">
               <div class="fin-sum-label">계약금액</div>
               <div style="display:flex;align-items:center;gap:4px;justify-content:center;margin-top:5px;">
-                <input type="text" inputmode="numeric" id="fin_contract" value="0" class="is-manual fin-num-input" style="width:100px;text-align:right;" oninput="g_contract_manual=true;calcFinance()" onblur="fmtFinInput(this)">
-                <span style="font-size:11px;color:var(--text3);">천원</span>
+                <input type="text" inputmode="numeric" id="fin_contract" value="0" class="is-manual fin-num-input" style="width:110px;text-align:right;font-size:16px;font-weight:700;" oninput="g_contract_manual=true;calcFinance()" onblur="fmtFinInput(this)">
+                <span style="font-size:13px;color:var(--text3);">천원</span>
                 <button id="btn_contract_reset" title="자동(필요계약금액 백만원 올림)으로 복원" style="background:none;border:none;cursor:pointer;color:#6b7280;font-size:13px;padding:0 2px;line-height:1;display:none;flex-shrink:0;" onclick="g_contract_manual=false;document.getElementById('btn_contract_reset').style.display='none';calcFinance()">↺</button>
               </div>
             </div>
