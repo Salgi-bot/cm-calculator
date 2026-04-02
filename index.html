@@ -1768,12 +1768,12 @@ function addExtraRow() {
         <option selected>특급</option><option>고급</option><option>중급</option><option>초급</option>
       </select>
     </td>
-    <td><input type="text" class="dep-date-input" id="extra_start_${idx}" value="${defStart}" placeholder="YYMM" maxlength="8"
+    <td style="padding:2px;"><div style="display:flex;align-items:center;gap:1px;"><input type="text" class="dep-date-input" id="extra_start_${idx}" value="${defStart}" placeholder="YYMM" maxlength="8"
       oninput="tryAutoFmt(this,false);g_extra_rows[${idx}]._manualStart=true;calcExtraDate(${idx})"
-      onfocus="onDepDateFocus(this)" onblur="onDepDateBlur(this)"></td>
-    <td><input type="text" class="dep-date-input" id="extra_end_${idx}"   value="${defEnd}"   placeholder="YYMM" maxlength="8"
+      onfocus="onDepDateFocus(this)" onblur="onDepDateBlur(this)"><div style="display:flex;flex-direction:column;gap:1px;"><button class="dep-date-spin" onclick="adjustDepDate('extra_start_${idx}',1)">▲</button><button class="dep-date-spin" onclick="adjustDepDate('extra_start_${idx}',-1)">▼</button></div></div></td>
+    <td style="padding:2px;"><div style="display:flex;align-items:center;gap:1px;"><input type="text" class="dep-date-input" id="extra_end_${idx}" value="${defEnd}" placeholder="YYMM" maxlength="8"
       oninput="tryAutoFmt(this,true);g_extra_rows[${idx}]._manualEnd=true;calcExtraDate(${idx})"
-      onfocus="onDepDateFocus(this)" onblur="onDepDateBlur(this)"></td>
+      onfocus="onDepDateFocus(this)" onblur="onDepDateBlur(this)"><div style="display:flex;flex-direction:column;gap:1px;"><button class="dep-date-spin" onclick="adjustDepDate('extra_end_${idx}',1)">▲</button><button class="dep-date-spin" onclick="adjustDepDate('extra_end_${idx}',-1)">▼</button></div></div></td>
     <td><input type="text" class="dep-dur-input" id="extra_dur_${idx}" placeholder="자동" title="개월수 또는 일수 직접입력 (예: 6, 90일)" style="width:52px;font-size:11px;" oninput="onExtraDurInput(this,${idx})"></td>
     <td class="dep-num" id="extra_mm_${idx}">-</td>
     <td style="text-align:center;">
