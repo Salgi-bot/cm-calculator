@@ -2174,8 +2174,15 @@ function calcFinance() {
 
   const totalCost = totalMonthly + totalHousing + totalTax + totalStart + totalEnd;
   const profit    = parseFinVal('fin_profit');
-  const contract  = parseFinVal('fin_contract');
   const required  = totalCost + profit;
+
+  // 계약금액 자동: 필요계약금액을 십만원(=100천원) 단위로 올림
+  if (!g_contract_manual) {
+    const autoContract = required > 0 ? Math.ceil(required / 100) * 100 : 0;
+    const contractEl = document.getElementById('fin_contract');
+    if (contractEl) contractEl.value = autoContract > 0 ? autoContract.toLocaleString('ko-KR') : '0';
+  }
+  const contract = parseFinVal('fin_contract');
   const netPnL    = contract - totalCost;
   const margin    = contract > 0 ? (netPnL / contract * 100) : 0;
 
