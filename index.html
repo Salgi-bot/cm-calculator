@@ -2024,6 +2024,81 @@ function exportGanttExcel() {
   XLSX.writeFile(wb, projName + '_배치계획표.xlsx');
 }
 
+// ─── 날짜 ±1개월 스피너 ────────────────────────────────────
+function adjustDepDate(elId, delta) {
+  const el = document.getElementById(elId);
+  if (!el) return;
+  const d = parseDepDate(el.value);
+  if (!d) return;
+  d.setMonth(d.getMonth() + delta);
+  el.value = fmtDepDate(d);
+  el.dispatchEvent(new Event('input', { bubbles: true }));
+}
+
+// ─── Gantt → Word(.doc) 내보내기 ────────────────────────────
+function exportGanttDoc() {
+  const persons = getAllPersonsWithDates();
+  if (!persons.length) { alert('배치계획을 먼저 작성하세요.'); return; }
+  let minDate = null, maxDate = null;
+  persons.forEach(p => {
+    const s = parseDepDate(p.startStr), e = parseDepDate(p.endStr);
+    if (s && (!minDate || s < minDate)) minDate = s;
+    if (e && (!maxDate || e > maxDate)) maxDate = e;
+  });
+  if (!minDate || !maxDate) { alert('날짜를 먼저 입력하세요.'); return; }
+  const months = [];
+  const cur = new Date(minDate.getFullYear(), minDate.getMonth(), 1);
+  const last = new Date(maxDate.getFullYear(), maxDate.getMonth(), 1);
+  while (cur <= last) { months.push({ year: cur.getFullYear(), month: cur.getMonth()+1 }); cur.setMonth(cur.getMonth()+1); }
+  const yearGroups = [];
+  months.forEach(m => { const l = yearGroups[yearGroups.length-1]; if (l && l.year===m.year) l.count++; else yearGroups.push({ year:m.year, count:1 }); });
+  const COL_W = 22;
+  const TH = 'background:#E8EEF8;border:1px solid #D1D5DB;font-size:8pt;text-align:center;padding:2px 3px;';
+  const TD = 'border:1px solid #E5E7EB;padding:2px 3px;font-size:8pt;';
+  let tbl = `<table style="border-collapse:collapse;width:100%;font-family:맑은 고딕,sans-serif;"><thead><tr>`;
+  tbl += `<th rowspan="2" style="${TH}min-width:80px;text-align:left;">인원</th>`;
+  tbl += `<th rowspan="2" style="${TH}width:46px;">배치기간</th>`;
+  tbl += `<th rowspan="2" style="${TH}width:42px;">인월수</th>`;
+  yearGroups.forEach(yg => { tbl += `<th colspan="${yg.count}" style="${TH}font-weight:700;">${yg.year}년</th>`; });
+  tbl += `<th rowspan="2" style="${TH}min-width:48px;">비고</th></tr><tr>`;
+  months.forEach(m => { tbl += `<th style="${TH}width:${COL_W}px;font-size:7pt;">${m.month}월</th>`; });
+  tbl += `</tr></thead><tbody>`;
+  persons.forEach(p => {
+    const pS = parseDepDate(p.startStr), pE = parseDepDate(p.endStr);
+    const color = GANTT_COLORS[p.type+' '+p.field] || '#64748b';
+    tbl += `<tr><td style="${TD}font-weight:600;white-space:nowrap;">${p.label}<br><span style="font-size:7pt;color:#64748B;font-weight:400;">${p.grade}</span></td>`;
+    tbl += `<td style="${TD}text-align:center;font-family:Consolas,monospace;">${(+p.dur).toFixed(2)}개월</td>`;
+    tbl += `<td style="${TD}text-align:center;font-family:Consolas,monospace;color:#1D4ED8;font-weight:600;">${p.mm.toFixed(3)}</td>`;
+    months.forEach(m => {
+      const mS = new Date(m.year,m.month-1,1), mE = new Date(m.year,m.month,0);
+      const active = pS && pE && pS<=mE && pE>=mS;
+      tbl += `<td style="${TD}width:${COL_W}px;height:18px;background:${active?color:'transparent'};"></td>`;
+    });
+    tbl += `<td style="${TD}"></td></tr>`;
+  });
+  const totalMM = persons.reduce((s,p) => s+p.mm, 0);
+  const legalMM = parseFloat(document.getElementById('d-legal-mm')?.textContent) || 0;
+  const diff = legalMM > 0 ? totalMM - legalMM : null;
+  const rowBg = diff===null ? '#F8FAFF' : (diff>=0 ? '#F0FDF4' : '#FEF2F2');
+  const sc = diff===null ? '#64748B' : (diff>=0 ? '#059669' : '#DC2626');
+  const st = diff===null ? '법적 인월수를 먼저 산출하세요' : diff>=0 ? `✔ 이상 없음 (+${diff.toFixed(3)} 인월 초과)` : `✘ 부족 (${diff.toFixed(3)} 인월 미달)`;
+  tbl += `<tr style="background:${rowBg};border-top:2px solid #1D4ED8;"><td style="${TD}font-weight:700;">합계</td><td style="${TD}"></td>`;
+  tbl += `<td style="${TD}text-align:center;font-family:Consolas,monospace;font-weight:700;color:#1D4ED8;">${totalMM.toFixed(3)}</td>`;
+  months.forEach(() => tbl += `<td style="${TD}background:${rowBg};"></td>`);
+  tbl += `<td style="${TD}background:${rowBg};"></td></tr>`;
+  tbl += `<tr style="background:${rowBg};"><td colspan="${3+months.length+1}" style="${TD}font-weight:700;color:${sc};">`;
+  tbl += `법적 배치인월수: ${legalMM>0?legalMM.toFixed(3):'-'} 인월 &nbsp;|&nbsp; 배치 인월수: ${totalMM.toFixed(3)} 인월 &nbsp;|&nbsp; ${st}</td></tr>`;
+  tbl += `</tbody></table>`;
+  const projName = document.getElementById('proj_name')?.value || '감리원배치계획';
+  const title = projName + ' 배치계획표';
+  const htmlDoc = `<html xmlns:o="urn:schemas-microsoft-com:office:office" xmlns:w="urn:schemas-microsoft-com:office:word" xmlns="http://www.w3.org/TR/REC-html40"><head><meta charset="UTF-8"><title>${title}</title><style>body{font-family:맑은 고딕,sans-serif;margin:1cm;}h3{font-size:12pt;color:#1D4ED8;margin-bottom:8px;}</style></head><body><h3>${title}</h3>${tbl}</body></html>`;
+  const blob = new Blob(['\ufeff', htmlDoc], { type: 'application/vnd.ms-word;charset=utf-8' });
+  const url = URL.createObjectURL(blob);
+  const a = document.createElement('a');
+  a.href = url; a.download = projName + '_배치계획표.doc'; a.click();
+  URL.revokeObjectURL(url);
+}
+
 function exportGanttCSV() {
   const persons = getAllPersonsWithDates();
   if (persons.length === 0) { alert('배치계획을 먼저 작성하세요.'); return; }
