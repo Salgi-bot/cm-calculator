@@ -2097,7 +2097,7 @@ function syncFinanceFromDeploy() {
     const fmtV = n => n > 0 ? Math.round(n).toLocaleString('ko-KR') : '';
     tr.innerHTML = `
       <td style="text-align:left;font-weight:600;">${p.label}</td>
-      <td style="font-family:var(--mono);text-align:center;">${p.dur}개월</td>
+      <td style="font-family:var(--mono);text-align:center;">${(+p.dur).toFixed(2)}개월</td>
       <td><input type="text" inputmode="numeric" class="fin-num-input" id="fin_annual_${i}" value="${fmtV(sv.annual)}" placeholder="연봉" oninput="calcFinance()" onblur="fmtFinInput(this)"></td>
       <td id="fin_monthly_${i}" style="font-family:var(--mono);text-align:right;color:var(--accent);font-weight:600;">${monthly.toLocaleString('ko-KR')}</td>
       <td><input type="text" inputmode="numeric" class="fin-num-input" id="fin_housing_${i}" value="${fmtV(sv.housing)}" placeholder="주재비" oninput="calcFinance()" onblur="fmtFinInput(this)"></td>
