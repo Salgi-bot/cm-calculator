@@ -2356,7 +2356,10 @@ window.addEventListener('DOMContentLoaded', () => {
 
 function buildQtyTable() {
   const tb = document.getElementById('qty-table');
-  tb.innerHTML = '';
+  // thead 보존 — tbody만 재생성
+  let tbody = tb.querySelector('tbody');
+  if (!tbody) { tbody = document.createElement('tbody'); tb.appendChild(tbody); }
+  tbody.innerHTML = '';
   DB.forEach(([task, unit]) => {
     const tr = document.createElement('tr');
     tr.innerHTML = `
