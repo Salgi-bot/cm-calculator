@@ -2227,7 +2227,7 @@ function calcFinance() {
   const pnlClass = netPnL >= 0 ? 'profit' : 'loss';
   const pnlSign  = netPnL >= 0 ? '+' : '';
   document.getElementById('finance-summary-result').innerHTML = `
-    <div class="fin-sum-card total"><div class="fin-sum-label">총 원가</div><div class="fin-sum-value" style="color:#1d4ed8;">${fmt(totalCost)}<small style="font-size:12px;"> 천원</small></div></div>
+    <div class="fin-sum-card total" style="grid-column:span 2"><div class="fin-sum-label">총 원가</div><div class="fin-sum-value" style="color:#1d4ed8;">${fmt(totalCost)}<small style="font-size:12px;"> 천원</small></div></div>
     <div class="fin-sum-card"><div class="fin-sum-label">이윤 + 필요 계약금액</div><div class="fin-sum-value">${fmt(profit)} + <span style="color:#9ca3af;">${fmt(required)}</span><small style="font-size:12px;"> 천원</small></div></div>
     <div class="fin-sum-card ${pnlClass}"><div class="fin-sum-label">실제 손익 (계약금액 기준)</div><div class="fin-sum-value">${pnlSign}${fmt(netPnL)}<small style="font-size:12px;"> 천원</small>${contract>0?`<div style="font-size:11px;color:var(--text3);">이익률 ${margin.toFixed(1)}%</div>`:''}</div></div>
   `;
