@@ -1899,7 +1899,7 @@ function renderGantt() {
     const color = GANTT_COLORS[p.type + ' ' + p.field] || '#64748b';
     html += `<tr>`;
     html += `<td style="padding:3px 6px;border:1px solid #e5e7eb;font-weight:600;white-space:nowrap;font-size:11px;">${p.label}<br><span style="font-size:9px;color:var(--text3);font-weight:400;">${p.grade}</span></td>`;
-    html += `<td style="padding:3px 2px;border:1px solid #e5e7eb;text-align:center;font-family:var(--mono);font-size:11px;color:var(--text2);">${p.dur}개월</td>`;
+    html += `<td style="padding:3px 2px;border:1px solid #e5e7eb;text-align:center;font-family:var(--mono);font-size:11px;color:var(--text2);">${(+p.dur).toFixed(2)}개월</td>`;
     html += `<td style="padding:3px 2px;border:1px solid #e5e7eb;text-align:center;font-family:var(--mono);font-size:11px;color:var(--accent);font-weight:600;">${p.mm.toFixed(3)}</td>`;
     months.forEach(m => {
       const mS = new Date(m.year, m.month - 1, 1);
