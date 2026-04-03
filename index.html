@@ -2495,6 +2495,15 @@ function resetQ() {
 // 자동 계산 (B방식: 첫 계산 후부터 1초 디바운스)
 // ═══════════════════════════════════════════
 let hasCalculated = false;   // 최초 계산 버튼을 눌렀는지 여부
+
+// 산출결과·배치계획 탭 비교기준 선택박스 양방향 동기화
+function syncLegalMode(value) {
+  const depEl = document.getElementById('dep-legal-mode');
+  const rcEl  = document.getElementById('rc-legal-mode');
+  if (depEl && depEl.value !== value) depEl.value = value;
+  if (rcEl  && rcEl.value  !== value) rcEl.value  = value;
+  updateDeployMM();
+}
 let autoCalcTimer = null;    // 디바운스 타이머
 
 function scheduleAutoCalc() {
