@@ -910,10 +910,8 @@
                   </label>
                 </td>
                 <td style="font-size:10px;color:var(--text3);text-align:center;">자동</td>
-                <td><input type="text" class="dep-date-input" id="dep_start_non_arch" placeholder="자동" maxlength="8"
-                  oninput="onNonArchManualInput()" onfocus="onDepDateFocus(this)" onblur="onDepDateBlur(this)"></td>
-                <td><input type="text" class="dep-date-input" id="dep_end_non_arch" placeholder="자동" maxlength="8"
-                  oninput="onNonArchManualInput()" onfocus="onDepDateFocus(this)" onblur="onDepDateBlur(this)"></td>
+                <td><div style="display:flex;align-items:center;gap:2px;"><button class="dep-month-btn" onclick="adjustDepMonth('dep_start_non_arch',-1)">◀</button><input type="text" class="dep-date-input" id="dep_start_non_arch" placeholder="자동" maxlength="8" oninput="onNonArchManualInput()" onfocus="onDepDateFocus(this)" onblur="onDepDateBlur(this)"><button class="dep-month-btn" onclick="adjustDepMonth('dep_start_non_arch',1)">▶</button></div></td>
+                <td><div style="display:flex;align-items:center;gap:2px;"><button class="dep-month-btn" onclick="adjustDepMonth('dep_end_non_arch',-1)">◀</button><input type="text" class="dep-date-input" id="dep_end_non_arch" placeholder="자동" maxlength="8" oninput="onNonArchManualInput()" onfocus="onDepDateFocus(this)" onblur="onDepDateBlur(this)"><button class="dep-month-btn" onclick="adjustDepMonth('dep_end_non_arch',1)">▶</button></div></td>
                 <td style="text-align:center;font-family:var(--mono);font-size:11px;font-weight:600;" id="dep_dur_non_arch">-</td>
                 <td class="dep-num" id="dep_mm_non_arch">-</td>
                 <td></td>
