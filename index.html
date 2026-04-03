@@ -2027,13 +2027,26 @@ function adjustProfitUnit(delta) {
   calcFinance();
 }
 
+// 연봉 입력 시: 비상주 건축이고 0원이면 주재비·세금 자동 0
+function onAnnualInput(el, i) {
+  const label = document.querySelector(`#finance-person-tbody tr[data-fin-idx="${i}"]`)?.dataset.label || '';
+  const annual = parseFloat((el.value || '').replace(/,/g, '')) || 0;
+  if (annual === 0 && label.includes('비상주')) {
+    const hEl = document.getElementById('fin_housing_' + i);
+    const tEl = document.getElementById('fin_tax_'     + i);
+    if (hEl) hEl.value = '';
+    if (tEl) tEl.value = '';
+  }
+  calcFinance();
+}
+
 function calcFinance() {
   const rows = document.querySelectorAll('#finance-person-tbody tr[data-fin-idx]');
   if (rows.length === 0) return;
 
   const fmt = n => Math.round(n).toLocaleString('ko-KR'); // 천원 단위 콤마 포맷
 
-  let totalMonthly = 0, totalHousing = 0, totalTax = 0, totalStart = 0, totalEnd = 0;
+  let totalMonthly = 0, totalHousing = 0, totalTax = 0, totalStart = 0, totalEnd = 0, totalRetire = 0;
 
   rows.forEach(tr => {
     const i = tr.dataset.finIdx;
@@ -2045,21 +2058,27 @@ function calcFinance() {
     // 월급여 = 연봉 / 13 (자동 산정)
     const monthly = annual > 0 ? Math.round(annual / 13) : 0;
 
-    // 배치 1개월 전: 월급여 + 세금
-    const startCost = monthly + tax;
-    // 종료 후 1개월: 월급여만
-    const endCost = monthly;
+    // 퇴직금: 배치기간분 + 배치전1개월분 + 종료후1개월분
+    const retireDur   = Math.round(monthly * dur / 12);
+    const retireMonth = Math.round(monthly / 12);
+
+    // 배치 1개월 전: 월급여 + 세금 + 퇴직금(1개월)
+    const startCost = monthly + tax + retireMonth;
+    // 종료 후 1개월: 월급여 + 세금 + 퇴직금(1개월)
+    const endCost = monthly + tax + retireMonth;
 
     // 자동 산정값 표시 업데이트
     const monthlyEl = document.getElementById('fin_monthly_' + i);
     const startEl   = document.getElementById('fin_start_'   + i);
     const endEl     = document.getElementById('fin_end_'     + i);
+    const retireEl  = document.getElementById('fin_retire_'  + i);
     if (monthlyEl) monthlyEl.textContent = fmt(monthly);
     if (startEl)   startEl.textContent   = fmt(startCost);
     if (endEl)     endEl.textContent     = fmt(endCost);
+    if (retireEl)  retireEl.textContent  = fmt(retireDur);
 
-    // 소계 = (월급여 + 주재비 + 세금) × 배치기간 + 배치전1개월 + 종료후1개월
-    const sub = (monthly + housing + tax) * dur + startCost + endCost;
+    // 소계 = (월급여 + 주재비 + 세금) × 배치기간 + 퇴직금(배치기간) + 배치전1개월 + 종료후1개월
+    const sub = (monthly + housing + tax) * dur + retireDur + startCost + endCost;
     const subEl = document.getElementById('fin_sub_' + i);
     if (subEl) subEl.textContent = fmt(sub) + ' 천원';
 
@@ -2068,9 +2087,10 @@ function calcFinance() {
     totalTax     += tax * dur;
     totalStart   += startCost;
     totalEnd     += endCost;
+    totalRetire  += retireDur + retireMonth * 2;
   });
 
-  const totalCost = totalMonthly + totalHousing + totalTax + totalStart + totalEnd;
+  const totalCost = totalMonthly + totalHousing + totalTax + totalStart + totalEnd + totalRetire;
   const profit    = parseFinVal('fin_profit');
   const contract  = parseFinVal('fin_contract');
   const required  = totalCost + profit;
@@ -2085,6 +2105,7 @@ function calcFinance() {
     <div class="fin-sum-card"><div class="fin-sum-label">주재비 합계</div><div class="fin-sum-value">${fmt(totalHousing)}<small style="font-size:12px;"> 천원</small></div></div>
     <div class="fin-sum-card"><div class="fin-sum-label">세금 합계</div><div class="fin-sum-value">${fmt(totalTax)}<small style="font-size:12px;"> 천원</small></div></div>
     <div class="fin-sum-card"><div class="fin-sum-label">배치전/종료후비</div><div class="fin-sum-value">${fmt(totalStart+totalEnd)}<small style="font-size:12px;"> 천원</small></div></div>
+    <div class="fin-sum-card"><div class="fin-sum-label">퇴직금 합계</div><div class="fin-sum-value">${fmt(totalRetire)}<small style="font-size:12px;"> 천원</small></div></div>
   `;
 
   const pnlClass = netPnL >= 0 ? 'profit' : 'loss';
