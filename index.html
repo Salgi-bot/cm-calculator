@@ -372,12 +372,6 @@
   .fin-sum-card.contract { border-color: #f59e0b; background: #fffbeb; }
   .fin-sum-label { font-size: 11px; color: var(--text3); margin-bottom: 4px; }
   .fin-sum-value { font-family: var(--mono); font-size: 17px; font-weight: 700; color: #0f172a; }
-  .preset-btn { font-size:11px;padding:3px 10px;border-radius:4px;font-weight:700;cursor:pointer;transition:all 0.15s; }
-  .preset-btn.sel-blue  { background:#1d4ed8!important;color:#fff!important;border-color:#1d4ed8!important; }
-  .preset-btn.sel-green { background:#16a34a!important;color:#fff!important;border-color:#16a34a!important; }
-  .preset-btn.sel-amber { background:#d97706!important;color:#fff!important;border-color:#d97706!important; }
-  .dep-slider-btn { height:26px;min-width:22px;border:1px solid #cbd5e1;border-radius:4px;background:#f8fafc;color:#334155;font-size:12px;font-weight:700;cursor:pointer;line-height:1;padding:0 4px; }
-  .dep-slider-disp { font-size:11px;font-weight:700;min-width:36px;text-align:center;color:#1e293b; }
 
   /* ══════════════════════════════
      RESPONSIVE — MOBILE
@@ -463,7 +457,7 @@
     <div class="topbar-brand">
       <span class="topbar-company">(주)아이팝엔지니어링</span>
       <span class="topbar-title">건설사업관리 <span>인월수 산출</span></span>
-      <span class="topbar-ver">Ver 1.6 &nbsp;·&nbsp; 프리셋 선택, 견적금액 자동, 날짜 슬라이더</span>
+      <span class="topbar-ver">Ver 1.5 &nbsp;·&nbsp; 이윤 산식 한줄 표시 (T×단가 = 계산값)</span>
     </div>
     <div class="topbar-right">
       <button class="btn btn-sm btn-gray" onclick="showHelp()">? 사용설명서</button>
@@ -785,8 +779,8 @@
                     <option selected>특급</option><option>고급</option><option>중급</option><option>초급</option>
                   </select>
                 </td>
-                <td><div style="display:flex;align-items:center;gap:2px;"><button class="dep-slider-btn" onclick="adjustDepDate('res_arch','start',-1)">◀</button><span class="dep-slider-disp" id="dep_start_res_arch_disp">-</span><button class="dep-slider-btn" onclick="adjustDepDate('res_arch','start',1)">▶</button><input type="hidden" id="dep_start_res_arch" value=""></div></td>
-                <td><div style="display:flex;align-items:center;gap:2px;"><button class="dep-slider-btn" onclick="adjustDepDate('res_arch','end',-1)">◀</button><span class="dep-slider-disp" id="dep_end_res_arch_disp">-</span><button class="dep-slider-btn" onclick="adjustDepDate('res_arch','end',1)">▶</button><input type="hidden" id="dep_end_res_arch" value=""></div></td>
+                <td><input type="text" class="dep-date-input" id="dep_start_res_arch" placeholder="YYMM" maxlength="8" oninput="onArchStartInput(this)" onfocus="onDepDateFocus(this)" onblur="onDepDateBlur(this)"></td>
+                <td><input type="text" class="dep-date-input" id="dep_end_res_arch"   placeholder="YYMM" maxlength="8" oninput="onArchEndInput(this)"  onfocus="onDepDateFocus(this)" onblur="onDepDateBlur(this)"></td>
                 <td><input type="text" class="dep-dur-input" id="dep_dur_res_arch" placeholder="자동" title="개월수 또는 일수 직접입력 (예: 6, 90일)" style="width:52px;font-size:11px;" oninput="onDurInput(this,'res_arch')"></td>
                 <td class="dep-num" id="dep_mm_res_arch">-</td>
                 <td></td>
@@ -805,8 +799,8 @@
                     <option selected>특급</option><option>고급</option><option>중급</option><option>초급</option>
                   </select>
                 </td>
-                <td><div style="display:flex;align-items:center;gap:2px;"><button class="dep-slider-btn" onclick="adjustDepDate('res_civil','start',-1)">◀</button><span class="dep-slider-disp" id="dep_start_res_civil_disp">-</span><button class="dep-slider-btn" onclick="adjustDepDate('res_civil','start',1)">▶</button><input type="hidden" id="dep_start_res_civil" value=""></div></td>
-                <td><div style="display:flex;align-items:center;gap:2px;"><button class="dep-slider-btn" onclick="adjustDepDate('res_civil','end',-1)">◀</button><span class="dep-slider-disp" id="dep_end_res_civil_disp">-</span><button class="dep-slider-btn" onclick="adjustDepDate('res_civil','end',1)">▶</button><input type="hidden" id="dep_end_res_civil" value=""></div></td>
+                <td><input type="text" class="dep-date-input" id="dep_start_res_civil" placeholder="YYMM" maxlength="8" oninput="onDepInput(this,'res_civil','start',false)" onfocus="onDepDateFocus(this)" onblur="onDepDateBlur(this)"></td>
+                <td><input type="text" class="dep-date-input" id="dep_end_res_civil"   placeholder="YYMM" maxlength="8" oninput="onCivilEndInput(this)" onfocus="onDepDateFocus(this)" onblur="onDepDateBlur(this)"></td>
                 <td><input type="text" class="dep-dur-input" id="dep_dur_res_civil" placeholder="자동" title="개월수 또는 일수 직접입력 (예: 6, 90일)" style="width:52px;font-size:11px;" oninput="onDurInput(this,'res_civil')"></td>
                 <td class="dep-num" id="dep_mm_res_civil">-</td>
                 <td></td>
@@ -825,8 +819,8 @@
                     <option selected>특급</option><option>고급</option><option>중급</option><option>초급</option>
                   </select>
                 </td>
-                <td><div style="display:flex;align-items:center;gap:2px;"><button class="dep-slider-btn" onclick="adjustDepDate('res_mech','start',-1)">◀</button><span class="dep-slider-disp" id="dep_start_res_mech_disp">-</span><button class="dep-slider-btn" onclick="adjustDepDate('res_mech','start',1)">▶</button><input type="hidden" id="dep_start_res_mech" value=""></div></td>
-                <td><div style="display:flex;align-items:center;gap:2px;"><button class="dep-slider-btn" onclick="adjustDepDate('res_mech','end',-1)">◀</button><span class="dep-slider-disp" id="dep_end_res_mech_disp">-</span><button class="dep-slider-btn" onclick="adjustDepDate('res_mech','end',1)">▶</button><input type="hidden" id="dep_end_res_mech" value=""></div></td>
+                <td><input type="text" class="dep-date-input" id="dep_start_res_mech" placeholder="YYMM" maxlength="8" oninput="onDepInput(this,'res_mech','start',false)" onfocus="onDepDateFocus(this)" onblur="onDepDateBlur(this)"></td>
+                <td><input type="text" class="dep-date-input" id="dep_end_res_mech"   placeholder="YYMM" maxlength="8" oninput="onDepInput(this,'res_mech','end',true)" onfocus="onDepDateFocus(this)" onblur="onDepDateBlur(this)"></td>
                 <td><input type="text" class="dep-dur-input" id="dep_dur_res_mech" placeholder="자동" title="개월수 또는 일수 직접입력 (예: 6, 90일)" style="width:52px;font-size:11px;" oninput="onDurInput(this,'res_mech')"></td>
                 <td class="dep-num" id="dep_mm_res_mech">-</td>
                 <td></td>
@@ -929,38 +923,38 @@
           <!-- 연봉 프리셋 선택 -->
           <div style="margin-bottom:10px;padding:8px 10px;background:#f0f9ff;border:1px solid #bae6fd;border-radius:6px;display:flex;align-items:center;gap:8px;flex-wrap:wrap;">
             <span style="font-size:11px;font-weight:700;color:var(--accent);white-space:nowrap;">연봉 프리셋</span>
-            <div id="preset-annual-group" style="display:flex;gap:4px;flex-wrap:wrap;">
-              <button class="preset-btn" style="border:1.5px solid #3b82f6;color:#1d4ed8;" onclick="selectPreset(this,'annual');applyAnnualPreset(70000,65000)">7,000만</button>
-              <button class="preset-btn" style="border:1.5px solid #3b82f6;color:#1d4ed8;" onclick="selectPreset(this,'annual');applyAnnualPreset(65000,60000)">6,500만</button>
-              <button class="preset-btn" style="border:1.5px solid #3b82f6;color:#1d4ed8;" onclick="selectPreset(this,'annual');applyAnnualPreset(60000,55000)">6,000만</button>
-              <button class="preset-btn" style="border:1.5px solid #3b82f6;color:#1d4ed8;" onclick="selectPreset(this,'annual');applyAnnualPreset(55000,50000)">5,500만</button>
-              <button class="preset-btn" style="border:1.5px solid #3b82f6;color:#1d4ed8;" onclick="selectPreset(this,'annual');applyAnnualPreset(50000,45000)">5,000만</button>
+            <div style="display:flex;gap:4px;flex-wrap:wrap;">
+              <button onclick="applyAnnualPreset(70000,65000)" style="font-size:11px;padding:3px 10px;border:1.5px solid #3b82f6;border-radius:4px;background:#fff;color:#1d4ed8;font-weight:700;cursor:pointer;">7,000만</button>
+              <button onclick="applyAnnualPreset(65000,60000)" style="font-size:11px;padding:3px 10px;border:1.5px solid #3b82f6;border-radius:4px;background:#fff;color:#1d4ed8;font-weight:700;cursor:pointer;">6,500만</button>
+              <button onclick="applyAnnualPreset(60000,55000)" style="font-size:11px;padding:3px 10px;border:1.5px solid #3b82f6;border-radius:4px;background:#fff;color:#1d4ed8;font-weight:700;cursor:pointer;">6,000만</button>
+              <button onclick="applyAnnualPreset(55000,50000)" style="font-size:11px;padding:3px 10px;border:1.5px solid #3b82f6;border-radius:4px;background:#fff;color:#1d4ed8;font-weight:700;cursor:pointer;">5,500만</button>
+              <button onclick="applyAnnualPreset(50000,45000)" style="font-size:11px;padding:3px 10px;border:1.5px solid #3b82f6;border-radius:4px;background:#fff;color:#1d4ed8;font-weight:700;cursor:pointer;">5,000만</button>
             </div>
             <span style="font-size:10px;color:var(--text3);">상주건축 기준, 나머지 -500만원 자동 적용</span>
           </div>
           <!-- 주재비 프리셋 선택 -->
           <div style="margin-bottom:6px;padding:8px 10px;background:#f0fdf4;border:1px solid #bbf7d0;border-radius:6px;display:flex;align-items:center;gap:8px;flex-wrap:wrap;">
             <span style="font-size:11px;font-weight:700;color:#059669;white-space:nowrap;">주재비 프리셋</span>
-            <div id="preset-housing-group" style="display:flex;gap:4px;flex-wrap:wrap;">
-              <button class="preset-btn" style="border:1.5px solid #16a34a;color:#15803d;" onclick="selectPreset(this,'housing');applyHousingPreset(400)">40만</button>
-              <button class="preset-btn" style="border:1.5px solid #16a34a;color:#15803d;" onclick="selectPreset(this,'housing');applyHousingPreset(500)">50만</button>
-              <button class="preset-btn" style="border:1.5px solid #16a34a;color:#15803d;" onclick="selectPreset(this,'housing');applyHousingPreset(600)">60만</button>
-              <button class="preset-btn" style="border:1.5px solid #16a34a;color:#15803d;" onclick="selectPreset(this,'housing');applyHousingPreset(700)">70만</button>
-              <button class="preset-btn" style="border:1.5px solid #16a34a;color:#15803d;" onclick="selectPreset(this,'housing');applyHousingPreset(800)">80만</button>
-              <button class="preset-btn" style="border:1.5px solid #16a34a;color:#15803d;" onclick="selectPreset(this,'housing');applyHousingPreset(900)">90만</button>
-              <button class="preset-btn" style="border:1.5px solid #16a34a;color:#15803d;" onclick="selectPreset(this,'housing');applyHousingPreset(1000)">100만</button>
+            <div style="display:flex;gap:4px;flex-wrap:wrap;">
+              <button onclick="applyHousingPreset(400)" style="font-size:11px;padding:3px 10px;border:1.5px solid #16a34a;border-radius:4px;background:#fff;color:#15803d;font-weight:700;cursor:pointer;">40만</button>
+              <button onclick="applyHousingPreset(500)" style="font-size:11px;padding:3px 10px;border:1.5px solid #16a34a;border-radius:4px;background:#fff;color:#15803d;font-weight:700;cursor:pointer;">50만</button>
+              <button onclick="applyHousingPreset(600)" style="font-size:11px;padding:3px 10px;border:1.5px solid #16a34a;border-radius:4px;background:#fff;color:#15803d;font-weight:700;cursor:pointer;">60만</button>
+              <button onclick="applyHousingPreset(700)" style="font-size:11px;padding:3px 10px;border:1.5px solid #16a34a;border-radius:4px;background:#fff;color:#15803d;font-weight:700;cursor:pointer;">70만</button>
+              <button onclick="applyHousingPreset(800)" style="font-size:11px;padding:3px 10px;border:1.5px solid #16a34a;border-radius:4px;background:#fff;color:#15803d;font-weight:700;cursor:pointer;">80만</button>
+              <button onclick="applyHousingPreset(900)" style="font-size:11px;padding:3px 10px;border:1.5px solid #16a34a;border-radius:4px;background:#fff;color:#15803d;font-weight:700;cursor:pointer;">90만</button>
+              <button onclick="applyHousingPreset(1000)" style="font-size:11px;padding:3px 10px;border:1.5px solid #16a34a;border-radius:4px;background:#fff;color:#15803d;font-weight:700;cursor:pointer;">100만</button>
             </div>
             <span style="font-size:10px;color:var(--text3);">전체 인원 일괄 적용 · 셀 직접 수정 가능</span>
           </div>
           <!-- 세금 프리셋 선택 -->
           <div style="margin-bottom:10px;padding:8px 10px;background:#fefce8;border:1px solid #fef08a;border-radius:6px;display:flex;align-items:center;gap:8px;flex-wrap:wrap;">
             <span style="font-size:11px;font-weight:700;color:#92400e;white-space:nowrap;">세금 프리셋</span>
-            <div id="preset-tax-group" style="display:flex;gap:4px;flex-wrap:wrap;">
-              <button class="preset-btn" style="border:1.5px solid #d97706;color:#92400e;" onclick="selectPreset(this,'tax');applyTaxPreset(300)">30만</button>
-              <button class="preset-btn" style="border:1.5px solid #d97706;color:#92400e;" onclick="selectPreset(this,'tax');applyTaxPreset(350)">35만</button>
-              <button class="preset-btn" style="border:1.5px solid #d97706;color:#92400e;" onclick="selectPreset(this,'tax');applyTaxPreset(400)">40만</button>
-              <button class="preset-btn" style="border:1.5px solid #d97706;color:#92400e;" onclick="selectPreset(this,'tax');applyTaxPreset(450)">45만</button>
-              <button class="preset-btn" style="border:1.5px solid #d97706;color:#92400e;" onclick="selectPreset(this,'tax');applyTaxPreset(500)">50만</button>
+            <div style="display:flex;gap:4px;flex-wrap:wrap;">
+              <button onclick="applyTaxPreset(300)" style="font-size:11px;padding:3px 10px;border:1.5px solid #d97706;border-radius:4px;background:#fff;color:#92400e;font-weight:700;cursor:pointer;">30만</button>
+              <button onclick="applyTaxPreset(350)" style="font-size:11px;padding:3px 10px;border:1.5px solid #d97706;border-radius:4px;background:#fff;color:#92400e;font-weight:700;cursor:pointer;">35만</button>
+              <button onclick="applyTaxPreset(400)" style="font-size:11px;padding:3px 10px;border:1.5px solid #d97706;border-radius:4px;background:#fff;color:#92400e;font-weight:700;cursor:pointer;">40만</button>
+              <button onclick="applyTaxPreset(450)" style="font-size:11px;padding:3px 10px;border:1.5px solid #d97706;border-radius:4px;background:#fff;color:#92400e;font-weight:700;cursor:pointer;">45만</button>
+              <button onclick="applyTaxPreset(500)" style="font-size:11px;padding:3px 10px;border:1.5px solid #d97706;border-radius:4px;background:#fff;color:#92400e;font-weight:700;cursor:pointer;">50만</button>
             </div>
             <span style="font-size:10px;color:var(--text3);">5만원 단위 · 셀 직접 수정 가능</span>
           </div>
@@ -986,37 +980,31 @@
           </div>
         </div>
 
+        <!-- 이윤 / 계약금액 -->
+        <div class="section">
+          <div class="section-title">이윤 및 계약금액 (단위: 천원)</div>
+          <div class="field" style="flex-wrap:wrap;gap:6px;align-items:center;background:#f0fdf4;border-radius:8px;padding:8px 12px;">
+            <label style="flex-shrink:0;font-weight:700;color:#065f46;">이윤</label>
+            <span style="font-size:13px;color:#475569;white-space:nowrap;flex-shrink:0;">T(<span id="fin_profit_T">0</span>개월) ×</span>
+            <button onclick="adjustProfitUnit(-1000)" style="height:32px;min-width:28px;border:1.5px solid #a7f3d0;border-radius:5px;background:#ecfdf5;color:#065f46;font-size:16px;font-weight:700;cursor:pointer;line-height:1;flex-shrink:0;">−</button>
+            <input type="text" id="fin_profit_unit" value="10,000" readonly style="width:80px;text-align:center;background:#ecfdf5;border:1.5px solid #a7f3d0;border-radius:5px;padding:4px 6px;font-size:13px;font-weight:700;color:#065f46;">
+            <button onclick="adjustProfitUnit(1000)" style="height:32px;min-width:28px;border:1.5px solid #a7f3d0;border-radius:5px;background:#ecfdf5;color:#065f46;font-size:16px;font-weight:700;cursor:pointer;line-height:1;flex-shrink:0;">+</button>
+            <span style="font-size:13px;color:#475569;white-space:nowrap;">천원 =</span>
+            <strong id="fin_profit_result" style="font-size:16px;color:#059669;white-space:nowrap;">0 천원</strong>
+            <input type="hidden" id="fin_profit" value="0">
+          </div>
+          <div class="field">
+            <label>계약금액</label>
+            <input type="text" inputmode="numeric" id="fin_contract" value="0" class="is-manual" style="flex:1;max-width:160px;" oninput="calcFinance()" onblur="fmtFinInput(this)">
+            <span class="unit">천원</span>
+          </div>
+        </div>
+
         <!-- 수지 요약 -->
         <div id="finance-summary" style="padding:14px 16px;background:#eff6ff;border-top:2px solid var(--accent);display:none;">
           <div style="font-size:11px;font-weight:700;color:var(--accent);margin-bottom:10px;">■ 수지 요약</div>
           <div style="display:grid;grid-template-columns:repeat(4,1fr);gap:8px;margin-bottom:10px;" id="finance-summary-grid"></div>
           <div style="display:grid;grid-template-columns:repeat(3,1fr);gap:8px;" id="finance-summary-result"></div>
-        </div>
-
-        <!-- 이윤 / 견적금액 (최하단 2열) -->
-        <div style="display:grid;grid-template-columns:1fr 1fr;gap:12px;padding:14px 16px;background:#f8fafc;border-top:2px solid #e2e8f0;">
-          <!-- 좌: 이윤 -->
-          <div style="background:#f0fdf4;border-radius:10px;padding:12px 14px;">
-            <div style="font-size:11px;font-weight:700;color:#065f46;margin-bottom:8px;">■ 이윤</div>
-            <div style="display:flex;flex-wrap:wrap;align-items:center;gap:6px;">
-              <span style="font-size:12px;color:#475569;white-space:nowrap;">T(<span id="fin_profit_T">0</span>개월) ×</span>
-              <button onclick="adjustProfitUnit(-1000)" style="height:28px;min-width:24px;border:1.5px solid #a7f3d0;border-radius:5px;background:#ecfdf5;color:#065f46;font-size:15px;font-weight:700;cursor:pointer;line-height:1;">−</button>
-              <input type="text" id="fin_profit_unit" value="10,000" readonly style="width:72px;text-align:center;background:#ecfdf5;border:1.5px solid #a7f3d0;border-radius:5px;padding:3px 5px;font-size:12px;font-weight:700;color:#065f46;">
-              <button onclick="adjustProfitUnit(1000)" style="height:28px;min-width:24px;border:1.5px solid #a7f3d0;border-radius:5px;background:#ecfdf5;color:#065f46;font-size:15px;font-weight:700;cursor:pointer;line-height:1;">+</button>
-              <span style="font-size:12px;color:#475569;white-space:nowrap;">천원</span>
-              <input type="hidden" id="fin_profit" value="0">
-            </div>
-            <div style="margin-top:8px;font-size:15px;font-weight:700;color:#059669;">= <span id="fin_profit_result">0</span> 천원</div>
-          </div>
-          <!-- 우: 견적금액 -->
-          <div style="background:#fffbeb;border-radius:10px;padding:12px 14px;">
-            <div style="font-size:11px;font-weight:700;color:#92400e;margin-bottom:8px;">■ 견적금액 <span style="font-size:10px;font-weight:400;color:#b45309;">(필요금액 백만원 올림)</span></div>
-            <div style="display:flex;align-items:center;gap:6px;flex-wrap:wrap;">
-              <input type="text" inputmode="numeric" id="fin_contract" value="0" class="is-manual" style="width:120px;text-align:right;font-size:14px;font-weight:700;" oninput="calcFinance()" onblur="fmtFinInput(this)">
-              <span style="font-size:12px;color:#475569;">천원</span>
-            </div>
-            <div style="margin-top:6px;font-size:10px;color:#b45309;">자동산정 · 직접 수정 가능</div>
-          </div>
         </div>
 
       </div><!-- /tab-finance-content -->
@@ -1219,12 +1207,6 @@ function endDateFromStart(startStr, T) {
 function setDepVal(id, val) {
   const el = document.getElementById(id);
   if (el) el.value = val;
-  // 슬라이더 표시 동기화
-  const dispEl = document.getElementById(id + '_disp');
-  if (dispEl && val && val.length >= 5) {
-    const d = val.replace(/\D/g,'');
-    if (d.length >= 4) dispEl.textContent = d.slice(0,2) + '.' + d.slice(2,4);
-  }
 }
 
 // 4자리 이상 입력되면 자동 포맷
@@ -2023,55 +2005,6 @@ function applyTaxPreset(val) {
   calcFinance();
 }
 
-// 프리셋 버튼 선택 상태 토글
-function selectPreset(btn, type) {
-  const selClass = type === 'annual' ? 'sel-blue' : type === 'housing' ? 'sel-green' : 'sel-amber';
-  const groupId  = type === 'annual' ? 'preset-annual-group' : type === 'housing' ? 'preset-housing-group' : 'preset-tax-group';
-  const group = document.getElementById(groupId);
-  if (!group) return;
-  group.querySelectorAll('.preset-btn').forEach(b => b.classList.remove(selClass));
-  btn.classList.add(selClass);
-}
-
-// 배치계획 날짜 슬라이더 (1개월 단위)
-function adjustDepDate(key, field, delta) {
-  const id = 'dep_' + field + '_' + key;
-  const el = document.getElementById(id);
-  const dispEl = document.getElementById(id + '_disp');
-  if (!el) return;
-  const isEnd = field === 'end';
-
-  // 현재 값 파싱
-  const cur = el.value.replace(/\D/g, '');
-  let yy, mm;
-  if (cur.length >= 4) {
-    yy = parseInt(cur.slice(0,2));
-    mm = parseInt(cur.slice(2,4));
-  } else {
-    const now = new Date();
-    yy = now.getFullYear() % 100;
-    mm = now.getMonth() + 1;
-  }
-
-  mm += delta;
-  if (mm > 12) { mm -= 12; yy++; }
-  if (mm < 1)  { mm += 12; yy--; }
-  if (yy < 0) yy = 99;
-
-  const yymm = String(yy).padStart(2,'0') + String(mm).padStart(2,'0');
-  el.value = autoFmtDepInput(yymm, isEnd);
-  if (dispEl) dispEl.textContent = String(yy).padStart(2,'0') + '.' + String(mm).padStart(2,'0');
-
-  // 적절한 핸들러 호출
-  if (key === 'res_arch' && field === 'start')      onArchStartInput(el);
-  else if (key === 'res_arch' && field === 'end')   onArchEndInput(el);
-  else if (key === 'res_civil' && field === 'end')  onCivilEndInput(el);
-  else                                               onDepInput(el, key, field, isEnd);
-}
-
-// setDepVal 후 슬라이더 표시도 갱신
-const _origSetDepVal = typeof setDepVal === 'function' ? setDepVal : null;
-
 // 이윤 단가 ±1,000천원(±100만원) 조정 → 이윤 = T × 단가 자동계산
 function adjustProfitUnit(delta) {
   const unitEl = document.getElementById('fin_profit_unit');
@@ -2135,14 +2068,8 @@ function calcFinance() {
 
   const totalCost = totalMonthly + totalHousing + totalTax + totalStart + totalEnd;
   const profit    = parseFinVal('fin_profit');
-  const required  = totalCost + profit;
-  // 견적금액: 필요금액을 백만원(1000천원) 단위 올림
-  const contractAuto = Math.ceil(required / 1000) * 1000;
-  const contractEl = document.getElementById('fin_contract');
-  if (contractEl && !contractEl.dataset.manualEdit) {
-    contractEl.value = contractAuto.toLocaleString('ko-KR');
-  }
   const contract  = parseFinVal('fin_contract');
+  const required  = totalCost + profit;
   const netPnL    = contract - totalCost;
   const margin    = contract > 0 ? (netPnL / contract * 100) : 0;
 
@@ -2161,8 +2088,8 @@ function calcFinance() {
   const pnlColor = netPnL >= 0 ? '#059669' : '#dc2626';
   document.getElementById('finance-summary-result').innerHTML = `
     <div class="fin-sum-card"><div class="fin-sum-label">총 원가</div><div class="fin-sum-value" style="color:#1d4ed8;">${fmt(totalCost)}<small style="font-size:12px;"> 천원</small></div></div>
-    <div class="fin-sum-card contract"><div class="fin-sum-label">이윤 + 필요 견적금액</div><div class="fin-sum-value">${fmt(profit)} + <span style="color:#b45309;">${fmt(required)}</span><small style="font-size:12px;"> 천원</small></div></div>
-    <div class="fin-sum-card"><div class="fin-sum-label">실제 손익 (견적금액 기준)</div><div class="fin-sum-value" style="color:${pnlColor};">${pnlSign}${fmt(netPnL)}<small style="font-size:12px;"> 천원</small>${contract>0?`<div style="font-size:11px;color:var(--text3);">이익률 ${margin.toFixed(1)}%</div>`:''}</div></div>
+    <div class="fin-sum-card contract"><div class="fin-sum-label">이윤 + 필요 계약금액</div><div class="fin-sum-value">${fmt(profit)} + <span style="color:#b45309;">${fmt(required)}</span><small style="font-size:12px;"> 천원</small></div></div>
+    <div class="fin-sum-card"><div class="fin-sum-label">실제 손익 (계약금액 기준)</div><div class="fin-sum-value" style="color:${pnlColor};">${pnlSign}${fmt(netPnL)}<small style="font-size:12px;"> 천원</small>${contract>0?`<div style="font-size:11px;color:var(--text3);">이익률 ${margin.toFixed(1)}%</div>`:''}</div></div>
   `;
 }
 
