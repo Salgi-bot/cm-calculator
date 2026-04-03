@@ -1545,6 +1545,38 @@ function updateDeployMM() {
   } else {
     diffEl.textContent = '-'; chipEl.className = ''; chipEl.textContent = '-';
   }
+
+  // ── 산출결과 탭 비교기준 동기화 ──
+  const rcBox = document.getElementById('result-deploy-compare');
+  if (rcBox) {
+    const rcLegalLabel = document.getElementById('rc-legal-label');
+    const rcLegalMm    = document.getElementById('rc-legal-mm');
+    const rcPlacedMm   = document.getElementById('rc-placed-mm');
+    const rcDiffVal    = document.getElementById('rc-diff-value');
+    const rcChip       = document.getElementById('rc-status-chip');
+    if (rcLegalLabel) rcLegalLabel.textContent = legalLabelMap[mode] || '법적 필요';
+    if (rcLegalMm)    rcLegalMm.textContent    = legal > 0 ? legal.toFixed(3) : '-';
+    if (rcPlacedMm)   rcPlacedMm.textContent   = placed.toFixed(3);
+    if (legal > 0 && rcDiffVal && rcChip) {
+      if (diff >= 0) {
+        rcDiffVal.textContent = '+' + diff.toFixed(3);
+        rcDiffVal.style.color = '#059669';
+        rcChip.style.background = '#dcfce7'; rcChip.style.color = '#15803d';
+        rcChip.textContent = '충족';
+      } else {
+        rcDiffVal.textContent = diff.toFixed(3);
+        rcDiffVal.style.color = '#dc2626';
+        rcChip.style.background = '#fee2e2'; rcChip.style.color = '#dc2626';
+        rcChip.textContent = '부족';
+      }
+    } else if (rcDiffVal) {
+      rcDiffVal.textContent = '-';
+      if (rcChip) { rcChip.textContent = '-'; rcChip.style.background = '#f1f5f9'; rcChip.style.color = '#64748b'; }
+    }
+    // 배치계획이 입력된 경우 박스 표시
+    if (placed > 0) rcBox.style.display = 'block';
+  }
+
   renderGantt();
 }
 
