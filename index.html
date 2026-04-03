@@ -1449,7 +1449,7 @@ function calcExtraDate(idx) {
 }
 
 // ─── 이벤트 핸들러 ──────────────────────────────────────
-// 건축 시작 변경 → 건축 종료 자동 + 토목/기계 동기화
+// 건축 시작 변경 → 건축 종료 자동 + 전체 동기화 (무조건)
 function onArchStartInput(el) {
   tryAutoFmt(el, false);
   if (el.value.replace(/\D/g,'').length < 6) return;
@@ -1460,25 +1460,23 @@ function onArchStartInput(el) {
   setDepVal('dep_end_res_arch', endStr);
   calcBasicDur('res_arch');
 
-  // 토목: 수동 수정 없으면 건축 시작 따라감
-  if (!g_dep_manual.has('res_civil_start')) setDepVal('dep_start_res_civil', startStr);
-  if (!g_dep_manual.has('res_civil_end')) {
-    const halfT    = Math.max(1, Math.floor(g_T / 2));
-    const civilEnd = endDateFromStart(startStr, halfT);
-    setDepVal('dep_end_res_civil', civilEnd);
-    if (!g_dep_manual.has('res_mech_start')) setDepVal('dep_start_res_mech', nextDepDay(civilEnd));
-  }
+  // 토목: 항상 건축 시작 따라감 (수동 여부 무관)
+  setDepVal('dep_start_res_civil', startStr);
+  const halfT    = Math.max(1, Math.floor(g_T / 2));
+  const civilEnd = endDateFromStart(startStr, halfT);
+  setDepVal('dep_end_res_civil', civilEnd);
+  setDepVal('dep_start_res_mech', nextDepDay(civilEnd));
   calcBasicDur('res_civil');
 
-  // 기계 종료 = 건축 종료
-  if (!g_dep_manual.has('res_mech_end')) setDepVal('dep_end_res_mech', endStr);
+  // 기계 종료 = 건축 종료 (항상)
+  setDepVal('dep_end_res_mech', endStr);
   calcBasicDur('res_mech');
 
-  // 추가 감리원 동기화
+  // 추가 감리원 항상 동기화
   g_extra_rows.forEach((row, i) => {
     if (row._removed) return;
-    if (!row._manualStart) setDepVal('extra_start_' + i, startStr);
-    if (!row._manualEnd)   setDepVal('extra_end_'   + i, endStr);
+    setDepVal('extra_start_' + i, startStr);
+    setDepVal('extra_end_'   + i, endStr);
     calcExtraDate(i);
   });
 
