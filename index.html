@@ -1572,6 +1572,9 @@ function updateDeployMM() {
   const legalLabelMap = { final:'법적 필요 (최종 투입)', min:'법적 필요 (최소 배치)', auth:'법적 필요 (감독 권한대행)' };
   const legalEl = document.getElementById('d-legal-label');
   if (legalEl) legalEl.textContent = legalLabelMap[mode] || '법적 필요';
+  // 산출결과 탭 선택박스 동기화
+  const rcModeEl = document.getElementById('rc-legal-mode');
+  if (rcModeEl && rcModeEl.value !== mode) rcModeEl.value = mode;
   document.getElementById('d-legal-mm').textContent = legal > 0 ? legal.toFixed(3) : '-';
 
   // 차이 및 상태
