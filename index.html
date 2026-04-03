@@ -2037,10 +2037,12 @@ function syncFinanceFromDeploy() {
   const tbody = document.getElementById('finance-person-tbody');
   tbody.innerHTML = '';
   persons.forEach((p, i) => {
+    const isRes = p.label.startsWith('상주');
     const isArch = p.label === '상주 건축';
-    const sv = saved[i] || { annual: isArch ? 60000 : 0, housing: 700, tax: 300 };
+    const defaultAnnual = isArch ? 60000 : (isRes ? 55000 : 0);
+    const sv = saved[i] || { annual: defaultAnnual, housing: isRes ? 700 : 0, tax: isRes ? 300 : 0 };
     // 처음 생성 시 기본값 적용
-    if (!saved[i]) { sv.housing = 700; sv.tax = 300; }
+    if (!saved[i]) { sv.housing = isRes ? 700 : 0; sv.tax = isRes ? 300 : 0; }
     const monthly = sv.annual > 0 ? Math.round(sv.annual / 13) : 0;
     const retireMonth = Math.round(monthly / 12);
     const startCost = monthly + sv.tax + retireMonth;
