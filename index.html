@@ -1998,6 +1998,114 @@ function exportGanttCSV() {
   URL.revokeObjectURL(url);
 }
 
+async function exportGanttDocx() {
+  const persons = getAllPersonsWithDates();
+  if (persons.length === 0) { alert('배치계획을 먼저 작성하세요.'); return; }
+  if (!window.docx) { alert('DOCX 라이브러리 로딩 중입니다. 잠시 후 다시 시도하세요.'); return; }
+
+  let minDate = null, maxDate = null;
+  persons.forEach(p => {
+    const s = parseDepDate(p.startStr), e = parseDepDate(p.endStr);
+    if (s && (!minDate || s < minDate)) minDate = s;
+    if (e && (!maxDate || e > maxDate)) maxDate = e;
+  });
+  const months = [];
+  if (minDate && maxDate) {
+    const cur = new Date(minDate.getFullYear(), minDate.getMonth(), 1);
+    const last = new Date(maxDate.getFullYear(), maxDate.getMonth(), 1);
+    while (cur <= last) {
+      months.push({ year: cur.getFullYear(), month: cur.getMonth() + 1 });
+      cur.setMonth(cur.getMonth() + 1);
+    }
+  }
+
+  const { Document, Packer, Table, TableRow, TableCell, Paragraph, TextRun,
+          WidthType, AlignmentType, ShadingType, BorderStyle } = window.docx;
+
+  const HEADER_BG = '1D4ED8';
+  const HEADER_FG = 'FFFFFF';
+  const BORDER = { style: BorderStyle.SINGLE, size: 4, color: 'CCCCCC' };
+  const borders = { top: BORDER, bottom: BORDER, left: BORDER, right: BORDER };
+
+  const cell = (text, { bold=false, bg=null, fg='000000', colSpan=1 }={}) =>
+    new TableCell({
+      columnSpan: colSpan,
+      borders,
+      shading: bg ? { type: ShadingType.CLEAR, fill: bg } : undefined,
+      children: [new Paragraph({
+        alignment: AlignmentType.CENTER,
+        spacing: { before: 40, after: 40 },
+        children: [new TextRun({ text: String(text), bold, size: 16,
+          color: bg ? (fg || HEADER_FG) : '1A1A2E', font: '맑은 고딕' })]
+      })]
+    });
+
+  const headerRow = new TableRow({ tableHeader: true, children: [
+    cell('구분/분야', { bold:true, bg:HEADER_BG }),
+    cell('등급',     { bold:true, bg:HEADER_BG }),
+    cell('배치기간', { bold:true, bg:HEADER_BG }),
+    cell('인월수',   { bold:true, bg:HEADER_BG }),
+    ...months.map(m => cell(m.year + '.' + String(m.month).padStart(2,'0'), { bold:true, bg:HEADER_BG })),
+    cell('비고', { bold:true, bg:HEADER_BG }),
+  ]});
+
+  const dataRows = persons.map(p => {
+    const pS = parseDepDate(p.startStr), pE = parseDepDate(p.endStr);
+    return new TableRow({ children: [
+      cell(p.label),
+      cell(p.grade),
+      cell(p.dur + '개월'),
+      cell(p.mm.toFixed(3)),
+      ...months.map(m => {
+        const mS = new Date(m.year, m.month-1, 1), mE = new Date(m.year, m.month, 0);
+        return cell((pS && pE && pS <= mE && pE >= mS) ? '■' : '', { bg: (pS && pE && pS <= mE && pE >= mS) ? 'DBEAFE' : null });
+      }),
+      cell(''),
+    ]});
+  });
+
+  const totalMM = persons.reduce((s, p) => s + p.mm, 0);
+  const legalMM = parseFloat(document.getElementById('d-legal-mm')?.textContent) || 0;
+  const diff = legalMM > 0 ? totalMM - legalMM : null;
+  const statusText = diff === null ? '' : (diff >= 0 ? `이상 없음 (+${diff.toFixed(3)})` : `부족 (${diff.toFixed(3)})`);
+
+  const totalRow = new TableRow({ children: [
+    cell('합계', { bold:true, bg:'F1F5F9' }),
+    cell('', { bg:'F1F5F9' }),
+    cell('', { bg:'F1F5F9' }),
+    cell(totalMM.toFixed(3), { bold:true, bg:'F1F5F9' }),
+    ...months.map(() => cell('', { bg:'F1F5F9' })),
+    cell('', { bg:'F1F5F9' }),
+  ]});
+
+  const statusRow = new TableRow({ children: [
+    cell(`법적: ${legalMM > 0 ? legalMM.toFixed(3) : '-'} 인월   배치: ${totalMM.toFixed(3)} 인월   ${statusText}`,
+      { colSpan: 4 + months.length + 1, bg:'EFF6FF' }),
+  ]});
+
+  const projName = document.getElementById('proj_name')?.value || '감리원배치계획';
+  const colWidths = [1800, 900, 900, 900, ...months.map(() => 600), 800];
+
+  const doc = new Document({ sections: [{ properties: {
+    page: { size: { width: 23811, height: 16838, orientation: 'landscape' }, margin: { top: 720, bottom: 720, left: 720, right: 720 } }
+  }, children: [
+    new Paragraph({ spacing: { after: 160 }, children: [
+      new TextRun({ text: projName + '  감리원 배치계획표', bold: true, size: 28, font: '맑은 고딕', color: '1D4ED8' })
+    ]}),
+    new Table({
+      width: { size: 100, type: WidthType.PERCENTAGE },
+      columnWidths: colWidths,
+      rows: [headerRow, ...dataRows, totalRow, statusRow],
+    }),
+  ]}]});
+
+  const blob = await Packer.toBlob(doc);
+  const url = URL.createObjectURL(blob);
+  const a = document.createElement('a');
+  a.href = url; a.download = projName + '_배치계획표.docx'; a.click();
+  URL.revokeObjectURL(url);
+}
+
 // ═══════════════════════════════════════════
 // FINANCE — 수지분석 (Beta)
 // ═══════════════════════════════════════════
