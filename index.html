@@ -2046,7 +2046,10 @@ function calcFinance() {
 
   const fmt = n => Math.round(n).toLocaleString('ko-KR'); // 천원 단위 콤마 포맷
 
-  let totalMonthly = 0, totalHousing = 0, totalTax = 0, totalStart = 0, totalEnd = 0, totalRetire = 0;
+  // totalStart/End_base: 퇴직금 제외 (배치전/종료후비 카드용)
+  // totalRetire: 배치기간 + 배치전 + 종료후 퇴직금 전체
+  let totalMonthly = 0, totalHousing = 0, totalTax = 0;
+  let totalStartBase = 0, totalEndBase = 0, totalRetire = 0;
 
   rows.forEach(tr => {
     const i = tr.dataset.finIdx;
@@ -2058,9 +2061,9 @@ function calcFinance() {
     // 월급여 = 연봉 / 13 (자동 산정)
     const monthly = annual > 0 ? Math.round(annual / 13) : 0;
 
-    // 퇴직금: 배치기간분 + 배치전1개월분 + 종료후1개월분
-    const retireDur   = Math.round(monthly * dur / 12);
-    const retireMonth = Math.round(monthly / 12);
+    // 퇴직금
+    const retireDur   = Math.round(monthly * dur / 12);   // 배치기간 중 퇴직금
+    const retireMonth = Math.round(monthly / 12);          // 배치전/종료후 각 1개월분
 
     // 배치 1개월 전: 월급여 + 세금 + 퇴직금(1개월)
     const startCost = monthly + tax + retireMonth;
@@ -2082,15 +2085,16 @@ function calcFinance() {
     const subEl = document.getElementById('fin_sub_' + i);
     if (subEl) subEl.textContent = fmt(sub) + ' 천원';
 
-    totalMonthly += monthly * dur;
-    totalHousing += housing * dur;
-    totalTax     += tax * dur;
-    totalStart   += startCost;
-    totalEnd     += endCost;
-    totalRetire  += retireDur + retireMonth * 2;
+    totalMonthly   += monthly * dur;
+    totalHousing   += housing * dur;
+    totalTax       += tax * dur;
+    totalStartBase += monthly + tax;           // 퇴직금 제외한 배치전 기본비용
+    totalEndBase   += monthly + tax;           // 퇴직금 제외한 종료후 기본비용
+    totalRetire    += retireDur + retireMonth * 2; // 전체 퇴직금 (배치기간+배치전+종료후)
   });
 
-  const totalCost = totalMonthly + totalHousing + totalTax + totalStart + totalEnd + totalRetire;
+  // 총 원가 = 인건비 + 주재비 + 세금 + 배치전/종료후 기본비 + 퇴직금 전체
+  const totalCost = totalMonthly + totalHousing + totalTax + totalStartBase + totalEndBase + totalRetire;
   const profit    = parseFinVal('fin_profit');
   const contract  = parseFinVal('fin_contract');
   const required  = totalCost + profit;
