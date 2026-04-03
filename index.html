@@ -967,18 +967,44 @@
         <div class="section">
           <div class="section-title">감리원별 비용 입력 (단위: 천원)</div>
           <div style="font-size:11px;color:var(--text3);margin-bottom:6px;">배치계획 탭 작성 후 자동으로 인원 목록이 채워집니다. · 연봉 입력 시 월급여(÷13) 및 배치전/종료후 비용 자동 산정</div>
-          <!-- 연봉 탭 선택 -->
-          <div style="margin-bottom:10px;">
-            <div style="display:flex;align-items:center;gap:0;border:1.5px solid #c5d9ef;border-radius:7px;overflow:hidden;background:#f4f7fc;">
-              <div style="padding:0 10px;font-size:11px;font-weight:700;color:var(--accent);white-space:nowrap;border-right:1.5px solid #c5d9ef;background:#edf4fb;display:flex;align-items:center;height:34px;">연봉</div>
-              <button id="annual-tab-70" onclick="selectAnnualTab(this,70000,65000)" style="flex:1;height:34px;border:none;border-right:1px solid #dde6f2;background:transparent;font-size:11px;font-weight:600;color:var(--text2);cursor:pointer;transition:all 0.15s;white-space:nowrap;">7,000만</button>
-              <button id="annual-tab-65" onclick="selectAnnualTab(this,65000,60000)" style="flex:1;height:34px;border:none;border-right:1px solid #dde6f2;background:transparent;font-size:11px;font-weight:600;color:var(--text2);cursor:pointer;transition:all 0.15s;white-space:nowrap;">6,500만</button>
-              <button id="annual-tab-60" onclick="selectAnnualTab(this,60000,55000)" style="flex:1;height:34px;border:none;border-right:1px solid #dde6f2;background:transparent;font-size:11px;font-weight:600;color:var(--text2);cursor:pointer;transition:all 0.15s;white-space:nowrap;">6,000만</button>
-              <button id="annual-tab-55" onclick="selectAnnualTab(this,55000,50000)" style="flex:1;height:34px;border:none;border-right:1px solid #dde6f2;background:transparent;font-size:11px;font-weight:600;color:var(--text2);cursor:pointer;transition:all 0.15s;white-space:nowrap;">5,500만</button>
-              <button id="annual-tab-50" onclick="selectAnnualTab(this,50000,45000)" style="flex:1;height:34px;border:none;background:transparent;font-size:11px;font-weight:600;color:var(--text2);cursor:pointer;transition:all 0.15s;white-space:nowrap;">5,000만</button>
-            </div>
-            <div style="display:flex;justify-content:space-between;margin-top:3px;padding:0 2px;">
-              <span style="font-size:10px;color:var(--text3);">상주건축 기준 · 나머지 -500만원 자동 적용</span>
+          <!-- 연봉·주재비·세금 드롭다운 프리셋 -->
+          <div style="margin-bottom:10px;padding:8px 10px;background:#edf4fb;border:1px solid #c5d9ef;border-radius:6px;">
+            <div style="display:flex;align-items:center;gap:12px;flex-wrap:wrap;">
+              <div style="display:flex;align-items:center;gap:5px;">
+                <span style="font-size:11px;font-weight:700;color:var(--accent);white-space:nowrap;">연봉</span>
+                <select class="dep-select" id="annual-select" style="font-size:11px;" onchange="onAnnualSelect(this)">
+                  <option value="">선택</option>
+                  <option value="70000,65000">7,000만원</option>
+                  <option value="65000,60000">6,500만원</option>
+                  <option value="60000,55000">6,000만원</option>
+                  <option value="55000,50000">5,500만원</option>
+                  <option value="50000,45000">5,000만원</option>
+                </select>
+              </div>
+              <div style="display:flex;align-items:center;gap:5px;">
+                <span style="font-size:11px;font-weight:700;color:var(--accent);white-space:nowrap;">주재비</span>
+                <select class="dep-select" id="housing-select" style="font-size:11px;" onchange="onHousingSelect(this)">
+                  <option value="">선택</option>
+                  <option value="500">50만원</option>
+                  <option value="600">60만원</option>
+                  <option value="700">70만원</option>
+                  <option value="800">80만원</option>
+                  <option value="900">90만원</option>
+                  <option value="1000">100만원</option>
+                </select>
+              </div>
+              <div style="display:flex;align-items:center;gap:5px;">
+                <span style="font-size:11px;font-weight:700;color:var(--accent);white-space:nowrap;">세금</span>
+                <select class="dep-select" id="tax-select" style="font-size:11px;" onchange="onTaxSelect(this)">
+                  <option value="">선택</option>
+                  <option value="300">30만원</option>
+                  <option value="350">35만원</option>
+                  <option value="400">40만원</option>
+                  <option value="450">45만원</option>
+                  <option value="500">50만원</option>
+                </select>
+              </div>
+              <span style="font-size:10px;color:var(--text3);flex:1;white-space:nowrap;">연봉: 상주건축 기준, 나머지 -500만원 자동 적용 · 셀 직접 수정 가능</span>
               <span id="fin-preset-hint" style="display:none;font-size:10px;color:#dc2626;font-weight:600;">배치계획 탭에서 인원을 먼저 배치하세요</span>
             </div>
           </div>
