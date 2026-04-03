@@ -1484,21 +1484,21 @@ function onArchStartInput(el) {
   updateDeployMM();
 }
 
-// 건축 종료 변경 → 기계 종료 동기화
+// 건축 종료 변경 → 전체 종료일 동기화 (무조건)
 function onArchEndInput(el) {
   tryAutoFmt(el, true);
   if (el.value.replace(/\D/g,'').length < 6) return;
-  g_dep_manual.add('res_arch_end');
   const endStr = el.value;
   calcBasicDur('res_arch');
 
-  if (!g_dep_manual.has('res_mech_end')) {
-    setDepVal('dep_end_res_mech', endStr);
-    calcBasicDur('res_mech');
-  }
+  // 기계·추가 종료 항상 건축 종료로
+  setDepVal('dep_end_res_mech', endStr);
+  calcBasicDur('res_mech');
+
   g_extra_rows.forEach((row, i) => {
     if (row._removed) return;
-    if (!row._manualEnd) { setDepVal('extra_end_' + i, endStr); calcExtraDate(i); }
+    setDepVal('extra_end_' + i, endStr);
+    calcExtraDate(i);
   });
   updateNonArchDates();
   updateDeployMM();
