@@ -2243,6 +2243,19 @@ function fmtFinInput(el) {
   calcFinance();
 }
 
+// 연봉 탭 선택 + 적용
+function selectAnnualTab(el, archAnnual, otherAnnual) {
+  document.querySelectorAll('[id^="annual-tab-"]').forEach(btn => {
+    btn.style.background = 'transparent';
+    btn.style.color = 'var(--text2)';
+    btn.style.fontWeight = '600';
+  });
+  el.style.background = 'var(--accent)';
+  el.style.color = '#fff';
+  el.style.fontWeight = '700';
+  applyAnnualPreset(archAnnual, otherAnnual);
+}
+
 // 연봉 프리셋 일괄 적용 (단위: 천원)
 // archAnnual: 상주건축 연봉, otherAnnual: 나머지 연봉
 function applyAnnualPreset(archAnnual, otherAnnual) {
