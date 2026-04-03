@@ -16,7 +16,7 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>건설사업관리 인월수 산출 Ver 1.3 Beta | (주)아이팝엔지니어링</title>
+<title>건설사업관리 인월수 산출 Ver 1.4 | (주)아이팝엔지니어링</title>
 <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+KR:wght@300;400;500;700;900&family=JetBrains+Mono:wght@400;600&display=swap" rel="stylesheet">
 <script src="https://cdn.jsdelivr.net/npm/xlsx@0.18.5/dist/xlsx.full.min.js"></script>
 <style>
@@ -27,9 +27,9 @@
     --surface3: #e8edf7;
     --border: #ccd6e8;
     --border2: #b0bdd4;
-    --accent: #2d6baf;
-    --accent2: #3d7cc5;
-    --accent-glow: rgba(45,107,175,0.12);
+    --accent: #1d4ed8;
+    --accent2: #2563eb;
+    --accent-glow: rgba(29,78,216,0.12);
     --green: #059669;
     --yellow: #92400e;
     --red: #dc2626;
@@ -48,71 +48,45 @@
     font-size: 14px;
     background-color: #cfd9ea;
     background-image:
-      linear-gradient(rgba(45,107,175,0.07) 1px, transparent 1px),
-      linear-gradient(90deg, rgba(45,107,175,0.07) 1px, transparent 1px),
-      linear-gradient(rgba(45,107,175,0.025) 1px, transparent 1px),
-      linear-gradient(90deg, rgba(45,107,175,0.025) 1px, transparent 1px);
+      linear-gradient(rgba(29,78,216,0.07) 1px, transparent 1px),
+      linear-gradient(90deg, rgba(29,78,216,0.07) 1px, transparent 1px),
+      linear-gradient(rgba(29,78,216,0.025) 1px, transparent 1px),
+      linear-gradient(90deg, rgba(29,78,216,0.025) 1px, transparent 1px);
     background-size: 80px 80px, 80px 80px, 20px 20px, 20px 20px;
   }
 
   /* ── LAYOUT ── */
-  #app { display: grid; grid-template-rows: 46px 1fr 26px; height: 100vh; }
+  #app { display: grid; grid-template-rows: 52px 1fr 32px; height: 100vh; }
 
   /* ── TOPBAR ── */
   #topbar {
     display: flex; align-items: center; justify-content: space-between;
-    padding: 0 16px; background: var(--accent); border-bottom: 2px solid #2e6194;
+    padding: 0 20px; background: var(--accent); border-bottom: 3px solid #1e40af;
     position: sticky; top: 0; z-index: 100; gap: 12px;
-    box-shadow: 0 2px 12px rgba(45,107,175,0.25);
+    box-shadow: 0 2px 12px rgba(29,78,216,0.25);
   }
-  .topbar-brand { display: flex; align-items: baseline; gap: 8px; flex-shrink: 0; }
+  .topbar-brand { display: flex; align-items: baseline; gap: 10px; flex-shrink: 0; }
   .topbar-company {
-    font-size: 12px; font-weight: 700; color: #fff;
-    border: 1px solid rgba(255,255,255,0.5); border-radius: 4px; padding: 1px 7px;
+    font-size: 13px; font-weight: 700; color: #fff;
+    border: 1px solid rgba(255,255,255,0.5); border-radius: 4px; padding: 2px 8px;
     letter-spacing: 0.3px; background: rgba(255,255,255,0.15);
   }
-  .topbar-title { font-size: 14px; font-weight: 700; color: #fff; letter-spacing: -0.3px; }
-  .topbar-title span { color: #c5d9ef; }
+  .topbar-title { font-size: 15px; font-weight: 700; color: #fff; letter-spacing: -0.3px; }
+  .topbar-title span { color: #bfdbfe; }
   .topbar-ver { font-size: 11px; color: rgba(255,255,255,0.6); font-weight: 400; }
   .topbar-right { display: flex; align-items: center; gap: 8px; flex-shrink: 0; }
 
   /* ── MAIN LAYOUT ── */
-  #main { display: grid; grid-template-columns: 340px 5px 1fr; overflow: hidden; height: 100%; min-height: 0; }
-  #left-panel { overflow-y: auto; background: var(--surface); box-shadow: 2px 0 8px rgba(45,107,175,0.06); min-height: 0; }
-  #right-panel { display: flex; flex-direction: column; overflow: hidden; background: var(--surface2); min-height: 0; height: 100%; }
-  #log-panel { overflow: hidden; display: flex; flex-direction: column; min-height: 0; }
-  #result-panel { overflow: hidden; display: flex; flex-direction: column; min-height: 0; }
-
-  /* ── RESIZE HANDLES ── */
-  .resize-h {
-    width: 5px; cursor: col-resize; background: var(--border);
-    transition: background 0.15s; position: relative; z-index: 20; flex-shrink: 0;
-  }
-  .resize-h:hover, .resize-h.dragging { background: var(--accent); }
-  .resize-h::after {
-    content: ''; position: absolute; top: 50%; left: 50%;
-    transform: translate(-50%, -50%);
-    width: 1px; height: 30px; background: var(--border2);
-    border-radius: 1px;
-  }
-  .resize-h:hover::after, .resize-h.dragging::after { background: #fff; }
-  .resize-v {
-    height: 5px; cursor: row-resize; background: var(--border);
-    transition: background 0.15s; position: relative; z-index: 20; flex-shrink: 0;
-  }
-  .resize-v:hover, .resize-v.dragging { background: var(--accent); }
-  .resize-v::after {
-    content: ''; position: absolute; top: 50%; left: 50%;
-    transform: translate(-50%, -50%);
-    height: 1px; width: 30px; background: var(--border2);
-    border-radius: 1px;
-  }
-  .resize-v:hover::after, .resize-v.dragging::after { background: #fff; }
+  #main { display: grid; grid-template-columns: 370px 1fr; overflow: hidden; }
+  #left-panel { overflow-y: auto; border-right: 1px solid var(--border); background: var(--surface); box-shadow: 2px 0 8px rgba(29,78,216,0.06); }
+  #right-panel { display: flex; flex-direction: column; overflow: hidden; background: var(--surface2); }
+  #log-panel { border-bottom: 1px solid var(--border); overflow: hidden; display: flex; flex-direction: column; }
+  #result-panel { overflow: hidden; display: flex; flex-direction: column; }
 
   /* ── FOOTER ── */
   #footer {
     display: flex; align-items: center; justify-content: space-between;
-    padding: 0 16px; background: #2a5480; border-top: 1px solid #2e6194;
+    padding: 0 20px; background: #1e3a8a; border-top: 1px solid #1e40af;
     font-size: 11px; color: rgba(255,255,255,0.6);
   }
 
@@ -156,14 +130,14 @@
     margin-bottom: 8px;
   }
   .group-label {
-    font-size: 11px; font-weight: 700; letter-spacing: 0.8px; text-transform: uppercase;
+    font-size: 10px; font-weight: 700; letter-spacing: 0.8px; text-transform: uppercase;
     color: var(--accent); margin-bottom: 7px; padding-left: 2px;
   }
 
   /* ── COLOR LEGEND ── */
   .color-legend {
     display: flex; gap: 14px; padding: 7px 14px 9px;
-    font-size: 11px; background: #edf4fb; border-bottom: 1px solid var(--border);
+    font-size: 11px; background: #f0f6ff; border-bottom: 1px solid var(--border);
   }
   .legend-item { display: flex; align-items: center; gap: 5px; color: var(--text2); font-weight: 500; }
   .legend-dot { width: 10px; height: 10px; border-radius: 3px; flex-shrink: 0; }
@@ -177,8 +151,8 @@
     color: var(--text2); font-family: var(--sans); font-size: 13px; font-weight: 500;
     border-radius: 6px; cursor: pointer; transition: all 0.15s;
   }
-  .seg-btn:hover { border-color: var(--accent); color: var(--accent); background: #edf4fb; }
-  .seg-btn.active { background: var(--accent); border-color: var(--accent); color: #fff; font-weight: 700; box-shadow: 0 2px 8px rgba(45,107,175,0.3); }
+  .seg-btn:hover { border-color: var(--accent); color: var(--accent); background: #eff6ff; }
+  .seg-btn.active { background: var(--accent); border-color: var(--accent); color: #fff; font-weight: 700; box-shadow: 0 2px 8px rgba(29,78,216,0.3); }
 
   /* ── CHECKBOX ── */
   .chk-row { display: flex; align-items: center; gap: 8px; margin-bottom: 6px; cursor: pointer; user-select: none; }
@@ -207,7 +181,7 @@
     text-align: right; outline: none; transition: border-color 0.12s;
   }
   .qty-table input:focus { border-color: var(--accent); box-shadow: 0 0 0 2px var(--accent-glow); }
-  .qty-section-head { font-size: 11px; font-weight: 700; color: var(--text3); letter-spacing: 0.5px; padding: 6px 2px 2px; }
+  .qty-section-head { font-size: 10px; font-weight: 700; color: var(--text3); letter-spacing: 0.5px; padding: 6px 2px 2px; }
 
   /* ── BUTTONS ── */
   .btn {
@@ -229,7 +203,7 @@
   .btn-reset:hover { color: #92400e; border-color: #f59e0b; background: #fffbeb; }
   .btn-calc {
     width: calc(100% - 32px); margin: 14px 16px 16px; height: 46px; font-size: 15px;
-    background: linear-gradient(135deg, #2d6baf, #3d7cc5);
+    background: linear-gradient(135deg, #1d4ed8, #3d7fff);
     box-shadow: 0 2px 16px rgba(61,127,255,0.3); border-radius: 10px;
   }
   .btn-calc:hover { transform: translateY(-1px); box-shadow: 0 6px 22px rgba(61,127,255,0.45); }
@@ -261,21 +235,21 @@
   #res-tbody { transition: opacity 0.3s; }
   #summary-box { transition: opacity 0.3s; }
   .res-table th {
-    position: sticky; top: 0; background: #2d6baf; color: #fff;
-    font-size: 12px; font-weight: 600; letter-spacing: 0.5px; padding: 9px 10px;
-    border-bottom: 2px solid #2e6194; text-align: center; white-space: nowrap;
+    position: sticky; top: 0; background: #1d4ed8; color: #fff;
+    font-size: 11px; font-weight: 600; letter-spacing: 0.5px; padding: 9px 10px;
+    border-bottom: 2px solid #1e40af; text-align: center; white-space: nowrap;
   }
   .res-table th:first-child { text-align: left; padding-left: 14px; }
   .res-table td { padding: 6px 10px; border-bottom: 1px solid #e2e8f0; text-align: center; color: var(--text2); }
   .res-table td:first-child { text-align: left; color: var(--text); padding-left: 14px; font-weight: 500; }
-  .res-table tr:hover td { background: #edf4fb; }
-  .res-table .val-cell { font-family: var(--mono); color: #2d6baf; font-weight: 700; }
-  .res-table .warn { font-size: 11px; color: #d97706; margin-left: 3px; }
-  .res-table .th-unit { font-size: 11px; font-weight: 400; color: #c5d9ef; display: block; margin-top: 1px; }
+  .res-table tr:hover td { background: #eff6ff; }
+  .res-table .val-cell { font-family: var(--mono); color: #1d4ed8; font-weight: 700; }
+  .res-table .warn { font-size: 10px; color: #d97706; margin-left: 3px; }
+  .res-table .th-unit { font-size: 10px; font-weight: 400; color: #bfdbfe; display: block; margin-top: 1px; }
 
   /* ── SUMMARY BOX ── */
   #summary-box {
-    padding: 14px 18px; background: #edf4fb;
+    padding: 14px 18px; background: #eff6ff;
     border-top: 3px solid var(--accent); display: none; flex-shrink: 0;
   }
   #summary-box.visible { display: block; }
@@ -283,14 +257,14 @@
   .summary-grid { display: grid; grid-template-columns: repeat(5, 1fr); gap: 10px; margin-bottom: 10px; }
   .sum-card {
     background: #fff; border-radius: 8px; padding: 10px 12px;
-    border: 1px solid #c5d9ef; box-shadow: 0 1px 4px rgba(45,107,175,0.08);
+    border: 1px solid #bfdbfe; box-shadow: 0 1px 4px rgba(29,78,216,0.08);
   }
-  .sum-card.highlight { border-color: var(--accent); background: #dce9f5; box-shadow: 0 2px 8px rgba(45,107,175,0.15); }
+  .sum-card.highlight { border-color: var(--accent); background: #dbeafe; box-shadow: 0 2px 8px rgba(29,78,216,0.15); }
   .sum-card-label { font-size: 11px; color: var(--text3); margin-bottom: 4px; }
   .sum-card-value { font-family: var(--mono); font-size: 18px; font-weight: 700; color: #92400e; line-height: 1.2; }
-  .sum-card.highlight .sum-card-value { color: #2d6baf; }
+  .sum-card.highlight .sum-card-value { color: #1d4ed8; }
   .sum-card-unit { font-size: 11px; color: var(--text3); margin-left: 3px; }
-  .sum-note { font-size: 11px; color: #d97706; line-height: 1.7; padding: 6px 0 0; border-top: 1px solid #c5d9ef; font-weight: 500; }
+  .sum-note { font-size: 11px; color: #d97706; line-height: 1.7; padding: 6px 0 0; border-top: 1px solid #bfdbfe; font-weight: 500; }
 
   /* ── D 고정 토글 ── */
   .d-lock-btn {
@@ -323,7 +297,7 @@
   /* ── RIGHT TABS (Beta) ── */
   #right-tab-nav {
     display: flex; align-items: center; gap: 2px;
-    padding: 4px 10px 0; background: #e8eef8;
+    padding: 6px 10px 0; background: #e8eef8;
     border-bottom: 2px solid var(--accent); flex-shrink: 0;
   }
   .rtab {
@@ -333,24 +307,24 @@
     border-radius: 6px 6px 0 0; cursor: pointer;
     font-family: var(--sans); transition: all 0.15s;
   }
-  .rtab:hover { background: #dce9f5; color: var(--accent); }
+  .rtab:hover { background: #dbeafe; color: var(--accent); }
   .rtab.active { background: #fff; color: var(--accent); border-color: var(--accent); font-weight: 700; }
   .beta-badge {
-    margin-left: 8px; font-size: 11px; font-weight: 700;
+    margin-left: 8px; font-size: 10px; font-weight: 700;
     background: #f59e0b; color: #fff;
     padding: 2px 7px; border-radius: 10px; letter-spacing: 0.5px;
   }
-  .rtab-content { flex: 1; overflow: hidden; display: none; min-height: 0; }
+  .rtab-content { flex: 1; overflow: hidden; display: none; }
   .rtab-content.active { display: flex; flex-direction: column; }
-  #tab-result-content.active { display: grid; grid-template-rows: 100px 5px 1fr; }
+  #tab-result-content.active { display: grid; grid-template-rows: 230px 1fr; }
 
   /* ── DEPLOY PANEL ── */
   .dep-table { width: 100%; border-collapse: collapse; font-size: 13px; }
-  .dep-table th { background: #2d6baf; color: #fff; padding: 7px 10px; font-size: 12px; font-weight: 600; text-align: center; }
+  .dep-table th { background: #1d4ed8; color: #fff; padding: 7px 10px; font-size: 11px; font-weight: 600; text-align: center; }
   .dep-table th:first-child { text-align: left; padding-left: 14px; }
   .dep-table td { padding: 5px 10px; border-bottom: 1px solid #e2e8f0; text-align: center; color: var(--text2); }
   .dep-table td:first-child { text-align: left; padding-left: 14px; }
-  .dep-table tr:hover td { background: #edf4fb; }
+  .dep-table tr:hover td { background: #eff6ff; }
   .dep-num { font-family: var(--mono); color: var(--accent); font-weight: 700; }
   .dep-dur-input {
     width: 70px; text-align: center; padding: 3px 6px;
@@ -377,9 +351,9 @@
 
   /* ── FINANCE PANEL ── */
   .fin-table { width: 100%; border-collapse: collapse; font-size: 12px; }
-  .fin-table th { background: #2d6baf; color: #fff; padding: 6px 8px; font-size: 12px; font-weight: 600; text-align: center; white-space: nowrap; }
+  .fin-table th { background: #1d4ed8; color: #fff; padding: 6px 8px; font-size: 11px; font-weight: 600; text-align: center; white-space: nowrap; }
   .fin-table td { padding: 4px 8px; border-bottom: 1px solid #e2e8f0; text-align: center; color: var(--text2); }
-  .fin-table tr:hover td { background: #edf4fb; }
+  .fin-table tr:hover td { background: #eff6ff; }
   .fin-num-input {
     width: 90px; text-align: right; padding: 3px 6px;
     border: 1.5px solid var(--border2); border-radius: 5px;
@@ -390,17 +364,12 @@
   .fin-subtotal { font-family: var(--mono); font-weight: 700; color: #92400e; }
   .fin-sum-card {
     background: #fff; border-radius: 8px; padding: 10px 14px;
-    border: 1px solid #c5d9ef; text-align: center;
+    border: 1px solid #bfdbfe; text-align: center;
   }
-  .fin-sum-card.total { border-color: #047857; background: #059669; }
-  .fin-sum-card.total .fin-sum-label { color: rgba(255,255,255,0.85); }
-  .fin-sum-card.total .fin-sum-value { color: #fff !important; }
+  .fin-sum-card.total { border-color: var(--accent); background: #dbeafe; }
   .fin-sum-card.profit { border-color: #059669; background: #d1fae5; }
-  .fin-sum-card.fin-input { border-color: var(--accent); background: #edf4fb; }
-  .fin-sum-card.fin-input .fin-sum-label { color: var(--accent); font-weight: 700; font-size: 13px; }
-  .dep-date-spin { background:#f1f5f9;border:1px solid #cbd5e1;border-radius:2px;cursor:pointer;color:#64748b;font-size:7px;padding:0;line-height:1;width:13px;height:10px;display:flex;align-items:center;justify-content:center;flex-shrink:0; }
-  .dep-date-spin:hover { background:#dce9f5;color:var(--accent);border-color:var(--accent); }
   .fin-sum-card.loss { border-color: #dc2626; background: #fee2e2; }
+  .fin-sum-card.contract { border-color: #f59e0b; background: #fffbeb; }
   .fin-sum-label { font-size: 11px; color: var(--text3); margin-bottom: 4px; }
   .fin-sum-value { font-family: var(--mono); font-size: 17px; font-weight: 700; color: #0f172a; }
 
@@ -419,7 +388,7 @@
       color: var(--text2); font-family: var(--sans); font-size: 12px; font-weight: 600;
       border-radius: 6px; cursor: pointer; transition: all 0.15s;
     }
-    .tab-btn.active { background: var(--accent); border-color: var(--accent); color: #fff; box-shadow: 0 2px 8px rgba(45,107,175,0.25); }
+    .tab-btn.active { background: var(--accent); border-color: var(--accent); color: #fff; box-shadow: 0 2px 8px rgba(29,78,216,0.25); }
     #left-panel { display: none; border: none; height: 100%; }
     #right-panel { display: none; height: 100%; grid-template-rows: 200px 1fr; }
     #left-panel.tab-active { display: block; overflow-y: auto; }
@@ -439,7 +408,7 @@
     body { background: #fff !important; color: #000 !important; }
     #topbar {
       position: static; padding: 10px 20px;
-      background: #2d6baf !important; border-bottom: 2px solid #2e6194;
+      background: #1d4ed8 !important; border-bottom: 2px solid #1e40af;
     }
     .topbar-right, #footer, #mobile-tabs { display: none !important; }
     #main { display: block; }
@@ -455,27 +424,27 @@
     #log-content.empty { display: none; }
     #result-panel { height: auto; overflow: visible; }
     #result-scroll { overflow: visible; }
-    .panel-header { background: #e8eef8 !important; border-bottom: 1px solid #c5d9ef; }
-    .panel-title { color: #2d6baf !important; }
+    .panel-header { background: #e8eef8 !important; border-bottom: 1px solid #bfdbfe; }
+    .panel-title { color: #1d4ed8 !important; }
     .panel-header .btn, #result-buttons { display: none !important; }
     .res-table { background: #fff !important; }
-    .res-table th { background: #2d6baf !important; color: #fff !important; }
+    .res-table th { background: #1d4ed8 !important; color: #fff !important; }
     .res-table td { color: #334155 !important; border-bottom: 1px solid #e2e8f0; }
     .res-table td:first-child { color: #0f172a !important; }
     .res-table tr:hover td { background: transparent !important; }
-    .res-table .val-cell { color: #2d6baf !important; }
-    #summary-box { background: #edf4fb !important; border-top: 3px solid #2d6baf; }
-    .sum-card { background: #fff !important; border: 1px solid #c5d9ef; }
-    .sum-card.highlight { background: #dce9f5 !important; }
+    .res-table .val-cell { color: #1d4ed8 !important; }
+    #summary-box { background: #eff6ff !important; border-top: 3px solid #1d4ed8; }
+    .sum-card { background: #fff !important; border: 1px solid #bfdbfe; }
+    .sum-card.highlight { background: #dbeafe !important; }
     .sum-card-value { color: #92400e !important; }
-    .sum-card.highlight .sum-card-value { color: #2d6baf !important; }
+    .sum-card.highlight .sum-card-value { color: #1d4ed8 !important; }
     #print-overview {
       display: block !important; margin: 12px 20px; padding: 12px 16px;
-      background: #edf4fb !important; border: 1px solid #c5d9ef; border-radius: 6px;
+      background: #f0f6ff !important; border: 1px solid #bfdbfe; border-radius: 6px;
       font-size: 12px; line-height: 2; color: #1e293b;
       page-break-inside: avoid;
     }
-    #print-overview strong { color: #2d6baf; }
+    #print-overview strong { color: #1d4ed8; }
     #summary-box.visible { display: block !important; page-break-inside: avoid; }
   }
 </style>
@@ -488,7 +457,7 @@
     <div class="topbar-brand">
       <span class="topbar-company">(주)아이팝엔지니어링</span>
       <span class="topbar-title">건설사업관리 <span>인월수 산출</span></span>
-      <span class="topbar-ver">Ver 1.3 Beta &nbsp;·&nbsp; 배치계획·수지분석 추가</span>
+      <span class="topbar-ver">Ver 1.5 &nbsp;·&nbsp; 이윤 산식 한줄 표시 (T×단가 = 계산값)</span>
     </div>
     <div class="topbar-right">
       <button class="btn btn-sm btn-gray" onclick="showHelp()">? 사용설명서</button>
@@ -623,22 +592,11 @@
           <div class="section-title" style="margin-bottom:0;">3 수량 미세 조정</div>
           <button class="btn btn-xs btn-reset" onclick="resetQ()">🔄 자동값 초기화</button>
         </div>
-        <table class="qty-table" id="qty-table">
-          <thead>
-            <tr>
-              <th style="text-align:left;font-size:11px;font-weight:600;color:var(--text3);padding:3px 2px 4px;border-bottom:1px solid var(--border);">업무항목</th>
-              <th style="font-size:11px;font-weight:600;color:var(--text3);padding:3px 2px 4px;text-align:center;border-bottom:1px solid var(--border);">단위</th>
-              <th style="font-size:11px;font-weight:600;color:var(--text3);padding:3px 2px 4px;text-align:right;border-bottom:1px solid var(--border);width:80px;">수량</th>
-            </tr>
-          </thead>
-        </table>
+        <table class="qty-table" id="qty-table"></table>
       </div>
 
       <button class="btn btn-primary btn-calc" onclick="calculate()">▶ 전체 계산 및 출력</button>
     </div><!-- /left-panel -->
-
-    <!-- LEFT/RIGHT RESIZE HANDLE -->
-    <div id="handle-lr" class="resize-h"></div>
 
     <!-- RIGHT PANEL -->
     <div id="right-panel">
@@ -648,7 +606,7 @@
         <button class="rtab active" id="rtab-result"  onclick="switchRightTab('result')">산출결과</button>
         <button class="rtab"        id="rtab-deploy"  onclick="switchRightTab('deploy')">배치계획</button>
         <button class="rtab"        id="rtab-finance" onclick="switchRightTab('finance')">수지분석</button>
-        <span class="beta-badge" data-tip="배치계획·수지분석은 베타 기능">BETA</span>
+        <span class="beta-badge">BETA</span>
       </div>
 
       <!-- ══ TAB 1: 산출결과 ══ -->
@@ -664,9 +622,6 @@
           </div>
           <div id="log-content" class="empty">계산 버튼을 누르면 상세 산식이 여기에 표시됩니다.</div>
         </div>
-
-        <!-- LOG/RESULT RESIZE HANDLE -->
-        <div id="handle-tb" class="resize-v"></div>
 
         <!-- RESULT -->
         <div id="result-panel">
@@ -706,8 +661,8 @@
             <div class="sum-title">■ 최종 산출 결과</div>
             <div class="summary-grid" id="summary-grid"></div>
             <div class="sum-note" id="summary-note"></div>
-            <div id="reduction-info" style="display:none; margin-top:12px; padding:10px 14px; background:#f8faff; border:1px solid #c5d9ef; border-radius:6px; font-size:12px; color:#334155; line-height:1.8;">
-              <div style="font-weight:700; color:#2d6baf; margin-bottom:6px; font-size:11px; letter-spacing:0.4px;">■ 법적 감액 배치 근거 (발주처 협의 적용 시)</div>
+            <div id="reduction-info" style="display:none; margin-top:12px; padding:10px 14px; background:#f8faff; border:1px solid #bfdbfe; border-radius:6px; font-size:12px; color:#334155; line-height:1.8;">
+              <div style="font-weight:700; color:#1d4ed8; margin-bottom:6px; font-size:11px; letter-spacing:0.4px;">■ 법적 감액 배치 근거 (발주처 협의 적용 시)</div>
               <table style="width:100%; border-collapse:collapse;">
                 <tr>
                   <td style="padding:2px 6px; color:#64748b; width:55%;">① 감독권한대행 기준 (100%)</td>
@@ -740,12 +695,12 @@
       <div id="tab-deploy-content" class="rtab-content" style="overflow-y:auto;">
 
         <!-- Panel Header: 비교 기준 선택 -->
-        <div class="panel-header" style="flex-shrink:0;padding:6px 14px;">
+        <div class="panel-header" style="flex-shrink:0;">
           <span class="panel-title">6 감리원 배치계획</span>
           <div style="display:flex;align-items:center;gap:8px;">
             <span style="font-size:11px;color:var(--text3);white-space:nowrap;">비교 기준:</span>
             <select id="dep-legal-mode" onchange="updateDeployMM()"
-              style="padding:2px 8px;border:1.5px solid var(--border2);border-radius:5px;font-size:12px;font-family:var(--sans);background:#fff;cursor:pointer;outline:none;">
+              style="padding:3px 8px;border:1.5px solid var(--border2);border-radius:5px;font-size:12px;font-family:var(--sans);background:#fff;cursor:pointer;outline:none;">
               <option value="final" selected>최종 투입인월수</option>
               <option value="min">최소 배치인월수</option>
               <option value="auth">감독 권한대행</option>
@@ -754,7 +709,7 @@
         </div>
 
         <!-- 등급별 환산비 설정 (KECA 연도별 자동) -->
-        <div style="padding:4px 16px;background:#f8faff;border-bottom:1px solid var(--border);display:flex;align-items:center;gap:8px;flex-shrink:0;flex-wrap:wrap;">
+        <div style="padding:6px 16px;background:#f8faff;border-bottom:1px solid var(--border);display:flex;align-items:center;gap:8px;flex-shrink:0;flex-wrap:wrap;">
           <div style="display:flex;align-items:center;gap:5px;flex-shrink:0;">
             <span style="font-size:11px;font-weight:700;color:var(--accent);">KECA 등급환산비</span>
             <select id="keca-year-select" onchange="loadKecaForYear(this.value)"
@@ -786,7 +741,7 @@
                 oninput="g_keca['초급']=parseFloat(this.value)||1;updateDeployMM()">
             </label>
           </div>
-          <span style="font-size:11px;color:var(--text3);">고급=1.000 기준 · 임의 수정 가능</span>
+          <span style="font-size:10px;color:var(--text3);">고급=1.000 기준 · 임의 수정 가능</span>
         </div>
 
         <!-- 통합 배치 테이블 (기본 + 추가 동일 컬럼) -->
@@ -808,7 +763,7 @@
             <tbody id="unified-deploy-tbody">
               <!-- 기본 배치 헤더 -->
               <tr style="background:#e8eef8;">
-                <td colspan="9" style="padding:4px 10px;font-size:11px;font-weight:700;letter-spacing:0.8px;color:var(--accent);text-transform:uppercase;">기본 배치</td>
+                <td colspan="9" style="padding:4px 10px;font-size:10px;font-weight:700;letter-spacing:0.8px;color:var(--accent);text-transform:uppercase;">기본 배치</td>
               </tr>
               <!-- 상주 건축 (기준 행: 시작일 변경 시 토목·기계 동기화) -->
               <tr data-dep-key="res_arch">
@@ -824,9 +779,9 @@
                     <option selected>특급</option><option>고급</option><option>중급</option><option>초급</option>
                   </select>
                 </td>
-                <td style="padding:2px;"><div style="display:flex;align-items:center;gap:1px;"><input type="text" class="dep-date-input" id="dep_start_res_arch" placeholder="YYMM" maxlength="8" data-tip="4자리 입력 (예: 2504 = 2025년 4월)" oninput="onArchStartInput(this)" onfocus="onDepDateFocus(this)" onblur="onDepDateBlur(this)"><div style="display:flex;flex-direction:column;gap:1px;"><button class="dep-date-spin" onclick="adjustDepDate('dep_start_res_arch',1)">▲</button><button class="dep-date-spin" onclick="adjustDepDate('dep_start_res_arch',-1)">▼</button></div></div></td>
-                <td style="padding:2px;"><div style="display:flex;align-items:center;gap:1px;"><input type="text" class="dep-date-input" id="dep_end_res_arch" placeholder="YYMM" maxlength="8" data-tip="4자리 입력 (예: 2504 = 2025년 4월)" oninput="onArchEndInput(this)" onfocus="onDepDateFocus(this)" onblur="onDepDateBlur(this)"><div style="display:flex;flex-direction:column;gap:1px;"><button class="dep-date-spin" onclick="adjustDepDate('dep_end_res_arch',1)">▲</button><button class="dep-date-spin" onclick="adjustDepDate('dep_end_res_arch',-1)">▼</button></div></div></td>
-                <td style="text-align:center;font-family:var(--mono);font-size:11px;font-weight:600;color:var(--accent);" id="dep_dur_res_arch" title="공사기간과 동일">-</td>
+                <td><input type="text" class="dep-date-input" id="dep_start_res_arch" placeholder="YYMM" maxlength="8" oninput="onArchStartInput(this)" onfocus="onDepDateFocus(this)" onblur="onDepDateBlur(this)"></td>
+                <td><input type="text" class="dep-date-input" id="dep_end_res_arch"   placeholder="YYMM" maxlength="8" oninput="onArchEndInput(this)"  onfocus="onDepDateFocus(this)" onblur="onDepDateBlur(this)"></td>
+                <td><input type="text" class="dep-dur-input" id="dep_dur_res_arch" placeholder="자동" title="개월수 또는 일수 직접입력 (예: 6, 90일)" style="width:52px;font-size:11px;" oninput="onDurInput(this,'res_arch')"></td>
                 <td class="dep-num" id="dep_mm_res_arch">-</td>
                 <td></td>
               </tr>
@@ -844,11 +799,11 @@
                     <option selected>특급</option><option>고급</option><option>중급</option><option>초급</option>
                   </select>
                 </td>
-                <td style="padding:2px;"><div style="display:flex;align-items:center;gap:1px;"><input type="text" class="dep-date-input" id="dep_start_res_civil" placeholder="YYMM" maxlength="8" data-tip="4자리 입력 (예: 2504 = 2025년 4월)" oninput="onDepInput(this,'res_civil','start',false)" onfocus="onDepDateFocus(this)" onblur="onDepDateBlur(this)"><div style="display:flex;flex-direction:column;gap:1px;"><button class="dep-date-spin" onclick="adjustDepDate('dep_start_res_civil',1)">▲</button><button class="dep-date-spin" onclick="adjustDepDate('dep_start_res_civil',-1)">▼</button></div></div></td>
-                <td style="padding:2px;"><div style="display:flex;align-items:center;gap:1px;"><input type="text" class="dep-date-input" id="dep_end_res_civil" placeholder="YYMM" maxlength="8" data-tip="4자리 입력 (예: 2504 = 2025년 4월)" oninput="onCivilEndInput(this)" onfocus="onDepDateFocus(this)" onblur="onDepDateBlur(this)"><div style="display:flex;flex-direction:column;gap:1px;"><button class="dep-date-spin" onclick="adjustDepDate('dep_end_res_civil',1)">▲</button><button class="dep-date-spin" onclick="adjustDepDate('dep_end_res_civil',-1)">▼</button></div></div></td>
-                <td><input type="text" class="dep-dur-input" id="dep_dur_res_civil" placeholder="자동" title="개월수 또는 일수 직접입력 (예: 6.50, 90일)" style="width:52px;font-size:11px;" oninput="onDurInput(this,'res_civil')"></td>
+                <td><input type="text" class="dep-date-input" id="dep_start_res_civil" placeholder="YYMM" maxlength="8" oninput="onDepInput(this,'res_civil','start',false)" onfocus="onDepDateFocus(this)" onblur="onDepDateBlur(this)"></td>
+                <td><input type="text" class="dep-date-input" id="dep_end_res_civil"   placeholder="YYMM" maxlength="8" oninput="onCivilEndInput(this)" onfocus="onDepDateFocus(this)" onblur="onDepDateBlur(this)"></td>
+                <td><input type="text" class="dep-dur-input" id="dep_dur_res_civil" placeholder="자동" title="개월수 또는 일수 직접입력 (예: 6, 90일)" style="width:52px;font-size:11px;" oninput="onDurInput(this,'res_civil')"></td>
                 <td class="dep-num" id="dep_mm_res_civil">-</td>
-                <td style="text-align:center;"><button title="자동으로 복원" style="background:none;border:none;cursor:pointer;color:#6b7280;font-size:13px;padding:0 2px;line-height:1;" onclick="resetDepRow('res_civil')">↺</button></td>
+                <td></td>
               </tr>
               <!-- 상주 기계 (시작=토목 종료+1일, 종료=건축 종료 기본) -->
               <tr data-dep-key="res_mech">
@@ -864,11 +819,11 @@
                     <option selected>특급</option><option>고급</option><option>중급</option><option>초급</option>
                   </select>
                 </td>
-                <td style="padding:2px;"><div style="display:flex;align-items:center;gap:1px;"><input type="text" class="dep-date-input" id="dep_start_res_mech" placeholder="YYMM" maxlength="8" data-tip="4자리 입력 (예: 2504 = 2025년 4월)" oninput="onDepInput(this,'res_mech','start',false)" onfocus="onDepDateFocus(this)" onblur="onDepDateBlur(this)"><div style="display:flex;flex-direction:column;gap:1px;"><button class="dep-date-spin" onclick="adjustDepDate('dep_start_res_mech',1)">▲</button><button class="dep-date-spin" onclick="adjustDepDate('dep_start_res_mech',-1)">▼</button></div></div></td>
-                <td style="padding:2px;"><div style="display:flex;align-items:center;gap:1px;"><input type="text" class="dep-date-input" id="dep_end_res_mech" placeholder="YYMM" maxlength="8" data-tip="4자리 입력 (예: 2504 = 2025년 4월)" oninput="onDepInput(this,'res_mech','end',true)" onfocus="onDepDateFocus(this)" onblur="onDepDateBlur(this)"><div style="display:flex;flex-direction:column;gap:1px;"><button class="dep-date-spin" onclick="adjustDepDate('dep_end_res_mech',1)">▲</button><button class="dep-date-spin" onclick="adjustDepDate('dep_end_res_mech',-1)">▼</button></div></div></td>
-                <td><input type="text" class="dep-dur-input" id="dep_dur_res_mech" placeholder="자동" title="개월수 또는 일수 직접입력 (예: 6.50, 90일)" style="width:52px;font-size:11px;" oninput="onDurInput(this,'res_mech')"></td>
+                <td><input type="text" class="dep-date-input" id="dep_start_res_mech" placeholder="YYMM" maxlength="8" oninput="onDepInput(this,'res_mech','start',false)" onfocus="onDepDateFocus(this)" onblur="onDepDateBlur(this)"></td>
+                <td><input type="text" class="dep-date-input" id="dep_end_res_mech"   placeholder="YYMM" maxlength="8" oninput="onDepInput(this,'res_mech','end',true)" onfocus="onDepDateFocus(this)" onblur="onDepDateBlur(this)"></td>
+                <td><input type="text" class="dep-dur-input" id="dep_dur_res_mech" placeholder="자동" title="개월수 또는 일수 직접입력 (예: 6, 90일)" style="width:52px;font-size:11px;" oninput="onDurInput(this,'res_mech')"></td>
                 <td class="dep-num" id="dep_mm_res_mech">-</td>
-                <td style="text-align:center;"><button title="자동으로 복원" style="background:none;border:none;cursor:pointer;color:#6b7280;font-size:13px;padding:0 2px;line-height:1;" onclick="resetDepRow('res_mech')">↺</button></td>
+                <td></td>
               </tr>
               <!-- 비상주 건축 (인월수 = 산출결과 기술지원기술인 고정, 기간 자동 표시) -->
               <tr data-dep-key="non_arch" style="background:#f8faff;">
@@ -879,16 +834,18 @@
                     <div class="chk-box"></div>
                   </label>
                 </td>
-                <td style="font-size:11px;color:var(--text3);text-align:center;">자동</td>
-                <td style="padding:2px;"><div style="display:flex;align-items:center;gap:1px;"><input type="text" class="dep-date-input" id="dep_start_non_arch" placeholder="자동" maxlength="8" oninput="onNonArchManualInput()" onfocus="onDepDateFocus(this)" onblur="onDepDateBlur(this)"><div style="display:flex;flex-direction:column;gap:1px;"><button class="dep-date-spin" onclick="adjustDepDate('dep_start_non_arch',1)">▲</button><button class="dep-date-spin" onclick="adjustDepDate('dep_start_non_arch',-1)">▼</button></div></div></td>
-                <td style="padding:2px;"><div style="display:flex;align-items:center;gap:1px;"><input type="text" class="dep-date-input" id="dep_end_non_arch" placeholder="자동" maxlength="8" oninput="onNonArchManualInput()" onfocus="onDepDateFocus(this)" onblur="onDepDateBlur(this)"><div style="display:flex;flex-direction:column;gap:1px;"><button class="dep-date-spin" onclick="adjustDepDate('dep_end_non_arch',1)">▲</button><button class="dep-date-spin" onclick="adjustDepDate('dep_end_non_arch',-1)">▼</button></div></div></td>
+                <td style="font-size:10px;color:var(--text3);text-align:center;">자동</td>
+                <td><input type="text" class="dep-date-input" id="dep_start_non_arch" placeholder="자동" maxlength="8"
+                  oninput="onNonArchManualInput()" onfocus="onDepDateFocus(this)" onblur="onDepDateBlur(this)"></td>
+                <td><input type="text" class="dep-date-input" id="dep_end_non_arch" placeholder="자동" maxlength="8"
+                  oninput="onNonArchManualInput()" onfocus="onDepDateFocus(this)" onblur="onDepDateBlur(this)"></td>
                 <td style="text-align:center;font-family:var(--mono);font-size:11px;font-weight:600;" id="dep_dur_non_arch">-</td>
                 <td class="dep-num" id="dep_mm_non_arch">-</td>
-                <td style="text-align:center;"><button title="자동(건축 시작/종료)으로 복원" style="background:none;border:none;cursor:pointer;color:#6b7280;font-size:13px;padding:0 2px;line-height:1;" onclick="resetNonArch()">↺</button></td>
+                <td></td>
               </tr>
               <!-- 추가 감리원 헤더 -->
               <tr style="background:#e8eef8;" id="extra-section-header">
-                <td colspan="8" style="padding:4px 10px;font-size:11px;font-weight:700;letter-spacing:0.8px;color:var(--accent);text-transform:uppercase;">추가 감리원</td>
+                <td colspan="8" style="padding:4px 10px;font-size:10px;font-weight:700;letter-spacing:0.8px;color:var(--accent);text-transform:uppercase;">추가 감리원</td>
                 <td style="text-align:center;padding:2px 4px;">
                   <button class="btn btn-xs btn-primary" onclick="addExtraRow()" style="padding:0 8px;height:22px;font-size:11px;">+</button>
                 </td>
@@ -901,52 +858,48 @@
           </table>
         </div>
 
-        <!-- 합계 + 법적 기준 vs 배치 현황 통합 한 줄 -->
-        <div style="padding:6px 16px;background:#edf4fb;border-top:2px solid var(--accent);display:flex;align-items:center;gap:0;flex-shrink:0;">
-          <div style="flex:0 0 auto;padding-right:16px;border-right:1px solid #c5d9ef;margin-right:16px;">
-            <div style="font-size:11px;color:var(--text3);">합계 배치</div>
-            <span id="deploy-total-mm" style="font-family:var(--mono);color:var(--accent);font-size:18px;font-weight:700;">-</span>
-            <span style="font-size:11px;color:var(--text3);margin-left:2px;">인ㆍ월</span>
-          </div>
-          <div id="deploy-legal-compare" style="flex:1;display:grid;grid-template-columns:1fr 1fr 1fr;gap:6px;">
+        <!-- 합계 배치 인월수 -->
+        <div style="padding:12px 16px 8px;background:#eff6ff;border-top:2px solid var(--accent);display:flex;justify-content:space-between;align-items:center;flex-shrink:0;">
+          <span style="font-size:13px;font-weight:700;color:var(--accent);">합계 배치 인월수</span>
+          <span id="deploy-total-mm" style="font-family:var(--mono);color:var(--accent);font-size:22px;font-weight:700;">-</span>
+        </div>
+
+        <!-- 법적 기준 vs 배치 현황 (합계 하단, 큰 텍스트) -->
+        <div id="deploy-legal-compare" style="padding:14px 16px;background:#eff6ff;border-top:1px solid #bfdbfe;flex-shrink:0;">
+          <div style="display:grid;grid-template-columns:1fr 1fr 1fr;gap:12px;">
             <div style="text-align:center;">
-              <div style="font-size:11px;color:var(--text3);" id="d-legal-label">법적 필요</div>
-              <span style="font-family:var(--mono);font-size:15px;font-weight:700;color:var(--accent);" id="d-legal-mm">-</span>
-              <span style="font-size:11px;color:var(--text3);"> 인ㆍ월</span>
+              <div style="font-size:11px;color:var(--text3);margin-bottom:4px;" id="d-legal-label">법적 필요 (최종 투입)</div>
+              <div style="font-family:var(--mono);font-size:20px;font-weight:700;color:var(--accent);" id="d-legal-mm">-</div>
+              <div style="font-size:11px;color:var(--text3);">인ㆍ월</div>
             </div>
             <div style="text-align:center;">
-              <div style="font-size:11px;color:var(--text3);">현재 배치</div>
-              <span style="font-family:var(--mono);font-size:15px;font-weight:700;color:#059669;" id="d-placed-mm">-</span>
-              <span style="font-size:11px;color:var(--text3);"> 인ㆍ월</span>
+              <div style="font-size:11px;color:var(--text3);margin-bottom:4px;">현재 배치</div>
+              <div style="font-family:var(--mono);font-size:20px;font-weight:700;color:#059669;" id="d-placed-mm">-</div>
+              <div style="font-size:11px;color:var(--text3);">인ㆍ월</div>
             </div>
             <div style="text-align:center;">
-              <div style="font-size:11px;color:var(--text3);">차이</div>
-              <span id="d-diff-value" style="font-family:var(--mono);font-size:15px;font-weight:700;">-</span>
-              <div id="deploy-status-chip" style="display:inline-block;margin-top:1px;font-size:11px;padding:1px 8px;border-radius:10px;background:#f1f5f9;color:#64748b;font-weight:700;">-</div>
+              <div style="font-size:11px;color:var(--text3);margin-bottom:4px;">차이</div>
+              <div id="d-diff-value" style="font-family:var(--mono);font-size:20px;font-weight:700;">-</div>
+              <div id="deploy-status-chip" style="display:inline-block;margin-top:4px;font-size:12px;padding:2px 12px;border-radius:12px;background:#f1f5f9;color:#64748b;font-weight:700;">-</div>
             </div>
           </div>
         </div>
 
-        <!-- 법적 근거 (접기/펼치기) -->
-        <details style="flex-shrink:0;background:#f8faff;border-top:1px solid var(--border);">
-          <summary style="padding:6px 16px;font-size:11px;font-weight:700;color:var(--text3);cursor:pointer;list-style:none;display:flex;align-items:center;gap:4px;">
-            <span>▶</span> 산출 근거
-          </summary>
-          <div style="padding:6px 16px 8px;font-size:11px;color:#64748b;line-height:1.7;">
-            ※ 기간(월) = 시작월~종료월 달력 월수 (일수 직접입력 시 ÷30 자동환산) / 인월수 = 기간(월) × 해당등급 환산비<br>
-            ※ 비상주 건축: 기술지원기술인 인월수 = 최종투입인월수 × 기술지원 비율 (산출 결과 자동 연동)<br>
-            ※ 법적 필요 인월수: 국토교통부 고시 제2023-580호 「건설엔지니어링 대가 등에 관한 기준」 [별표 2]<br>
-            ※ 최소 배치인월수: 업무수행지침 제8조② 추가 20% 감액 적용 (기준인원 × 0.8 × 0.8 = 64%)
-          </div>
-        </details>
+        <!-- 법적 근거 -->
+        <div style="padding:10px 16px;background:#f8faff;border-top:1px solid var(--border);font-size:11px;color:#64748b;line-height:1.8;flex-shrink:0;">
+          <div style="font-weight:700;color:var(--text2);margin-bottom:4px;">■ 산출 근거</div>
+          ※ 기간(월) = 시작월~종료월 달력 월수 (일수 직접입력 시 ÷30 자동환산) / 인월수 = 기간(월) × 해당등급 환산비<br>
+          ※ 비상주 건축: 기술지원기술인 인월수 = 최종투입인월수 × 기술지원 비율 (산출 결과 자동 연동)<br>
+          ※ 법적 필요 인월수: 국토교통부 고시 제2023-580호 「건설엔지니어링 대가 등에 관한 기준」 [별표 2]<br>
+          ※ 최소 배치인월수: 업무수행지침 제8조② 추가 20% 감액 적용 (기준인원 × 0.8 × 0.8 = 64%)
+        </div>
 
         <!-- 배치계획표 Bar Chart -->
-        <div id="gantt-section" style="padding:8px 16px 10px;background:#fff;border-top:1px solid var(--border);flex-shrink:0;">
-          <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:6px;flex-wrap:wrap;gap:4px;">
+        <div id="gantt-section" style="padding:12px 16px;background:#fff;border-top:1px solid var(--border);flex-shrink:0;">
+          <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:8px;flex-wrap:wrap;gap:6px;">
             <div style="font-weight:700;color:var(--text2);font-size:11px;">■ 배치계획표 (Bar Chart)</div>
             <div style="display:flex;gap:6px;">
               <button class="btn btn-xs btn-green" onclick="exportGanttExcel()">⬇ XLSX</button>
-              <button class="btn btn-xs" style="background:#edf4fb;color:#2d6baf;border:1px solid #c5d9ef;" onclick="exportGanttDoc()">⬇ DOCX</button>
               <button class="btn btn-xs" style="background:#f0fdf4;color:#059669;border:1px solid #bbf7d0;" onclick="exportGanttCSV()">⬇ CSV</button>
             </div>
           </div>
@@ -967,47 +920,43 @@
         <div class="section">
           <div class="section-title">감리원별 비용 입력 (단위: 천원)</div>
           <div style="font-size:11px;color:var(--text3);margin-bottom:6px;">배치계획 탭 작성 후 자동으로 인원 목록이 채워집니다. · 연봉 입력 시 월급여(÷13) 및 배치전/종료후 비용 자동 산정</div>
-          <!-- 연봉·주재비·세금 드롭다운 프리셋 -->
-          <div style="margin-bottom:10px;padding:8px 10px;background:#edf4fb;border:1px solid #c5d9ef;border-radius:6px;">
-            <div style="display:flex;align-items:center;gap:12px;flex-wrap:wrap;">
-              <div style="display:flex;align-items:center;gap:5px;">
-                <span style="font-size:11px;font-weight:700;color:var(--accent);white-space:nowrap;">연봉</span>
-                <select class="dep-select" id="annual-select" style="font-size:11px;" onchange="onAnnualSelect(this)">
-                  <option value="">선택</option>
-                  <option value="70000,65000">7,000만원</option>
-                  <option value="65000,60000">6,500만원</option>
-                  <option value="60000,55000">6,000만원</option>
-                  <option value="55000,50000">5,500만원</option>
-                  <option value="50000,45000">5,000만원</option>
-                </select>
-              </div>
-              <div style="display:flex;align-items:center;gap:5px;">
-                <span style="font-size:11px;font-weight:700;color:var(--accent);white-space:nowrap;">주재비</span>
-                <select class="dep-select" id="housing-select" style="font-size:11px;" onchange="onHousingSelect(this)">
-                  <option value="">선택</option>
-                  <option value="400">40만원</option>
-                  <option value="500">50만원</option>
-                  <option value="600">60만원</option>
-                  <option value="700">70만원</option>
-                  <option value="800">80만원</option>
-                  <option value="900">90만원</option>
-                  <option value="1000">100만원</option>
-                </select>
-              </div>
-              <div style="display:flex;align-items:center;gap:5px;">
-                <span style="font-size:11px;font-weight:700;color:var(--accent);white-space:nowrap;">세금</span>
-                <select class="dep-select" id="tax-select" style="font-size:11px;" onchange="onTaxSelect(this)">
-                  <option value="">선택</option>
-                  <option value="300">30만원</option>
-                  <option value="350">35만원</option>
-                  <option value="400">40만원</option>
-                  <option value="450">45만원</option>
-                  <option value="500">50만원</option>
-                </select>
-              </div>
-              <span style="font-size:10px;color:var(--text3);flex:1;white-space:nowrap;">연봉: 상주건축 기준, 나머지 -500만원 자동 적용 · 셀 직접 수정 가능</span>
-              <span id="fin-preset-hint" style="display:none;font-size:10px;color:#dc2626;font-weight:600;">배치계획 탭에서 인원을 먼저 배치하세요</span>
+          <!-- 연봉 프리셋 선택 -->
+          <div style="margin-bottom:10px;padding:8px 10px;background:#f0f9ff;border:1px solid #bae6fd;border-radius:6px;display:flex;align-items:center;gap:8px;flex-wrap:wrap;">
+            <span style="font-size:11px;font-weight:700;color:var(--accent);white-space:nowrap;">연봉 프리셋</span>
+            <div style="display:flex;gap:4px;flex-wrap:wrap;">
+              <button onclick="applyAnnualPreset(70000,65000)" style="font-size:11px;padding:3px 10px;border:1.5px solid #3b82f6;border-radius:4px;background:#fff;color:#1d4ed8;font-weight:700;cursor:pointer;">7,000만</button>
+              <button onclick="applyAnnualPreset(65000,60000)" style="font-size:11px;padding:3px 10px;border:1.5px solid #3b82f6;border-radius:4px;background:#fff;color:#1d4ed8;font-weight:700;cursor:pointer;">6,500만</button>
+              <button onclick="applyAnnualPreset(60000,55000)" style="font-size:11px;padding:3px 10px;border:1.5px solid #3b82f6;border-radius:4px;background:#fff;color:#1d4ed8;font-weight:700;cursor:pointer;">6,000만</button>
+              <button onclick="applyAnnualPreset(55000,50000)" style="font-size:11px;padding:3px 10px;border:1.5px solid #3b82f6;border-radius:4px;background:#fff;color:#1d4ed8;font-weight:700;cursor:pointer;">5,500만</button>
+              <button onclick="applyAnnualPreset(50000,45000)" style="font-size:11px;padding:3px 10px;border:1.5px solid #3b82f6;border-radius:4px;background:#fff;color:#1d4ed8;font-weight:700;cursor:pointer;">5,000만</button>
             </div>
+            <span style="font-size:10px;color:var(--text3);">상주건축 기준, 나머지 -500만원 자동 적용</span>
+          </div>
+          <!-- 주재비 프리셋 선택 -->
+          <div style="margin-bottom:6px;padding:8px 10px;background:#f0fdf4;border:1px solid #bbf7d0;border-radius:6px;display:flex;align-items:center;gap:8px;flex-wrap:wrap;">
+            <span style="font-size:11px;font-weight:700;color:#059669;white-space:nowrap;">주재비 프리셋</span>
+            <div style="display:flex;gap:4px;flex-wrap:wrap;">
+              <button onclick="applyHousingPreset(400)" style="font-size:11px;padding:3px 10px;border:1.5px solid #16a34a;border-radius:4px;background:#fff;color:#15803d;font-weight:700;cursor:pointer;">40만</button>
+              <button onclick="applyHousingPreset(500)" style="font-size:11px;padding:3px 10px;border:1.5px solid #16a34a;border-radius:4px;background:#fff;color:#15803d;font-weight:700;cursor:pointer;">50만</button>
+              <button onclick="applyHousingPreset(600)" style="font-size:11px;padding:3px 10px;border:1.5px solid #16a34a;border-radius:4px;background:#fff;color:#15803d;font-weight:700;cursor:pointer;">60만</button>
+              <button onclick="applyHousingPreset(700)" style="font-size:11px;padding:3px 10px;border:1.5px solid #16a34a;border-radius:4px;background:#fff;color:#15803d;font-weight:700;cursor:pointer;">70만</button>
+              <button onclick="applyHousingPreset(800)" style="font-size:11px;padding:3px 10px;border:1.5px solid #16a34a;border-radius:4px;background:#fff;color:#15803d;font-weight:700;cursor:pointer;">80만</button>
+              <button onclick="applyHousingPreset(900)" style="font-size:11px;padding:3px 10px;border:1.5px solid #16a34a;border-radius:4px;background:#fff;color:#15803d;font-weight:700;cursor:pointer;">90만</button>
+              <button onclick="applyHousingPreset(1000)" style="font-size:11px;padding:3px 10px;border:1.5px solid #16a34a;border-radius:4px;background:#fff;color:#15803d;font-weight:700;cursor:pointer;">100만</button>
+            </div>
+            <span style="font-size:10px;color:var(--text3);">전체 인원 일괄 적용 · 셀 직접 수정 가능</span>
+          </div>
+          <!-- 세금 프리셋 선택 -->
+          <div style="margin-bottom:10px;padding:8px 10px;background:#fefce8;border:1px solid #fef08a;border-radius:6px;display:flex;align-items:center;gap:8px;flex-wrap:wrap;">
+            <span style="font-size:11px;font-weight:700;color:#92400e;white-space:nowrap;">세금 프리셋</span>
+            <div style="display:flex;gap:4px;flex-wrap:wrap;">
+              <button onclick="applyTaxPreset(300)" style="font-size:11px;padding:3px 10px;border:1.5px solid #d97706;border-radius:4px;background:#fff;color:#92400e;font-weight:700;cursor:pointer;">30만</button>
+              <button onclick="applyTaxPreset(350)" style="font-size:11px;padding:3px 10px;border:1.5px solid #d97706;border-radius:4px;background:#fff;color:#92400e;font-weight:700;cursor:pointer;">35만</button>
+              <button onclick="applyTaxPreset(400)" style="font-size:11px;padding:3px 10px;border:1.5px solid #d97706;border-radius:4px;background:#fff;color:#92400e;font-weight:700;cursor:pointer;">40만</button>
+              <button onclick="applyTaxPreset(450)" style="font-size:11px;padding:3px 10px;border:1.5px solid #d97706;border-radius:4px;background:#fff;color:#92400e;font-weight:700;cursor:pointer;">45만</button>
+              <button onclick="applyTaxPreset(500)" style="font-size:11px;padding:3px 10px;border:1.5px solid #d97706;border-radius:4px;background:#fff;color:#92400e;font-weight:700;cursor:pointer;">50만</button>
+            </div>
+            <span style="font-size:10px;color:var(--text3);">5만원 단위 · 셀 직접 수정 가능</span>
           </div>
           <div style="overflow-x:auto;">
             <table class="fin-table" id="finance-person-table">
@@ -1031,28 +980,31 @@
           </div>
         </div>
 
-        <!-- 수지 요약 -->
-        <div id="finance-summary" style="padding:14px 16px;background:#edf4fb;border-top:2px solid var(--accent);display:none;">
-          <div style="font-size:11px;font-weight:700;color:var(--accent);margin-bottom:10px;">■ 수지 요약</div>
-          <div style="display:grid;grid-template-columns:repeat(4,1fr);gap:8px;margin-bottom:8px;" id="finance-summary-grid"></div>
-          <div style="display:grid;grid-template-columns:repeat(4,1fr);gap:8px;margin-bottom:8px;" id="finance-summary-result"></div>
-          <div style="display:grid;grid-template-columns:repeat(4,1fr);gap:8px;">
-            <div class="fin-sum-card" style="grid-column:span 2;text-align:center;">
-              <div class="fin-sum-label">이윤 <span style="font-size:11px;font-weight:400;color:var(--text3);">(T×10,000)</span></div>
-              <div style="display:flex;align-items:center;gap:4px;justify-content:center;margin-top:5px;">
-                <input type="text" inputmode="numeric" id="fin_profit" value="0" class="is-manual fin-num-input" style="width:110px;text-align:right;font-size:16px;font-weight:700;" oninput="calcFinance()" onblur="fmtFinInput(this)">
-                <span style="font-size:13px;color:var(--text3);">천원</span>
-              </div>
-            </div>
-            <div class="fin-sum-card" style="grid-column:span 2;text-align:center;">
-              <div class="fin-sum-label">계약금액</div>
-              <div style="display:flex;align-items:center;gap:4px;justify-content:center;margin-top:5px;">
-                <input type="text" inputmode="numeric" id="fin_contract" value="0" class="is-manual fin-num-input" style="width:110px;text-align:right;font-size:16px;font-weight:700;" oninput="g_contract_manual=true;calcFinance()" onblur="fmtFinInput(this)">
-                <span style="font-size:13px;color:var(--text3);">천원</span>
-                <button id="btn_contract_reset" title="자동(필요계약금액 백만원 올림)으로 복원" style="background:none;border:none;cursor:pointer;color:#6b7280;font-size:13px;padding:0 2px;line-height:1;display:none;flex-shrink:0;" onclick="g_contract_manual=false;document.getElementById('btn_contract_reset').style.display='none';calcFinance()">↺</button>
-              </div>
-            </div>
+        <!-- 이윤 / 계약금액 -->
+        <div class="section">
+          <div class="section-title">이윤 및 계약금액 (단위: 천원)</div>
+          <div class="field" style="flex-wrap:wrap;gap:6px;align-items:center;background:#f0fdf4;border-radius:8px;padding:8px 12px;">
+            <label style="flex-shrink:0;font-weight:700;color:#065f46;">이윤</label>
+            <span style="font-size:13px;color:#475569;white-space:nowrap;flex-shrink:0;">T(<span id="fin_profit_T">0</span>개월) ×</span>
+            <button onclick="adjustProfitUnit(-1000)" style="height:32px;min-width:28px;border:1.5px solid #a7f3d0;border-radius:5px;background:#ecfdf5;color:#065f46;font-size:16px;font-weight:700;cursor:pointer;line-height:1;flex-shrink:0;">−</button>
+            <input type="text" id="fin_profit_unit" value="10,000" readonly style="width:80px;text-align:center;background:#ecfdf5;border:1.5px solid #a7f3d0;border-radius:5px;padding:4px 6px;font-size:13px;font-weight:700;color:#065f46;">
+            <button onclick="adjustProfitUnit(1000)" style="height:32px;min-width:28px;border:1.5px solid #a7f3d0;border-radius:5px;background:#ecfdf5;color:#065f46;font-size:16px;font-weight:700;cursor:pointer;line-height:1;flex-shrink:0;">+</button>
+            <span style="font-size:13px;color:#475569;white-space:nowrap;">천원 =</span>
+            <strong id="fin_profit_result" style="font-size:16px;color:#059669;white-space:nowrap;">0 천원</strong>
+            <input type="hidden" id="fin_profit" value="0">
           </div>
+          <div class="field">
+            <label>계약금액</label>
+            <input type="text" inputmode="numeric" id="fin_contract" value="0" class="is-manual" style="flex:1;max-width:160px;" oninput="calcFinance()" onblur="fmtFinInput(this)">
+            <span class="unit">천원</span>
+          </div>
+        </div>
+
+        <!-- 수지 요약 -->
+        <div id="finance-summary" style="padding:14px 16px;background:#eff6ff;border-top:2px solid var(--accent);display:none;">
+          <div style="font-size:11px;font-weight:700;color:var(--accent);margin-bottom:10px;">■ 수지 요약</div>
+          <div style="display:grid;grid-template-columns:repeat(4,1fr);gap:8px;margin-bottom:10px;" id="finance-summary-grid"></div>
+          <div style="display:grid;grid-template-columns:repeat(3,1fr);gap:8px;" id="finance-summary-result"></div>
         </div>
 
       </div><!-- /tab-finance-content -->
@@ -1068,13 +1020,13 @@
      HELP MODAL
 ══════════════════════════════ -->
 <div id="help-modal" style="display:none;position:fixed;inset:0;background:rgba(15,23,42,0.6);z-index:999;align-items:center;justify-content:center;">
-  <div style="background:#fff;border:1px solid #c5d9ef;border-radius:12px;width:min(560px,92vw);max-height:85vh;overflow-y:auto;padding:28px;position:relative;box-shadow:0 20px 60px rgba(45,107,175,0.2);">
+  <div style="background:#fff;border:1px solid #bfdbfe;border-radius:12px;width:min(560px,92vw);max-height:85vh;overflow-y:auto;padding:28px;position:relative;box-shadow:0 20px 60px rgba(29,78,216,0.2);">
     <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:18px;">
       <span style="font-size:16px;font-weight:700;color:#0f172a;">사용설명서</span>
       <button onclick="closeHelp()" style="background:#f1f5f9;border:1px solid #e2e8f0;color:#64748b;font-size:18px;cursor:pointer;line-height:1;width:32px;height:32px;border-radius:6px;">✕</button>
     </div>
     <div style="font-size:13px;line-height:2;color:#334155;">
-      <p style="color:#2d6baf;font-weight:600;margin-bottom:14px;font-size:12px;background:#edf4fb;padding:8px 12px;border-radius:6px;border-left:3px solid #2d6baf;">
+      <p style="color:#1d4ed8;font-weight:600;margin-bottom:14px;font-size:12px;background:#eff6ff;padding:8px 12px;border-radius:6px;border-left:3px solid #1d4ed8;">
         국토교통부 고시 제2023-580호 · 건설엔지니어링 대가 등에 관한 기준
       </p>
 
@@ -1143,15 +1095,13 @@ const DB = [
 // ═══════════════════════════════════════════
 let g_final_mm = 0, g_min_mm = 0, g_base_mm = 0, g_T = 0, g_tech_mm = 0;
 let g_extra_rows = []; // [{type, field, grade, start, end, dur, mm, active}]
-let g_contract_manual = false; // 계약금액 수동 입력 여부
 
 // KECA 등급별 환산비 연도별 테이블 (고급=1.000 기준)
-// ※ 한국건설엔지니어링협회 건설사업관리기술인 노임가격 공표치 기준
-// ※ 환산비 = 해당등급 일당 ÷ 고급 일당
+// ※ 매년 KECA 공표 후 해당 연도 값 추가/업데이트
 const KECA_RATES = {
-  2024: { 특급: 1.092, 고급: 1.000, 중급: 0.925, 초급: 0.707 }, // 391,590 / 358,628 / 331,723 / 253,599원
-  2025: { 특급: 1.070, 고급: 1.000, 중급: 0.920, 초급: 0.714 }, // 396,707 / 370,635 / 341,029 / 264,639원
-  2026: { 특급: 1.061, 고급: 1.000, 중급: 0.931, 초급: 0.764 }, // 399,247 / 376,400 / 350,580 / 287,724원
+  2024: { 특급: 1.061, 고급: 1.000, 중급: 0.799, 초급: 0.638 }, // KECA 2024 (값 확인 후 업데이트 필요)
+  2025: { 특급: 1.061, 고급: 1.000, 중급: 0.799, 초급: 0.638 },
+  2026: { 특급: 1.061, 고급: 1.000, 중급: 0.931, 초급: 0.764 }, // KECA 2026 공표값
 };
 let g_keca_year = new Date().getFullYear();
 let g_keca = { ...(KECA_RATES[g_keca_year] || KECA_RATES[Math.max(...Object.keys(KECA_RATES).map(Number))]) };
@@ -1237,14 +1187,11 @@ function autoFmtDepInput(val, isEnd) {
   return `${yy}.${mm}.${d.slice(4,6)}`;
 }
 
-// YY.MM.DD 기간(월) 계산 — endDateFromStart의 역함수
-// 종료일이 시작일 day보다 작으면 완전한 월, 같거나 크면 +1월
+// YY.MM.DD 기간(월) 계산 (달력 월 기준, 시작월~종료월 포함)
 function calcMonthsDep(startStr, endStr) {
   const s = parseDepDate(startStr), e = parseDepDate(endStr);
   if (!s || !e || e < s) return 0;
-  let m = (e.getFullYear() - s.getFullYear()) * 12 + (e.getMonth() - s.getMonth());
-  if (e.getDate() >= s.getDate()) m += 1;
-  return m;
+  return (e.getFullYear() - s.getFullYear()) * 12 + (e.getMonth() - s.getMonth()) + 1;
 }
 
 // 시작(YY.MM.DD) + T개월 → 종료(YY.MM.DD)
@@ -1257,51 +1204,24 @@ function endDateFromStart(startStr, T) {
   return fmtDepDate(d);
 }
 
-// 날짜를 상주 건축 기간 범위로 클램프
-function clampToArchRange(dateStr, isEnd) {
-  const d = parseDepDate(dateStr);
-  if (!d) return dateStr;
-  const archS = parseDepDate(document.getElementById('dep_start_res_arch')?.value || '');
-  const archE = parseDepDate(document.getElementById('dep_end_res_arch')?.value   || '');
-  if (!isEnd && archS && d < archS) return fmtDepDate(archS);
-  if (isEnd  && archE && d > archE) return fmtDepDate(archE);
-  return dateStr;
-}
-
 function setDepVal(id, val) {
   const el = document.getElementById(id);
   if (el) el.value = val;
 }
 
-// 4자리 이상 입력되면 자동 포맷 (이미 점이 있으면 편집 중이므로 건너뜀)
+// 4자리 이상 입력되면 자동 포맷
 function tryAutoFmt(el, isEnd) {
-  if (el.value.includes('.')) return; // 편집 중인 기존 날짜 — 건드리지 않음
   const d = el.value.replace(/\D/g, '');
   if (d.length >= 4) el.value = autoFmtDepInput(el.value, isEnd);
 }
 
-// ─── 날짜 포커스/블러: 포커스 시 전체 선택(편집 가능), 블러 시 포맷/복원 ──
+// ─── 날짜 포커스/블러: 포커스 시 빈칸, 블러 시 원래값 복원 ──
 function onDepDateFocus(el) {
   el.dataset.prevVal = el.value;
-  // 전체 선택 → 새로 입력하거나 커서 이동해 일자만 수정 가능
-  setTimeout(() => el.select(), 0);
+  el.value = '';
 }
 function onDepDateBlur(el) {
-  const raw = el.value.replace(/\D/g, '');
-  if (raw.length >= 6) {
-    const isEnd = el.id.includes('_end');
-    el.value = autoFmtDepInput(el.value, isEnd);
-    // blur 포맷 후 배치기간·인월수 재계산
-    const extraM = el.id.match(/^extra_(?:start|end)_(\d+)$/);
-    if (extraM) {
-      calcExtraDate(parseInt(extraM[1]));
-    } else {
-      updateNonArchDates();
-      updateDeployMM();
-    }
-  } else {
-    el.value = el.dataset.prevVal || '';
-  }
+  if (!el.value.trim()) el.value = el.dataset.prevVal || '';
 }
 
 // ─── 기간(월) 직접입력: "90일" → 3.000개월, "3.5" → 3.500개월 ──
@@ -1320,44 +1240,9 @@ function onDurInput(el, key) {
   if (el.value.trim()) {
     g_dep_dur_manual.add(key);
     el.classList.add('is-manual');
-    // 종료일 자동 갱신: 시작 + 입력 개월수 (건축 범위 클램프)
-    const dur = parseDurInput(el.value);
-    if (dur > 0) {
-      const startStr = document.getElementById('dep_start_' + key)?.value || '';
-      if (startStr.replace(/\D/g,'').length >= 6) {
-        const rawEnd = endDateFromStart(startStr, dur);
-        const newEnd = rawEnd ? clampToArchRange(rawEnd, true) : '';
-        if (newEnd) {
-          setDepVal('dep_end_' + key, newEnd);
-          g_dep_manual.add(key + '_end');
-          // 토목 종료 변경 시 기계 시작 연동 (기계 시작이 수동이 아닐 때)
-          if (key === 'res_civil' && !g_dep_manual.has('res_mech_start')) {
-            setDepVal('dep_start_res_mech', clampToArchRange(nextDepDay(newEnd), false));
-            calcBasicDur('res_mech');
-          }
-        }
-      }
-    }
   } else {
-    // 개월 입력 지웠을 때 → 자동 종료일로 복원
     g_dep_dur_manual.delete(key);
     el.classList.remove('is-manual');
-    g_dep_manual.delete(key + '_end');
-    const startStr = document.getElementById('dep_start_' + key)?.value || '';
-    if (startStr.replace(/\D/g,'').length >= 6 && g_T > 0) {
-      let autoEnd = '';
-      if (key === 'res_arch') autoEnd = endDateFromStart(startStr, g_T);
-      else if (key === 'res_civil') {
-        autoEnd = endDateFromStart(startStr, Math.max(1, Math.floor(g_T / 2)));
-        // 토목 종료 복원 시 기계 시작도 복원
-        if (autoEnd && !g_dep_manual.has('res_mech_start')) {
-          setDepVal('dep_start_res_mech', clampToArchRange(nextDepDay(autoEnd), false));
-          calcBasicDur('res_mech');
-        }
-      }
-      else if (key === 'res_mech') autoEnd = document.getElementById('dep_end_res_arch')?.value || '';
-      if (autoEnd) setDepVal('dep_end_' + key, autoEnd);
-    }
   }
   calcBasicDur(key);
   updateDeployMM();
@@ -1367,26 +1252,9 @@ function onExtraDurInput(el, idx) {
   if (el.value.trim()) {
     if (g_extra_rows[idx]) g_extra_rows[idx]._manualDur = true;
     el.classList.add('is-manual');
-    const dur = parseDurInput(el.value);
-    if (dur > 0 && g_extra_rows[idx]) {
-      const startStr = document.getElementById('extra_start_' + idx)?.value || '';
-      if (startStr.replace(/\D/g,'').length >= 6) {
-        const newEnd = endDateFromStart(startStr, dur);
-        if (newEnd) {
-          setDepVal('extra_end_' + idx, newEnd);
-          g_extra_rows[idx]._manualEnd = true;
-        }
-      }
-    }
   } else {
-    if (g_extra_rows[idx]) {
-      g_extra_rows[idx]._manualDur = false;
-      g_extra_rows[idx]._manualEnd = false;
-    }
+    if (g_extra_rows[idx]) g_extra_rows[idx]._manualDur = false;
     el.classList.remove('is-manual');
-    // 개월 지웠을 때 종료일 복원 (건축 종료 기준)
-    const archEnd = document.getElementById('dep_end_res_arch')?.value || '';
-    if (archEnd) setDepVal('extra_end_' + idx, archEnd);
   }
   calcExtraDate(idx);
 }
@@ -1395,50 +1263,9 @@ function getKecaFactor(grade) {
   return g_keca[grade] || 1.000;
 }
 
-// ─── 비상주 건축 초기화 (↺ 버튼) ────────────────────────
-function resetNonArch() {
-  const startEl = document.getElementById('dep_start_non_arch');
-  const endEl   = document.getElementById('dep_end_non_arch');
-  if (startEl) { startEl.value = ''; delete startEl.dataset.manual; }
-  if (endEl)   { endEl.value   = ''; delete endEl.dataset.manual; }
-  updateNonArchDates();
-}
-
-// ─── 배치 행 초기화 (↺ 버튼) ────────────────────────────
-function resetDepRow(key) {
-  // 수동 플래그 해제
-  g_dep_manual.delete(key + '_start');
-  g_dep_manual.delete(key + '_end');
-  g_dep_dur_manual.delete(key);
-  const durEl = document.getElementById('dep_dur_' + key);
-  if (durEl && durEl.tagName === 'INPUT') { durEl.value = ''; durEl.classList.remove('is-manual'); }
-
-  if (!g_T) { calcBasicDur(key); updateDeployMM(); return; }
-  const archStart = document.getElementById('dep_start_res_arch')?.value || '';
-
-  if (key === 'res_arch') {
-    if (archStart) setDepVal('dep_end_res_arch', endDateFromStart(archStart, g_T));
-  } else if (key === 'res_civil') {
-    g_dep_manual.delete('res_civil_start');
-    setDepVal('dep_start_res_civil', archStart);
-    const halfT = Math.max(1, Math.floor(g_T / 2));
-    const civilEnd = endDateFromStart(archStart, halfT);
-    setDepVal('dep_end_res_civil', civilEnd);
-    g_dep_manual.delete('res_mech_start');
-    setDepVal('dep_start_res_mech', nextDepDay(civilEnd));
-    calcBasicDur('res_mech');
-  } else if (key === 'res_mech') {
-    const archEnd = document.getElementById('dep_end_res_arch')?.value || '';
-    if (archEnd) setDepVal('dep_end_res_mech', archEnd);
-  }
-  calcBasicDur(key);
-  updateDeployMM();
-}
-
 // ─── 초기화 ─────────────────────────────────────────────
 function initDeployFromCalc(T) {
   g_dep_manual.clear();
-  g_contract_manual = false;
   const today = new Date();
   const startStr  = fmtDepDate(today);
   const endStr    = endDateFromStart(startStr, T);
@@ -1474,8 +1301,8 @@ function calcBasicDur(key) {
   const endStr   = document.getElementById('dep_end_' + key)?.value   || '';
   const dur = calcMonthsDep(startStr, endStr);
   if (durEl) {
-    if (durEl.tagName === 'INPUT') durEl.value = dur > 0 ? (+dur).toFixed(2) : '';
-    else durEl.textContent = dur > 0 ? (+dur).toFixed(2) + '개월' : '-';
+    if (durEl.tagName === 'INPUT') durEl.value = dur > 0 ? dur + '' : '';
+    else durEl.textContent = dur > 0 ? dur + '개월' : '-';
   }
   return dur;
 }
@@ -1493,7 +1320,7 @@ function updateNonArchDates() {
   const actualEnd   = endEl?.value   || archEnd;
   const dur = calcMonthsDep(actualStart, actualEnd);
   const durEl = document.getElementById('dep_dur_non_arch');
-  if (durEl) durEl.textContent = dur > 0 ? (+dur).toFixed(2) + '개월' : '-';
+  if (durEl) durEl.textContent = dur > 0 ? dur + '개월' : '-';
 }
 
 function onNonArchManualInput() {
@@ -1503,7 +1330,7 @@ function onNonArchManualInput() {
   if (endEl)   endEl.dataset.manual   = '1';
   const dur = calcMonthsDep(startEl?.value || '', endEl?.value || '');
   const durEl = document.getElementById('dep_dur_non_arch');
-  if (durEl) durEl.textContent = dur > 0 ? (+dur).toFixed(2) + '개월' : '-';
+  if (durEl) durEl.textContent = dur > 0 ? dur + '개월' : '-';
   updateDeployMM();
 }
 
@@ -1518,8 +1345,8 @@ function calcExtraDate(idx) {
     const endStr   = document.getElementById('extra_end_'   + idx)?.value || '';
     dur = calcMonthsDep(startStr, endStr);
     if (durEl) {
-      if (durEl.tagName === 'INPUT') durEl.value = dur > 0 ? (+dur).toFixed(2) : '';
-      else durEl.textContent = dur > 0 ? (+dur).toFixed(2) + '개월' : '-';
+      if (durEl.tagName === 'INPUT') durEl.value = dur > 0 ? dur + '' : '';
+      else durEl.textContent = dur > 0 ? dur + '개월' : '-';
     }
   }
   if (g_extra_rows[idx]) g_extra_rows[idx].dur = dur;
@@ -1534,50 +1361,29 @@ function onArchStartInput(el) {
   const startStr = el.value;
   if (!g_T) { calcBasicDur('res_arch'); updateDeployMM(); return; }
 
-  // 건축 종료: 항상 start+g_T (공사기간 기준) — 상주건축 배치기간은 공사기간과 동일
-  setDepVal('dep_end_res_arch', endDateFromStart(startStr, g_T));
-  g_dep_manual.delete('res_arch_end');
+  const endStr = endDateFromStart(startStr, g_T);
+  setDepVal('dep_end_res_arch', endStr);
   calcBasicDur('res_arch');
-  const endStr = document.getElementById('dep_end_res_arch')?.value || endDateFromStart(startStr, g_T);
 
   // 토목: 수동 수정 없으면 건축 시작 따라감
   if (!g_dep_manual.has('res_civil_start')) setDepVal('dep_start_res_civil', startStr);
   if (!g_dep_manual.has('res_civil_end')) {
-    if (g_dep_dur_manual.has('res_civil')) {
-      // 토목 개월 수동: 토목시작+dur → 토목종료
-      const civilStart = document.getElementById('dep_start_res_civil')?.value || startStr;
-      const dur = parseDurInput(document.getElementById('dep_dur_res_civil')?.value || '');
-      if (dur > 0) {
-        const civilEnd = endDateFromStart(civilStart, dur);
-        setDepVal('dep_end_res_civil', civilEnd);
-        if (!g_dep_manual.has('res_mech_start')) setDepVal('dep_start_res_mech', nextDepDay(civilEnd));
-      }
-    } else {
-      const halfT    = Math.max(1, Math.floor(g_T / 2));
-      const civilEnd = endDateFromStart(startStr, halfT);
-      setDepVal('dep_end_res_civil', civilEnd);
-      if (!g_dep_manual.has('res_mech_start')) setDepVal('dep_start_res_mech', nextDepDay(civilEnd));
-    }
+    const halfT    = Math.max(1, Math.floor(g_T / 2));
+    const civilEnd = endDateFromStart(startStr, halfT);
+    setDepVal('dep_end_res_civil', civilEnd);
+    if (!g_dep_manual.has('res_mech_start')) setDepVal('dep_start_res_mech', nextDepDay(civilEnd));
   }
   calcBasicDur('res_civil');
 
-  // 기계 종료: dur 수동이면 기계시작+dur, 아니면 건축 종료와 동기
-  if (!g_dep_manual.has('res_mech_end')) {
-    if (g_dep_dur_manual.has('res_mech')) {
-      const mechStart = document.getElementById('dep_start_res_mech')?.value || '';
-      const dur = parseDurInput(document.getElementById('dep_dur_res_mech')?.value || '');
-      if (dur > 0 && mechStart) setDepVal('dep_end_res_mech', endDateFromStart(mechStart, dur));
-    } else {
-      setDepVal('dep_end_res_mech', endStr);
-    }
-  }
+  // 기계 종료 = 건축 종료
+  if (!g_dep_manual.has('res_mech_end')) setDepVal('dep_end_res_mech', endStr);
   calcBasicDur('res_mech');
 
   // 추가 감리원 동기화
   g_extra_rows.forEach((row, i) => {
     if (row._removed) return;
     if (!row._manualStart) setDepVal('extra_start_' + i, startStr);
-    if (!row._manualEnd && !row._manualDur) setDepVal('extra_end_' + i, endStr);
+    if (!row._manualEnd)   setDepVal('extra_end_'   + i, endStr);
     calcExtraDate(i);
   });
 
@@ -1585,28 +1391,13 @@ function onArchStartInput(el) {
   updateDeployMM();
 }
 
-// 건축 종료 변경 → 토목/기계 종료 클램프 + 기계 종료 동기화
+// 건축 종료 변경 → 기계 종료 동기화
 function onArchEndInput(el) {
   tryAutoFmt(el, true);
   if (el.value.replace(/\D/g,'').length < 6) return;
   g_dep_manual.add('res_arch_end');
   const endStr = el.value;
   calcBasicDur('res_arch');
-
-  // 토목 종료가 새 건축 종료를 초과하면 클램프 → 기계 시작 연동
-  const civilEndEl = document.getElementById('dep_end_res_civil');
-  if (civilEndEl && civilEndEl.value) {
-    const archE = parseDepDate(endStr);
-    const civE  = parseDepDate(civilEndEl.value);
-    if (archE && civE && civE > archE) {
-      setDepVal('dep_end_res_civil', endStr);
-      calcBasicDur('res_civil');
-      if (!g_dep_manual.has('res_mech_start')) {
-        setDepVal('dep_start_res_mech', clampToArchRange(nextDepDay(endStr), false));
-        calcBasicDur('res_mech');
-      }
-    }
-  }
 
   if (!g_dep_manual.has('res_mech_end')) {
     setDepVal('dep_end_res_mech', endStr);
@@ -1620,39 +1411,26 @@ function onArchEndInput(el) {
   updateDeployMM();
 }
 
-// 토목 종료 변경 → 기계 시작 자동 (건축 범위 클램프)
+// 토목 종료 변경 → 기계 시작 자동
 function onCivilEndInput(el) {
   tryAutoFmt(el, true);
   if (el.value.replace(/\D/g,'').length < 6) return;
-  // 건축 종료 범위로 클램프
-  const clamped = clampToArchRange(el.value, true);
-  if (clamped !== el.value) el.value = clamped;
   g_dep_manual.add('res_civil_end');
   const civilEnd = el.value;
   calcBasicDur('res_civil');
 
   if (!g_dep_manual.has('res_mech_start')) {
-    setDepVal('dep_start_res_mech', clampToArchRange(nextDepDay(civilEnd), false));
+    setDepVal('dep_start_res_mech', nextDepDay(civilEnd));
     calcBasicDur('res_mech');
   }
   updateDeployMM();
 }
 
-// 그 외 날짜 수동 변경 (건축 범위 클램프)
+// 그 외 날짜 수동 변경
 function onDepInput(el, key, field, isEnd) {
   tryAutoFmt(el, isEnd);
   if (el.value.replace(/\D/g,'').length < 6) return;
-  // 건축(res_arch) 자체는 클램프 제외, 나머지는 범위 내로 제한
-  if (key !== 'res_arch') {
-    const clamped = clampToArchRange(el.value, isEnd);
-    if (clamped !== el.value) el.value = clamped;
-  }
   g_dep_manual.add(key + '_' + field);
-  // 토목 종료 직접 입력 시 기계 시작 연동 (기계 시작 수동이 아닐 때)
-  if (key === 'res_civil' && field === 'end' && !g_dep_manual.has('res_mech_start')) {
-    setDepVal('dep_start_res_mech', clampToArchRange(nextDepDay(el.value), false));
-    calcBasicDur('res_mech');
-  }
   calcBasicDur(key);
   updateDeployMM();
 }
@@ -1808,12 +1586,12 @@ function addExtraRow() {
         <option selected>특급</option><option>고급</option><option>중급</option><option>초급</option>
       </select>
     </td>
-    <td style="padding:2px;"><div style="display:flex;align-items:center;gap:1px;"><input type="text" class="dep-date-input" id="extra_start_${idx}" value="${defStart}" placeholder="YYMM" maxlength="8" data-tip="4자리 입력 (예: 2504 = 2025년 4월)"
+    <td><input type="text" class="dep-date-input" id="extra_start_${idx}" value="${defStart}" placeholder="YYMM" maxlength="8"
       oninput="tryAutoFmt(this,false);g_extra_rows[${idx}]._manualStart=true;calcExtraDate(${idx})"
-      onfocus="onDepDateFocus(this)" onblur="onDepDateBlur(this)"><div style="display:flex;flex-direction:column;gap:1px;"><button class="dep-date-spin" onclick="adjustDepDate('extra_start_${idx}',1)">▲</button><button class="dep-date-spin" onclick="adjustDepDate('extra_start_${idx}',-1)">▼</button></div></div></td>
-    <td style="padding:2px;"><div style="display:flex;align-items:center;gap:1px;"><input type="text" class="dep-date-input" id="extra_end_${idx}" value="${defEnd}" placeholder="YYMM" maxlength="8" data-tip="4자리 입력 (예: 2504 = 2025년 4월)"
+      onfocus="onDepDateFocus(this)" onblur="onDepDateBlur(this)"></td>
+    <td><input type="text" class="dep-date-input" id="extra_end_${idx}"   value="${defEnd}"   placeholder="YYMM" maxlength="8"
       oninput="tryAutoFmt(this,true);g_extra_rows[${idx}]._manualEnd=true;calcExtraDate(${idx})"
-      onfocus="onDepDateFocus(this)" onblur="onDepDateBlur(this)"><div style="display:flex;flex-direction:column;gap:1px;"><button class="dep-date-spin" onclick="adjustDepDate('extra_end_${idx}',1)">▲</button><button class="dep-date-spin" onclick="adjustDepDate('extra_end_${idx}',-1)">▼</button></div></div></td>
+      onfocus="onDepDateFocus(this)" onblur="onDepDateBlur(this)"></td>
     <td><input type="text" class="dep-dur-input" id="extra_dur_${idx}" placeholder="자동" title="개월수 또는 일수 직접입력 (예: 6, 90일)" style="width:52px;font-size:11px;" oninput="onExtraDurInput(this,${idx})"></td>
     <td class="dep-num" id="extra_mm_${idx}">-</td>
     <td style="text-align:center;">
@@ -1925,7 +1703,7 @@ function renderGantt() {
   });
 
   const COL_W = 30;
-  const TH_BASE = 'background:#e8eef8;border:1px solid #d1d5db;font-size:11px;text-align:center;';
+  const TH_BASE = 'background:#e8eef8;border:1px solid #d1d5db;font-size:10px;text-align:center;';
   let html = `<table style="border-collapse:collapse;">`;
 
   // 헤더 행1: 인원(rowspan2) | 배치기간(rowspan2) | 인월수(rowspan2) | 년도(colspan) | 비고(rowspan2)
@@ -1951,7 +1729,7 @@ function renderGantt() {
     const color = GANTT_COLORS[p.type + ' ' + p.field] || '#64748b';
     html += `<tr>`;
     html += `<td style="padding:3px 6px;border:1px solid #e5e7eb;font-weight:600;white-space:nowrap;font-size:11px;">${p.label}<br><span style="font-size:9px;color:var(--text3);font-weight:400;">${p.grade}</span></td>`;
-    html += `<td style="padding:3px 2px;border:1px solid #e5e7eb;text-align:center;font-family:var(--mono);font-size:11px;color:var(--text2);">${(+p.dur).toFixed(2)}개월</td>`;
+    html += `<td style="padding:3px 2px;border:1px solid #e5e7eb;text-align:center;font-family:var(--mono);font-size:11px;color:var(--text2);">${p.dur}개월</td>`;
     html += `<td style="padding:3px 2px;border:1px solid #e5e7eb;text-align:center;font-family:var(--mono);font-size:11px;color:var(--accent);font-weight:600;">${p.mm.toFixed(3)}</td>`;
     months.forEach(m => {
       const mS = new Date(m.year, m.month - 1, 1);
@@ -1978,7 +1756,7 @@ function renderGantt() {
       : `✘ 배치 인원 부족  (${diff.toFixed(3)} 인월 미달)`;
 
   html += `<tr style="background:${rowBg};border-top:2px solid var(--accent);">`;
-  html += `<td style="padding:4px 6px;border:1px solid #d1d5db;font-size:11px;font-weight:700;color:var(--text2);white-space:nowrap;">합계</td>`;
+  html += `<td style="padding:4px 6px;border:1px solid #d1d5db;font-size:10px;font-weight:700;color:var(--text2);white-space:nowrap;">합계</td>`;
   html += `<td style="border:1px solid #d1d5db;"></td>`;
   html += `<td style="padding:3px 2px;border:1px solid #d1d5db;text-align:center;font-family:var(--mono);font-size:11px;font-weight:700;color:var(--accent);">${totalMM.toFixed(3)}</td>`;
   months.forEach(() => html += `<td style="border:1px solid #d1d5db;background:${rowBg};"></td>`);
@@ -2033,7 +1811,7 @@ function exportGanttExcel() {
 
   persons.forEach(p => {
     const pS = parseDepDate(p.startStr), pE = parseDepDate(p.endStr);
-    const row = [p.label, p.grade, (+p.dur).toFixed(2) + '개월', p.mm.toFixed(3)];
+    const row = [p.label, p.grade, p.dur + '개월', p.mm.toFixed(3)];
     months.forEach(m => {
       const mS = new Date(m.year, m.month - 1, 1), mE = new Date(m.year, m.month, 0);
       row.push((pS && pE && pS <= mE && pE >= mS) ? '■' : '');
@@ -2063,91 +1841,6 @@ function exportGanttExcel() {
   XLSX.writeFile(wb, projName + '_배치계획표.xlsx');
 }
 
-// ─── 날짜 ±1개월 스피너 ────────────────────────────────────
-// 월말 날짜(해당 월 마지막 날)이면 결과월의 마지막 날로, 그 외엔 동일 날짜(없으면 말일)로 이동
-function adjustDepDate(elId, delta) {
-  const el = document.getElementById(elId);
-  if (!el) return;
-  const d = parseDepDate(el.value);
-  if (!d) return;
-
-  const year  = d.getFullYear();
-  const month = d.getMonth();
-  const day   = d.getDate();
-  const lastDayThisMonth   = new Date(year, month + 1, 0).getDate();
-  const isLastDay          = day === lastDayThisMonth;
-  // 목표월의 마지막 날 (연도 넘침 자동 처리)
-  const lastDayTargetMonth = new Date(year, month + delta + 1, 0).getDate();
-  const targetDay = isLastDay ? lastDayTargetMonth : Math.min(day, lastDayTargetMonth);
-
-  el.value = fmtDepDate(new Date(year, month + delta, targetDay));
-  el.dispatchEvent(new Event('input', { bubbles: true }));
-}
-
-// ─── Gantt → Word(.doc) 내보내기 ────────────────────────────
-function exportGanttDoc() {
-  const persons = getAllPersonsWithDates();
-  if (!persons.length) { alert('배치계획을 먼저 작성하세요.'); return; }
-  let minDate = null, maxDate = null;
-  persons.forEach(p => {
-    const s = parseDepDate(p.startStr), e = parseDepDate(p.endStr);
-    if (s && (!minDate || s < minDate)) minDate = s;
-    if (e && (!maxDate || e > maxDate)) maxDate = e;
-  });
-  if (!minDate || !maxDate) { alert('날짜를 먼저 입력하세요.'); return; }
-  const months = [];
-  const cur = new Date(minDate.getFullYear(), minDate.getMonth(), 1);
-  const last = new Date(maxDate.getFullYear(), maxDate.getMonth(), 1);
-  while (cur <= last) { months.push({ year: cur.getFullYear(), month: cur.getMonth()+1 }); cur.setMonth(cur.getMonth()+1); }
-  const yearGroups = [];
-  months.forEach(m => { const l = yearGroups[yearGroups.length-1]; if (l && l.year===m.year) l.count++; else yearGroups.push({ year:m.year, count:1 }); });
-  const COL_W = 22;
-  const TH = 'background:#E8EEF8;border:1px solid #D1D5DB;font-size:8pt;text-align:center;padding:2px 3px;';
-  const TD = 'border:1px solid #E5E7EB;padding:2px 3px;font-size:8pt;';
-  let tbl = `<table style="border-collapse:collapse;width:100%;font-family:맑은 고딕,sans-serif;"><thead><tr>`;
-  tbl += `<th rowspan="2" style="${TH}min-width:80px;text-align:left;">인원</th>`;
-  tbl += `<th rowspan="2" style="${TH}width:46px;">배치기간</th>`;
-  tbl += `<th rowspan="2" style="${TH}width:42px;">인월수</th>`;
-  yearGroups.forEach(yg => { tbl += `<th colspan="${yg.count}" style="${TH}font-weight:700;">${yg.year}년</th>`; });
-  tbl += `<th rowspan="2" style="${TH}min-width:48px;">비고</th></tr><tr>`;
-  months.forEach(m => { tbl += `<th style="${TH}width:${COL_W}px;font-size:7pt;">${m.month}월</th>`; });
-  tbl += `</tr></thead><tbody>`;
-  persons.forEach(p => {
-    const pS = parseDepDate(p.startStr), pE = parseDepDate(p.endStr);
-    const color = GANTT_COLORS[p.type+' '+p.field] || '#64748b';
-    tbl += `<tr><td style="${TD}font-weight:600;white-space:nowrap;">${p.label}<br><span style="font-size:7pt;color:#64748B;font-weight:400;">${p.grade}</span></td>`;
-    tbl += `<td style="${TD}text-align:center;font-family:Consolas,monospace;">${(+p.dur).toFixed(2)}개월</td>`;
-    tbl += `<td style="${TD}text-align:center;font-family:Consolas,monospace;color:#1D4ED8;font-weight:600;">${p.mm.toFixed(3)}</td>`;
-    months.forEach(m => {
-      const mS = new Date(m.year,m.month-1,1), mE = new Date(m.year,m.month,0);
-      const active = pS && pE && pS<=mE && pE>=mS;
-      tbl += `<td style="${TD}width:${COL_W}px;height:18px;background:${active?color:'transparent'};"></td>`;
-    });
-    tbl += `<td style="${TD}"></td></tr>`;
-  });
-  const totalMM = persons.reduce((s,p) => s+p.mm, 0);
-  const legalMM = parseFloat(document.getElementById('d-legal-mm')?.textContent) || 0;
-  const diff = legalMM > 0 ? totalMM - legalMM : null;
-  const rowBg = diff===null ? '#F8FAFF' : (diff>=0 ? '#F0FDF4' : '#FEF2F2');
-  const sc = diff===null ? '#64748B' : (diff>=0 ? '#059669' : '#DC2626');
-  const st = diff===null ? '법적 인월수를 먼저 산출하세요' : diff>=0 ? `✔ 이상 없음 (+${diff.toFixed(3)} 인월 초과)` : `✘ 부족 (${diff.toFixed(3)} 인월 미달)`;
-  tbl += `<tr style="background:${rowBg};border-top:2px solid #1D4ED8;"><td style="${TD}font-weight:700;">합계</td><td style="${TD}"></td>`;
-  tbl += `<td style="${TD}text-align:center;font-family:Consolas,monospace;font-weight:700;color:#1D4ED8;">${totalMM.toFixed(3)}</td>`;
-  months.forEach(() => tbl += `<td style="${TD}background:${rowBg};"></td>`);
-  tbl += `<td style="${TD}background:${rowBg};"></td></tr>`;
-  tbl += `<tr style="background:${rowBg};"><td colspan="${3+months.length+1}" style="${TD}font-weight:700;color:${sc};">`;
-  tbl += `법적 배치인월수: ${legalMM>0?legalMM.toFixed(3):'-'} 인월 &nbsp;|&nbsp; 배치 인월수: ${totalMM.toFixed(3)} 인월 &nbsp;|&nbsp; ${st}</td></tr>`;
-  tbl += `</tbody></table>`;
-  const projName = document.getElementById('proj_name')?.value || '감리원배치계획';
-  const title = projName + ' 배치계획표';
-  const htmlDoc = `<html xmlns:o="urn:schemas-microsoft-com:office:office" xmlns:w="urn:schemas-microsoft-com:office:word" xmlns="http://www.w3.org/TR/REC-html40"><head><meta charset="UTF-8"><title>${title}</title><style>body{font-family:맑은 고딕,sans-serif;margin:1cm;}h3{font-size:12pt;color:#1D4ED8;margin-bottom:8px;}</style></head><body><h3>${title}</h3>${tbl}</body></html>`;
-  const blob = new Blob(['\ufeff', htmlDoc], { type: 'application/vnd.ms-word;charset=utf-8' });
-  const url = URL.createObjectURL(blob);
-  const a = document.createElement('a');
-  a.href = url; a.download = projName + '_배치계획표.doc'; a.click();
-  URL.revokeObjectURL(url);
-}
-
 function exportGanttCSV() {
   const persons = getAllPersonsWithDates();
   if (persons.length === 0) { alert('배치계획을 먼저 작성하세요.'); return; }
@@ -2174,7 +1867,7 @@ function exportGanttCSV() {
   rows.push(['구분/분야', '등급', '배치기간', '인월수', ...months.map(m => m.year + '.' + String(m.month).padStart(2,'0')), '비고'].map(esc).join(','));
   persons.forEach(p => {
     const pS = parseDepDate(p.startStr), pE = parseDepDate(p.endStr);
-    const row = [p.label, p.grade, (+p.dur).toFixed(2) + '개월', p.mm.toFixed(3)];
+    const row = [p.label, p.grade, p.dur + '개월', p.mm.toFixed(3)];
     months.forEach(m => {
       const mS = new Date(m.year, m.month - 1, 1), mE = new Date(m.year, m.month, 0);
       row.push((pS && pE && pS <= mE && pE >= mS) ? '■' : '');
@@ -2234,7 +1927,7 @@ function syncFinanceFromDeploy() {
     const fmtV = n => n > 0 ? Math.round(n).toLocaleString('ko-KR') : '';
     tr.innerHTML = `
       <td style="text-align:left;font-weight:600;">${p.label}</td>
-      <td style="font-family:var(--mono);text-align:center;">${(+p.dur).toFixed(2)}개월</td>
+      <td style="font-family:var(--mono);text-align:center;">${p.dur}개월</td>
       <td><input type="text" inputmode="numeric" class="fin-num-input" id="fin_annual_${i}" value="${fmtV(sv.annual)}" placeholder="연봉" oninput="calcFinance()" onblur="fmtFinInput(this)"></td>
       <td id="fin_monthly_${i}" style="font-family:var(--mono);text-align:right;color:var(--accent);font-weight:600;">${monthly.toLocaleString('ko-KR')}</td>
       <td><input type="text" inputmode="numeric" class="fin-num-input" id="fin_housing_${i}" value="${fmtV(sv.housing)}" placeholder="주재비" oninput="calcFinance()" onblur="fmtFinInput(this)"></td>
@@ -2246,12 +1939,18 @@ function syncFinanceFromDeploy() {
     tbody.appendChild(tr);
   });
 
-  // 이윤 기본값: T × 10,000 천원 (= T × 1,000만원)
-  if (g_T > 0) {
+  // 이윤 기본값: T × 단가(기본 10,000천원 = 1,000만원)
+  {
+    const unitEl = document.getElementById('fin_profit_unit');
     const profitEl = document.getElementById('fin_profit');
-    const curVal = parseFloat((profitEl?.value || '').replace(/,/g,'')) || 0;
-    if (profitEl && curVal === 0) {
-      profitEl.value = (g_T * 10000).toLocaleString('ko-KR');
+    const resultEl = document.getElementById('fin_profit_result');
+    const tEl = document.getElementById('fin_profit_T');
+    if (tEl) tEl.textContent = g_T;
+    if (unitEl && profitEl) {
+      const curUnit = parseFloat((unitEl.value || '').replace(/,/g,'')) || 10000;
+      const profit = g_T * curUnit;
+      profitEl.value = profit.toLocaleString('ko-KR');
+      if (resultEl) resultEl.textContent = profit.toLocaleString('ko-KR') + ' 천원';
     }
   }
   calcFinance();
@@ -2270,44 +1969,57 @@ function fmtFinInput(el) {
   calcFinance();
 }
 
-// 드롭다운 선택 핸들러
-function onAnnualSelect(el) {
-  if (!el.value) return;
-  const [arch, other] = el.value.split(',').map(Number);
-  applyAnnualPreset(arch, other);
-}
-function onHousingSelect(el) {
-  if (!el.value) return;
-  const val = Number(el.value);
-  const rows = document.querySelectorAll('#finance-person-tbody tr[data-fin-idx]');
-  if (rows.length === 0) { el.value = ''; const h = document.getElementById('fin-preset-hint'); if(h){h.style.display='inline';setTimeout(()=>h.style.display='none',3000);} return; }
-  rows.forEach(tr => { const e = document.getElementById('fin_housing_' + tr.dataset.finIdx); if(e) e.value = val.toLocaleString('ko-KR'); });
-  calcFinance();
-}
-function onTaxSelect(el) {
-  if (!el.value) return;
-  const val = Number(el.value);
-  const rows = document.querySelectorAll('#finance-person-tbody tr[data-fin-idx]');
-  if (rows.length === 0) { el.value = ''; const h = document.getElementById('fin-preset-hint'); if(h){h.style.display='inline';setTimeout(()=>h.style.display='none',3000);} return; }
-  rows.forEach(tr => { const e = document.getElementById('fin_tax_' + tr.dataset.finIdx); if(e) e.value = val.toLocaleString('ko-KR'); });
-  calcFinance();
-}
-
 // 연봉 프리셋 일괄 적용 (단위: 천원)
 // archAnnual: 상주건축 연봉, otherAnnual: 나머지 연봉
 function applyAnnualPreset(archAnnual, otherAnnual) {
   const rows = document.querySelectorAll('#finance-person-tbody tr[data-fin-idx]');
-  if (rows.length === 0) {
-    const hint = document.getElementById('fin-preset-hint');
-    if (hint) { hint.style.display = 'inline'; setTimeout(() => hint.style.display = 'none', 3000); }
-    return;
-  }
+  if (rows.length === 0) { alert('배치계획 탭에서 인원을 먼저 배치하세요.'); return; }
   rows.forEach(tr => {
     const label = tr.dataset.label || '';
     const annual = (label === '상주 건축') ? archAnnual : otherAnnual;
     const el = document.getElementById('fin_annual_' + tr.dataset.finIdx);
     if (el) el.value = annual.toLocaleString('ko-KR');
   });
+  calcFinance();
+}
+
+// 주재비 프리셋 일괄 적용 (단위: 천원, val: 예) 400 = 40만원)
+function applyHousingPreset(val) {
+  const rows = document.querySelectorAll('#finance-person-tbody tr[data-fin-idx]');
+  if (rows.length === 0) { alert('배치계획 탭에서 인원을 먼저 배치하세요.'); return; }
+  rows.forEach(tr => {
+    const el = document.getElementById('fin_housing_' + tr.dataset.finIdx);
+    if (el) el.value = val.toLocaleString('ko-KR');
+  });
+  calcFinance();
+}
+
+// 세금 프리셋 일괄 적용 (단위: 천원, val: 예) 300 = 30만원)
+function applyTaxPreset(val) {
+  const rows = document.querySelectorAll('#finance-person-tbody tr[data-fin-idx]');
+  if (rows.length === 0) { alert('배치계획 탭에서 인원을 먼저 배치하세요.'); return; }
+  rows.forEach(tr => {
+    const el = document.getElementById('fin_tax_' + tr.dataset.finIdx);
+    if (el) el.value = val.toLocaleString('ko-KR');
+  });
+  calcFinance();
+}
+
+// 이윤 단가 ±1,000천원(±100만원) 조정 → 이윤 = T × 단가 자동계산
+function adjustProfitUnit(delta) {
+  const unitEl = document.getElementById('fin_profit_unit');
+  const profitEl = document.getElementById('fin_profit');
+  const resultEl = document.getElementById('fin_profit_result');
+  const tEl = document.getElementById('fin_profit_T');
+  if (!unitEl || !profitEl) return;
+  const curUnit = parseFloat((unitEl.value || '').replace(/,/g, '')) || 10000;
+  const newUnit = Math.max(1000, curUnit + delta);
+  const T = g_T || 0;
+  const profit = T * newUnit;
+  unitEl.value = newUnit.toLocaleString('ko-KR');
+  profitEl.value = profit.toLocaleString('ko-KR');
+  if (resultEl) resultEl.textContent = profit.toLocaleString('ko-KR') + ' 천원';
+  if (tEl) tEl.textContent = T;
   calcFinance();
 }
 
@@ -2356,19 +2068,8 @@ function calcFinance() {
 
   const totalCost = totalMonthly + totalHousing + totalTax + totalStart + totalEnd;
   const profit    = parseFinVal('fin_profit');
+  const contract  = parseFinVal('fin_contract');
   const required  = totalCost + profit;
-
-  // 계약금액 자동: 필요계약금액을 십만원(=100천원) 단위로 올림
-  const resetBtn = document.getElementById('btn_contract_reset');
-  if (!g_contract_manual) {
-    const autoContract = required > 0 ? Math.ceil(required / 1000) * 1000 : 0;
-    const contractEl = document.getElementById('fin_contract');
-    if (contractEl) contractEl.value = autoContract > 0 ? autoContract.toLocaleString('ko-KR') : '0';
-    if (resetBtn) resetBtn.style.display = 'none';
-  } else {
-    if (resetBtn) resetBtn.style.display = 'inline';
-  }
-  const contract = parseFinVal('fin_contract');
   const netPnL    = contract - totalCost;
   const margin    = contract > 0 ? (netPnL / contract * 100) : 0;
 
@@ -2382,11 +2083,12 @@ function calcFinance() {
     <div class="fin-sum-card"><div class="fin-sum-label">배치전/종료후비</div><div class="fin-sum-value">${fmt(totalStart+totalEnd)}<small style="font-size:12px;"> 천원</small></div></div>
   `;
 
+  const pnlClass = netPnL >= 0 ? 'profit' : 'loss';
   const pnlSign  = netPnL >= 0 ? '+' : '';
   const pnlColor = netPnL >= 0 ? '#059669' : '#dc2626';
   document.getElementById('finance-summary-result').innerHTML = `
-    <div class="fin-sum-card" style="grid-column:span 2"><div class="fin-sum-label">총 원가</div><div class="fin-sum-value">${fmt(totalCost)}<small style="font-size:12px;"> 천원</small></div></div>
-    <div class="fin-sum-card"><div class="fin-sum-label">이윤 + 필요 계약금액</div><div class="fin-sum-value">${fmt(profit)} + <span>${fmt(required)}</span><small style="font-size:12px;"> 천원</small></div></div>
+    <div class="fin-sum-card"><div class="fin-sum-label">총 원가</div><div class="fin-sum-value" style="color:#1d4ed8;">${fmt(totalCost)}<small style="font-size:12px;"> 천원</small></div></div>
+    <div class="fin-sum-card contract"><div class="fin-sum-label">이윤 + 필요 계약금액</div><div class="fin-sum-value">${fmt(profit)} + <span style="color:#b45309;">${fmt(required)}</span><small style="font-size:12px;"> 천원</small></div></div>
     <div class="fin-sum-card"><div class="fin-sum-label">실제 손익 (계약금액 기준)</div><div class="fin-sum-value" style="color:${pnlColor};">${pnlSign}${fmt(netPnL)}<small style="font-size:12px;"> 천원</small>${contract>0?`<div style="font-size:11px;color:var(--text3);">이익률 ${margin.toFixed(1)}%</div>`:''}</div></div>
   `;
 }
@@ -2413,10 +2115,7 @@ window.addEventListener('DOMContentLoaded', () => {
 
 function buildQtyTable() {
   const tb = document.getElementById('qty-table');
-  // thead 보존 — tbody만 재생성
-  let tbody = tb.querySelector('tbody');
-  if (!tbody) { tbody = document.createElement('tbody'); tb.appendChild(tbody); }
-  tbody.innerHTML = '';
+  tb.innerHTML = '';
   DB.forEach(([task, unit]) => {
     const tr = document.createElement('tr');
     tr.innerHTML = `
@@ -2424,9 +2123,9 @@ function buildQtyTable() {
       <td class="unit-label">(${unit})</td>
       <td style="text-align:right;"><input type="number" id="q_${escId(task)}" step="0.1" value="0" min="0"></td>
     `;
-    tbody.appendChild(tr);
+    tb.appendChild(tr);
   });
-  tbody.addEventListener('input', e => {
+  tb.addEventListener('input', e => {
     if (e.target.matches('input[type=number]')) scheduleAutoCalc();
   });
 }
@@ -3086,118 +2785,6 @@ renderFooter();
   if (!f) return;
   const obs = new MutationObserver(() => renderFooter());
   obs.observe(f, { childList: true, subtree: true, characterData: true });
-})();
-
-// ── PANEL RESIZE ──────────────────────────────────────────────
-(function() {
-  const LS_LR = 'cm-panel-lr';   // 좌우 분할 (px)
-  const LS_TB = 'cm-panel-tb';   // 상하 분할 (px)
-  const LR_MIN = 180, LR_MAX = 700;
-  const TB_MIN = 60,  TB_MAX = 600;
-
-  // ── 저장된 크기 복원 ──
-  function restoreSizes() {
-    const main = document.getElementById('main');
-    const tabResult = document.getElementById('tab-result-content');
-    const lr = parseInt(localStorage.getItem(LS_LR));
-    const tb = parseInt(localStorage.getItem(LS_TB));
-    if (lr && lr >= LR_MIN && lr <= LR_MAX) {
-      main.style.gridTemplateColumns = lr + 'px 5px 1fr';
-    }
-    if (tb && tb >= TB_MIN && tb <= TB_MAX) {
-      tabResult.style.gridTemplateRows = tb + 'px 5px 1fr';
-    }
-  }
-  restoreSizes();
-
-  // ── 공통 드래그 팩토리 ──
-  function makeDragger(handleId, opts) {
-    const handle = document.getElementById(handleId);
-    if (!handle) return;
-    let dragging = false, startPos, startSize;
-
-    handle.addEventListener('mousedown', e => {
-      e.preventDefault();
-      dragging = true;
-      startPos = opts.isH ? e.clientX : e.clientY;
-      startSize = opts.getSize();
-      handle.classList.add('dragging');
-      document.body.style.cursor = opts.isH ? 'col-resize' : 'row-resize';
-      document.body.style.userSelect = 'none';
-      // 드래그 중 iframe / 다른 요소 이벤트 방지용 오버레이
-      overlay.style.display = 'block';
-      overlay.style.cursor  = opts.isH ? 'col-resize' : 'row-resize';
-    });
-
-    document.addEventListener('mousemove', e => {
-      if (!dragging) return;
-      const delta = (opts.isH ? e.clientX : e.clientY) - startPos;
-      const newSize = Math.max(opts.min, Math.min(opts.max, startSize + delta));
-      opts.setSize(newSize);
-    });
-
-    document.addEventListener('mouseup', () => {
-      if (!dragging) return;
-      dragging = false;
-      handle.classList.remove('dragging');
-      document.body.style.cursor = '';
-      document.body.style.userSelect = '';
-      overlay.style.display = 'none';
-      opts.save();
-    });
-  }
-
-  // 드래그 오버레이 (드래그 중 텍스트 선택·이벤트 차단)
-  const overlay = document.createElement('div');
-  Object.assign(overlay.style, {
-    display: 'none', position: 'fixed', inset: '0',
-    zIndex: '9999', background: 'transparent'
-  });
-  document.body.appendChild(overlay);
-
-  // ── 좌우 핸들 (left ↔ right) ──
-  const main = document.getElementById('main');
-  makeDragger('handle-lr', {
-    isH: true,
-    min: LR_MIN, max: LR_MAX,
-    getSize() {
-      return parseInt(getComputedStyle(main).gridTemplateColumns.split(' ')[0]);
-    },
-    setSize(px) {
-      main.style.gridTemplateColumns = px + 'px 5px 1fr';
-    },
-    save() {
-      const px = parseInt(getComputedStyle(main).gridTemplateColumns.split(' ')[0]);
-      localStorage.setItem(LS_LR, px);
-    }
-  });
-
-  // ── 상하 핸들 (log ↔ result, 산출결과 탭 안) ──
-  const tabResult = document.getElementById('tab-result-content');
-  makeDragger('handle-tb', {
-    isH: false,
-    min: TB_MIN, max: TB_MAX,
-    getSize() {
-      return parseInt(getComputedStyle(tabResult).gridTemplateRows.split(' ')[0]);
-    },
-    setSize(px) {
-      tabResult.style.gridTemplateRows = px + 'px 5px 1fr';
-    },
-    save() {
-      const px = parseInt(getComputedStyle(tabResult).gridTemplateRows.split(' ')[0]);
-      localStorage.setItem(LS_TB, px);
-    }
-  });
-
-  // ── 더블클릭으로 기본값 리셋 ──
-  document.getElementById('handle-lr').addEventListener('dblclick', () => {
-    main.style.gridTemplateColumns = '340px 5px 1fr';
-    localStorage.removeItem(LS_LR);
-  });
-  document.getElementById('handle-tb').addEventListener('dblclick', () => {
-    tabResult.style.gridTemplateRows = '100px 5px 1fr';
-    localStorage.removeItem(LS_TB);
-  });
 })();
 </script>
 </body>
