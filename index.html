@@ -767,7 +767,7 @@
           <span class="panel-title">6 감리원 배치계획</span>
           <div style="display:flex;align-items:center;gap:8px;">
             <span style="font-size:11px;color:var(--text3);white-space:nowrap;">비교 기준:</span>
-            <select id="dep-legal-mode" onchange="updateDeployMM()"
+            <select id="dep-legal-mode" onchange="syncLegalMode(this.value)"
               style="padding:3px 8px;border:1.5px solid var(--border2);border-radius:5px;font-size:12px;font-family:var(--sans);background:#fff;cursor:pointer;outline:none;">
               <option value="final" selected>최종 투입인월수</option>
               <option value="min">최소 배치인월수</option>
