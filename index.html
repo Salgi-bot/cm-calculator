@@ -2201,10 +2201,11 @@ function calcFinance() {
   // 총 원가 = 인건비 + 주재비 + 세금 + 배치전/종료후 기본비 + 퇴직금 전체
   const totalCost = totalMonthly + totalHousing + totalTax + totalStartBase + totalEndBase + totalRetire;
   const profit    = parseFinVal('fin_profit');
-  const contract  = parseFinVal('fin_contract');
   const required  = totalCost + profit;
-  const netPnL    = contract - totalCost;
-  const margin    = contract > 0 ? (netPnL / contract * 100) : 0;
+  // 견적금액 = 필요금액을 십만원 자리에서 올림 → 백만원 단위
+  const estimate  = Math.ceil(required / 1000) * 1000;
+  const contractEl = document.getElementById('fin_contract');
+  if (contractEl) contractEl.value = estimate.toLocaleString('ko-KR');
 
   const sumBox = document.getElementById('finance-summary');
   sumBox.style.display = 'block';
@@ -2217,13 +2218,10 @@ function calcFinance() {
     <div class="fin-sum-card"><div class="fin-sum-label">퇴직금 합계</div><div class="fin-sum-value">${fmt(totalRetire)}<small style="font-size:12px;"> 천원</small></div></div>
   `;
 
-  const pnlClass = netPnL >= 0 ? 'profit' : 'loss';
-  const pnlSign  = netPnL >= 0 ? '+' : '';
-  const pnlColor = netPnL >= 0 ? '#059669' : '#dc2626';
   document.getElementById('finance-summary-result').innerHTML = `
     <div class="fin-sum-card"><div class="fin-sum-label">총 원가</div><div class="fin-sum-value" style="color:#1d4ed8;">${fmt(totalCost)}<small style="font-size:12px;"> 천원</small></div></div>
-    <div class="fin-sum-card contract"><div class="fin-sum-label">이윤 + 필요 계약금액</div><div class="fin-sum-value">${fmt(profit)} + <span style="color:#b45309;">${fmt(required)}</span><small style="font-size:12px;"> 천원</small></div></div>
-    <div class="fin-sum-card"><div class="fin-sum-label">실제 손익 (계약금액 기준)</div><div class="fin-sum-value" style="color:${pnlColor};">${pnlSign}${fmt(netPnL)}<small style="font-size:12px;"> 천원</small>${contract>0?`<div style="font-size:11px;color:var(--text3);">이익률 ${margin.toFixed(1)}%</div>`:''}</div></div>
+    <div class="fin-sum-card profit"><div class="fin-sum-label">이윤</div><div class="fin-sum-value" style="color:#059669;">${fmt(profit)}<small style="font-size:12px;"> 천원</small></div></div>
+    <div class="fin-sum-card contract"><div class="fin-sum-label">견적금액 (백만원 올림)</div><div class="fin-sum-value" style="color:#b45309;">${fmt(estimate)}<small style="font-size:12px;"> 천원</small></div></div>
   `;
 }
 
