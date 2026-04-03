@@ -2018,7 +2018,8 @@ function syncFinanceFromDeploy() {
   const tbody = document.getElementById('finance-person-tbody');
   tbody.innerHTML = '';
   persons.forEach((p, i) => {
-    const sv = saved[i] || { annual: 0, housing: 700, tax: 300 };
+    const isArch = p.label === '상주 건축';
+    const sv = saved[i] || { annual: isArch ? 60000 : 0, housing: 700, tax: 300 };
     // 처음 생성 시 기본값 적용
     if (!saved[i]) { sv.housing = 700; sv.tax = 300; }
     const monthly = sv.annual > 0 ? Math.round(sv.annual / 13) : 0;
