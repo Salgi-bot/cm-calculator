@@ -409,10 +409,8 @@
     #left-panel.tab-active { display: block; overflow-y: auto; overflow-x: hidden; }
     #right-panel.tab-active { display: flex; overflow-x: hidden; }
 
-    /* ⑤ 탭 컨텐츠 수평 오버플로우 차단 */
-    #tab-deploy-content { overflow-x: hidden !important; }
-    #tab-finance-content { overflow-x: hidden !important; }
-    .rtab-content { overflow-x: hidden; }
+    /* ⑤ 탭 컨텐츠 — 세로 스크롤 허용, 가로 오버플로우는 html에서 차단 */
+    .rtab-content { overflow-x: clip; }
 
     /* ⑥ 산출결과 요약 카드 2열 */
     .summary-grid { grid-template-columns: repeat(2, 1fr) !important; }
