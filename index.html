@@ -1223,6 +1223,21 @@ const g_dep_manual = new Set();
 
 // ─── 날짜 유틸 (YY.MM.DD 텍스트 포맷) ───────────────────
 // YY.MM.DD → Date
+// 날짜 ±월 조절 버튼
+function adjustDepMonth(id, delta) {
+  const el = document.getElementById(id);
+  if (!el || !el.value) return;
+  const d = parseDepDate(el.value);
+  if (!d) return;
+  const day = d.getDate();
+  d.setDate(1);
+  d.setMonth(d.getMonth() + delta);
+  const lastDay = new Date(d.getFullYear(), d.getMonth() + 1, 0).getDate();
+  d.setDate(Math.min(day, lastDay));
+  el.value = fmtDepDate(d);
+  el.dispatchEvent(new Event('input', { bubbles: true }));
+}
+
 function parseDepDate(str) {
   if (!str) return null;
   const d = str.replace(/\D/g, '');
