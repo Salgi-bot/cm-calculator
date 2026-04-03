@@ -2269,17 +2269,27 @@ function fmtFinInput(el) {
   calcFinance();
 }
 
-// 연봉 탭 선택 + 적용
-function selectAnnualTab(el, archAnnual, otherAnnual) {
-  document.querySelectorAll('[id^="annual-tab-"]').forEach(btn => {
-    btn.style.background = 'transparent';
-    btn.style.color = 'var(--text2)';
-    btn.style.fontWeight = '600';
-  });
-  el.style.background = 'var(--accent)';
-  el.style.color = '#fff';
-  el.style.fontWeight = '700';
-  applyAnnualPreset(archAnnual, otherAnnual);
+// 드롭다운 선택 핸들러
+function onAnnualSelect(el) {
+  if (!el.value) return;
+  const [arch, other] = el.value.split(',').map(Number);
+  applyAnnualPreset(arch, other);
+}
+function onHousingSelect(el) {
+  if (!el.value) return;
+  const val = Number(el.value);
+  const rows = document.querySelectorAll('#finance-person-tbody tr[data-fin-idx]');
+  if (rows.length === 0) { el.value = ''; const h = document.getElementById('fin-preset-hint'); if(h){h.style.display='inline';setTimeout(()=>h.style.display='none',3000);} return; }
+  rows.forEach(tr => { const e = document.getElementById('fin_housing_' + tr.dataset.finIdx); if(e) e.value = val.toLocaleString('ko-KR'); });
+  calcFinance();
+}
+function onTaxSelect(el) {
+  if (!el.value) return;
+  const val = Number(el.value);
+  const rows = document.querySelectorAll('#finance-person-tbody tr[data-fin-idx]');
+  if (rows.length === 0) { el.value = ''; const h = document.getElementById('fin-preset-hint'); if(h){h.style.display='inline';setTimeout(()=>h.style.display='none',3000);} return; }
+  rows.forEach(tr => { const e = document.getElementById('fin_tax_' + tr.dataset.finIdx); if(e) e.value = val.toLocaleString('ko-KR'); });
+  calcFinance();
 }
 
 // 연봉 프리셋 일괄 적용 (단위: 천원)
