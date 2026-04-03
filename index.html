@@ -1063,22 +1063,27 @@
           <div style="display:grid;grid-template-columns:repeat(3,1fr);gap:8px;" id="finance-summary-result"></div>
         </div>
 
-        <!-- 이윤 / 견적금액 (수지요약 아래, 한 줄) -->
-        <div class="section">
-          <div class="section-title">이윤 및 견적금액 (단위: 천원)</div>
-          <div style="display:flex;flex-wrap:wrap;gap:6px;align-items:center;background:#f0fdf4;border-radius:8px;padding:8px 12px;">
-            <label style="flex-shrink:0;font-weight:700;color:#065f46;">이윤</label>
-            <span style="font-size:13px;color:#475569;white-space:nowrap;flex-shrink:0;">T(<span id="fin_profit_T">0</span>개월) ×</span>
-            <button onclick="adjustProfitUnit(-1000)" style="height:32px;min-width:28px;border:1.5px solid #a7f3d0;border-radius:5px;background:#ecfdf5;color:#065f46;font-size:16px;font-weight:700;cursor:pointer;line-height:1;flex-shrink:0;">−</button>
-            <input type="text" id="fin_profit_unit" value="10,000" readonly style="width:80px;text-align:center;background:#ecfdf5;border:1.5px solid #a7f3d0;border-radius:5px;padding:4px 6px;font-size:13px;font-weight:700;color:#065f46;">
-            <button onclick="adjustProfitUnit(1000)" style="height:32px;min-width:28px;border:1.5px solid #a7f3d0;border-radius:5px;background:#ecfdf5;color:#065f46;font-size:16px;font-weight:700;cursor:pointer;line-height:1;flex-shrink:0;">+</button>
-            <span style="font-size:13px;color:#475569;white-space:nowrap;">천원 =</span>
-            <strong id="fin_profit_result" style="font-size:16px;color:#059669;white-space:nowrap;">0 천원</strong>
-            <input type="hidden" id="fin_profit" value="0">
-            <span style="color:#cbd5e1;margin:0 4px;font-size:18px;">|</span>
-            <label style="flex-shrink:0;font-weight:700;color:#b45309;">견적금액</label>
-            <input type="text" id="fin_contract" value="0" readonly style="width:120px;text-align:right;background:#fffbeb;border:1.5px solid #fcd34d;border-radius:5px;padding:4px 8px;font-size:13px;font-weight:700;color:#b45309;">
-            <span style="font-size:13px;color:#475569;">천원</span>
+        <!-- 이윤 / 견적금액 (수지요약 아래) -->
+        <div style="margin:0;padding:14px 16px;background:linear-gradient(135deg,#f0fdf4 0%,#fffbeb 100%);border-top:3px solid #059669;border-bottom:3px solid #f59e0b;">
+          <div style="font-size:12px;font-weight:800;color:#065f46;margin-bottom:10px;letter-spacing:0.5px;">■ 이윤 및 견적금액 (단위: 천원)</div>
+          <div style="display:flex;flex-wrap:wrap;gap:10px;align-items:center;">
+            <!-- 이윤 -->
+            <div style="display:flex;align-items:center;gap:6px;background:#ecfdf5;border:2px solid #6ee7b7;border-radius:10px;padding:10px 14px;flex-wrap:wrap;">
+              <span style="font-size:13px;font-weight:800;color:#065f46;white-space:nowrap;">이윤</span>
+              <span style="font-size:12px;color:#475569;white-space:nowrap;">T(<span id="fin_profit_T">0</span>개월) ×</span>
+              <button onclick="adjustProfitUnit(-1000)" style="height:34px;min-width:30px;border:2px solid #a7f3d0;border-radius:6px;background:#fff;color:#065f46;font-size:18px;font-weight:700;cursor:pointer;line-height:1;flex-shrink:0;">−</button>
+              <input type="text" id="fin_profit_unit" value="10,000" readonly style="width:86px;text-align:center;background:#fff;border:2px solid #a7f3d0;border-radius:6px;padding:5px 6px;font-size:15px;font-weight:800;color:#065f46;">
+              <button onclick="adjustProfitUnit(1000)" style="height:34px;min-width:30px;border:2px solid #a7f3d0;border-radius:6px;background:#fff;color:#065f46;font-size:18px;font-weight:700;cursor:pointer;line-height:1;flex-shrink:0;">+</button>
+              <span style="font-size:12px;color:#475569;white-space:nowrap;">천원 =</span>
+              <strong id="fin_profit_result" style="font-size:20px;font-weight:900;color:#059669;white-space:nowrap;">0 천원</strong>
+              <input type="hidden" id="fin_profit" value="0">
+            </div>
+            <!-- 견적금액 -->
+            <div style="display:flex;align-items:center;gap:8px;background:#fffbeb;border:2px solid #fcd34d;border-radius:10px;padding:10px 14px;">
+              <span style="font-size:13px;font-weight:800;color:#b45309;white-space:nowrap;">견적금액</span>
+              <input type="text" id="fin_contract" value="0" readonly style="width:140px;text-align:right;background:#fff;border:2px solid #fcd34d;border-radius:6px;padding:5px 10px;font-size:20px;font-weight:900;color:#b45309;">
+              <span style="font-size:13px;font-weight:700;color:#92400e;">천원</span>
+            </div>
           </div>
         </div>
 
