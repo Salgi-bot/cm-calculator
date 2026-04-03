@@ -1051,10 +1051,17 @@
           </div>
         </div>
 
-        <!-- 이윤 / 계약금액 -->
+        <!-- 수지 요약 -->
+        <div id="finance-summary" style="padding:14px 16px;background:#eff6ff;border-top:2px solid var(--accent);display:none;">
+          <div style="font-size:11px;font-weight:700;color:var(--accent);margin-bottom:10px;">■ 수지 요약</div>
+          <div style="display:grid;grid-template-columns:repeat(4,1fr);gap:8px;margin-bottom:10px;" id="finance-summary-grid"></div>
+          <div style="display:grid;grid-template-columns:repeat(3,1fr);gap:8px;" id="finance-summary-result"></div>
+        </div>
+
+        <!-- 이윤 / 견적금액 (수지요약 아래, 한 줄) -->
         <div class="section">
-          <div class="section-title">이윤 및 계약금액 (단위: 천원)</div>
-          <div class="field" style="flex-wrap:wrap;gap:6px;align-items:center;background:#f0fdf4;border-radius:8px;padding:8px 12px;">
+          <div class="section-title">이윤 및 견적금액 (단위: 천원)</div>
+          <div style="display:flex;flex-wrap:wrap;gap:6px;align-items:center;background:#f0fdf4;border-radius:8px;padding:8px 12px;">
             <label style="flex-shrink:0;font-weight:700;color:#065f46;">이윤</label>
             <span style="font-size:13px;color:#475569;white-space:nowrap;flex-shrink:0;">T(<span id="fin_profit_T">0</span>개월) ×</span>
             <button onclick="adjustProfitUnit(-1000)" style="height:32px;min-width:28px;border:1.5px solid #a7f3d0;border-radius:5px;background:#ecfdf5;color:#065f46;font-size:16px;font-weight:700;cursor:pointer;line-height:1;flex-shrink:0;">−</button>
@@ -1063,19 +1070,11 @@
             <span style="font-size:13px;color:#475569;white-space:nowrap;">천원 =</span>
             <strong id="fin_profit_result" style="font-size:16px;color:#059669;white-space:nowrap;">0 천원</strong>
             <input type="hidden" id="fin_profit" value="0">
+            <span style="color:#cbd5e1;margin:0 4px;font-size:18px;">|</span>
+            <label style="flex-shrink:0;font-weight:700;color:#b45309;">견적금액</label>
+            <input type="text" id="fin_contract" value="0" readonly style="width:120px;text-align:right;background:#fffbeb;border:1.5px solid #fcd34d;border-radius:5px;padding:4px 8px;font-size:13px;font-weight:700;color:#b45309;">
+            <span style="font-size:13px;color:#475569;">천원</span>
           </div>
-          <div class="field">
-            <label>계약금액</label>
-            <input type="text" inputmode="numeric" id="fin_contract" value="0" class="is-manual" style="flex:1;max-width:160px;" oninput="calcFinance()" onblur="fmtFinInput(this)">
-            <span class="unit">천원</span>
-          </div>
-        </div>
-
-        <!-- 수지 요약 -->
-        <div id="finance-summary" style="padding:14px 16px;background:#eff6ff;border-top:2px solid var(--accent);display:none;">
-          <div style="font-size:11px;font-weight:700;color:var(--accent);margin-bottom:10px;">■ 수지 요약</div>
-          <div style="display:grid;grid-template-columns:repeat(4,1fr);gap:8px;margin-bottom:10px;" id="finance-summary-grid"></div>
-          <div style="display:grid;grid-template-columns:repeat(3,1fr);gap:8px;" id="finance-summary-result"></div>
         </div>
 
       </div><!-- /tab-finance-content -->
