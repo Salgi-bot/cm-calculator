@@ -1918,8 +1918,10 @@ function syncFinanceFromDeploy() {
     // 처음 생성 시 기본값 적용
     if (!saved[i]) { sv.housing = 700; sv.tax = 300; }
     const monthly = sv.annual > 0 ? Math.round(sv.annual / 13) : 0;
-    const startCost = monthly + sv.tax;
-    const endCost   = monthly;
+    const retireMonth = Math.round(monthly / 12);
+    const startCost = monthly + sv.tax + retireMonth;
+    const endCost   = monthly + sv.tax + retireMonth;
+    const retireDur = Math.round(monthly * p.dur / 12);
 
     const tr = document.createElement('tr');
     tr.dataset.finIdx = i;
@@ -1929,12 +1931,13 @@ function syncFinanceFromDeploy() {
     tr.innerHTML = `
       <td style="text-align:left;font-weight:600;">${p.label}</td>
       <td style="font-family:var(--mono);text-align:center;">${p.dur}개월</td>
-      <td><input type="text" inputmode="numeric" class="fin-num-input" id="fin_annual_${i}" value="${fmtV(sv.annual)}" placeholder="연봉" oninput="calcFinance()" onblur="fmtFinInput(this)"></td>
+      <td><input type="text" inputmode="numeric" class="fin-num-input" id="fin_annual_${i}" value="${fmtV(sv.annual)}" placeholder="연봉" oninput="onAnnualInput(this,${i})" onblur="fmtFinInput(this)"></td>
       <td id="fin_monthly_${i}" style="font-family:var(--mono);text-align:right;color:var(--accent);font-weight:600;">${monthly.toLocaleString('ko-KR')}</td>
       <td><input type="text" inputmode="numeric" class="fin-num-input" id="fin_housing_${i}" value="${fmtV(sv.housing)}" placeholder="주재비" oninput="calcFinance()" onblur="fmtFinInput(this)"></td>
       <td><input type="text" inputmode="numeric" class="fin-num-input" id="fin_tax_${i}" value="${fmtV(sv.tax)}" placeholder="세금" oninput="calcFinance()" onblur="fmtFinInput(this)"></td>
       <td id="fin_start_${i}" style="font-family:var(--mono);text-align:right;color:var(--text2);">${startCost.toLocaleString('ko-KR')}</td>
       <td id="fin_end_${i}"   style="font-family:var(--mono);text-align:right;color:var(--text2);">${endCost.toLocaleString('ko-KR')}</td>
+      <td id="fin_retire_${i}" style="font-family:var(--mono);text-align:right;color:var(--text2);">${retireDur.toLocaleString('ko-KR')}</td>
       <td class="fin-subtotal" id="fin_sub_${i}">-</td>
     `;
     tbody.appendChild(tr);
