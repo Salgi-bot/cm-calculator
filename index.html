@@ -16,7 +16,7 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>건설사업관리 인월수 산출 Ver 1.4 | (주)아이팝엔지니어링</title>
+<title>건설사업관리 인월수 산출 Ver 1.3 Beta | (주)아이팝엔지니어링</title>
 <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+KR:wght@300;400;500;700;900&family=JetBrains+Mono:wght@400;600&display=swap" rel="stylesheet">
 <script src="https://cdn.jsdelivr.net/npm/xlsx@0.18.5/dist/xlsx.full.min.js"></script>
 <style>
@@ -369,7 +369,6 @@
   .fin-sum-card.total { border-color: var(--accent); background: #dbeafe; }
   .fin-sum-card.profit { border-color: #059669; background: #d1fae5; }
   .fin-sum-card.loss { border-color: #dc2626; background: #fee2e2; }
-  .fin-sum-card.contract { border-color: #f59e0b; background: #fffbeb; }
   .fin-sum-label { font-size: 11px; color: var(--text3); margin-bottom: 4px; }
   .fin-sum-value { font-family: var(--mono); font-size: 17px; font-weight: 700; color: #0f172a; }
 
@@ -457,7 +456,7 @@
     <div class="topbar-brand">
       <span class="topbar-company">(주)아이팝엔지니어링</span>
       <span class="topbar-title">건설사업관리 <span>인월수 산출</span></span>
-      <span class="topbar-ver">Ver 1.4 &nbsp;·&nbsp; 주재비·세금 프리셋, 이윤 조정 버튼 추가</span>
+      <span class="topbar-ver">Ver 1.3 Beta &nbsp;·&nbsp; 배치계획·수지분석 추가</span>
     </div>
     <div class="topbar-right">
       <button class="btn btn-sm btn-gray" onclick="showHelp()">? 사용설명서</button>
@@ -932,32 +931,6 @@
             </div>
             <span style="font-size:10px;color:var(--text3);">상주건축 기준, 나머지 -500만원 자동 적용</span>
           </div>
-          <!-- 주재비 프리셋 선택 -->
-          <div style="margin-bottom:6px;padding:8px 10px;background:#f0fdf4;border:1px solid #bbf7d0;border-radius:6px;display:flex;align-items:center;gap:8px;flex-wrap:wrap;">
-            <span style="font-size:11px;font-weight:700;color:#059669;white-space:nowrap;">주재비 프리셋</span>
-            <div style="display:flex;gap:4px;flex-wrap:wrap;">
-              <button onclick="applyHousingPreset(400)" style="font-size:11px;padding:3px 10px;border:1.5px solid #16a34a;border-radius:4px;background:#fff;color:#15803d;font-weight:700;cursor:pointer;">40만</button>
-              <button onclick="applyHousingPreset(500)" style="font-size:11px;padding:3px 10px;border:1.5px solid #16a34a;border-radius:4px;background:#fff;color:#15803d;font-weight:700;cursor:pointer;">50만</button>
-              <button onclick="applyHousingPreset(600)" style="font-size:11px;padding:3px 10px;border:1.5px solid #16a34a;border-radius:4px;background:#fff;color:#15803d;font-weight:700;cursor:pointer;">60만</button>
-              <button onclick="applyHousingPreset(700)" style="font-size:11px;padding:3px 10px;border:1.5px solid #16a34a;border-radius:4px;background:#fff;color:#15803d;font-weight:700;cursor:pointer;">70만</button>
-              <button onclick="applyHousingPreset(800)" style="font-size:11px;padding:3px 10px;border:1.5px solid #16a34a;border-radius:4px;background:#fff;color:#15803d;font-weight:700;cursor:pointer;">80만</button>
-              <button onclick="applyHousingPreset(900)" style="font-size:11px;padding:3px 10px;border:1.5px solid #16a34a;border-radius:4px;background:#fff;color:#15803d;font-weight:700;cursor:pointer;">90만</button>
-              <button onclick="applyHousingPreset(1000)" style="font-size:11px;padding:3px 10px;border:1.5px solid #16a34a;border-radius:4px;background:#fff;color:#15803d;font-weight:700;cursor:pointer;">100만</button>
-            </div>
-            <span style="font-size:10px;color:var(--text3);">전체 인원 일괄 적용 · 셀 직접 수정 가능</span>
-          </div>
-          <!-- 세금 프리셋 선택 -->
-          <div style="margin-bottom:10px;padding:8px 10px;background:#fefce8;border:1px solid #fef08a;border-radius:6px;display:flex;align-items:center;gap:8px;flex-wrap:wrap;">
-            <span style="font-size:11px;font-weight:700;color:#92400e;white-space:nowrap;">세금 프리셋</span>
-            <div style="display:flex;gap:4px;flex-wrap:wrap;">
-              <button onclick="applyTaxPreset(300)" style="font-size:11px;padding:3px 10px;border:1.5px solid #d97706;border-radius:4px;background:#fff;color:#92400e;font-weight:700;cursor:pointer;">30만</button>
-              <button onclick="applyTaxPreset(350)" style="font-size:11px;padding:3px 10px;border:1.5px solid #d97706;border-radius:4px;background:#fff;color:#92400e;font-weight:700;cursor:pointer;">35만</button>
-              <button onclick="applyTaxPreset(400)" style="font-size:11px;padding:3px 10px;border:1.5px solid #d97706;border-radius:4px;background:#fff;color:#92400e;font-weight:700;cursor:pointer;">40만</button>
-              <button onclick="applyTaxPreset(450)" style="font-size:11px;padding:3px 10px;border:1.5px solid #d97706;border-radius:4px;background:#fff;color:#92400e;font-weight:700;cursor:pointer;">45만</button>
-              <button onclick="applyTaxPreset(500)" style="font-size:11px;padding:3px 10px;border:1.5px solid #d97706;border-radius:4px;background:#fff;color:#92400e;font-weight:700;cursor:pointer;">50만</button>
-            </div>
-            <span style="font-size:10px;color:var(--text3);">5만원 단위 · 셀 직접 수정 가능</span>
-          </div>
           <div style="overflow-x:auto;">
             <table class="fin-table" id="finance-person-table">
               <thead>
@@ -985,9 +958,7 @@
           <div class="section-title">이윤 및 계약금액 (단위: 천원)</div>
           <div class="field">
             <label>이윤 (기본: T×10,000천원)</label>
-            <button onclick="adjustProfit(-1000)" style="height:32px;min-width:28px;border:1.5px solid #cbd5e1;border-radius:5px;background:#f8fafc;color:#334155;font-size:16px;font-weight:700;cursor:pointer;line-height:1;flex-shrink:0;">−</button>
-            <input type="text" inputmode="numeric" id="fin_profit" value="0" class="is-manual" style="flex:1;max-width:140px;" oninput="calcFinance()" onblur="fmtFinInput(this)">
-            <button onclick="adjustProfit(1000)" style="height:32px;min-width:28px;border:1.5px solid #cbd5e1;border-radius:5px;background:#f8fafc;color:#334155;font-size:16px;font-weight:700;cursor:pointer;line-height:1;flex-shrink:0;">+</button>
+            <input type="text" inputmode="numeric" id="fin_profit" value="0" class="is-manual" style="flex:1;max-width:160px;" oninput="calcFinance()" onblur="fmtFinInput(this)">
             <span class="unit">천원</span>
           </div>
           <div class="field">
@@ -1974,38 +1945,6 @@ function applyAnnualPreset(archAnnual, otherAnnual) {
   calcFinance();
 }
 
-// 주재비 프리셋 일괄 적용 (단위: 천원, val: 예) 400 = 40만원)
-function applyHousingPreset(val) {
-  const rows = document.querySelectorAll('#finance-person-tbody tr[data-fin-idx]');
-  if (rows.length === 0) { alert('배치계획 탭에서 인원을 먼저 배치하세요.'); return; }
-  rows.forEach(tr => {
-    const el = document.getElementById('fin_housing_' + tr.dataset.finIdx);
-    if (el) el.value = val.toLocaleString('ko-KR');
-  });
-  calcFinance();
-}
-
-// 세금 프리셋 일괄 적용 (단위: 천원, val: 예) 300 = 30만원)
-function applyTaxPreset(val) {
-  const rows = document.querySelectorAll('#finance-person-tbody tr[data-fin-idx]');
-  if (rows.length === 0) { alert('배치계획 탭에서 인원을 먼저 배치하세요.'); return; }
-  rows.forEach(tr => {
-    const el = document.getElementById('fin_tax_' + tr.dataset.finIdx);
-    if (el) el.value = val.toLocaleString('ko-KR');
-  });
-  calcFinance();
-}
-
-// 이윤 ±1,000천원(±100만원) 조정
-function adjustProfit(delta) {
-  const el = document.getElementById('fin_profit');
-  if (!el) return;
-  const cur = parseFloat((el.value || '').replace(/,/g, '')) || 0;
-  const next = Math.max(0, cur + delta);
-  el.value = next.toLocaleString('ko-KR');
-  calcFinance();
-}
-
 function calcFinance() {
   const rows = document.querySelectorAll('#finance-person-tbody tr[data-fin-idx]');
   if (rows.length === 0) return;
@@ -2068,11 +2007,10 @@ function calcFinance() {
 
   const pnlClass = netPnL >= 0 ? 'profit' : 'loss';
   const pnlSign  = netPnL >= 0 ? '+' : '';
-  const pnlColor = netPnL >= 0 ? '#059669' : '#dc2626';
   document.getElementById('finance-summary-result').innerHTML = `
-    <div class="fin-sum-card"><div class="fin-sum-label">총 원가</div><div class="fin-sum-value" style="color:#1d4ed8;">${fmt(totalCost)}<small style="font-size:12px;"> 천원</small></div></div>
-    <div class="fin-sum-card contract"><div class="fin-sum-label">이윤 + 필요 계약금액</div><div class="fin-sum-value">${fmt(profit)} + <span style="color:#b45309;">${fmt(required)}</span><small style="font-size:12px;"> 천원</small></div></div>
-    <div class="fin-sum-card"><div class="fin-sum-label">실제 손익 (계약금액 기준)</div><div class="fin-sum-value" style="color:${pnlColor};">${pnlSign}${fmt(netPnL)}<small style="font-size:12px;"> 천원</small>${contract>0?`<div style="font-size:11px;color:var(--text3);">이익률 ${margin.toFixed(1)}%</div>`:''}</div></div>
+    <div class="fin-sum-card total"><div class="fin-sum-label">총 원가</div><div class="fin-sum-value" style="color:#1d4ed8;">${fmt(totalCost)}<small style="font-size:12px;"> 천원</small></div></div>
+    <div class="fin-sum-card"><div class="fin-sum-label">이윤 + 필요 계약금액</div><div class="fin-sum-value">${fmt(profit)} + <span style="color:#1d4ed8;">${fmt(required)}</span><small style="font-size:12px;"> 천원</small></div></div>
+    <div class="fin-sum-card ${pnlClass}"><div class="fin-sum-label">실제 손익 (계약금액 기준)</div><div class="fin-sum-value">${pnlSign}${fmt(netPnL)}<small style="font-size:12px;"> 천원</small>${contract>0?`<div style="font-size:11px;color:var(--text3);">이익률 ${margin.toFixed(1)}%</div>`:''}</div></div>
   `;
 }
 
