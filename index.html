@@ -2503,7 +2503,8 @@ function calculate(silent = false) {
   const tech_mm  = Math.round(final_mm * tech_ratio * 1000) / 1000;
   const res_mm   = Math.round((final_mm - tech_mm) * 1000) / 1000;
 
-  const avg_persons = T > 0 ? Math.round(final_mm / T * 100) / 100 : 0;
+  // 평균상시투입인원: 상주기술인(res_mm) ÷ (기간 × 특급KECA환산비) → 특급기술인 배치 가정
+  const avg_persons = T > 0 ? Math.round(res_mm / (T * (g_keca['특급'] || 1.061)) * 100) / 100 : 0;
 
   // ── 전역 저장 (Beta: 배치계획/수지분석 연동) ──
   const _auth_mm = Math.round(base_mm * 0.8 * 1000) / 1000;
