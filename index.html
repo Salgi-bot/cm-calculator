@@ -2000,6 +2000,24 @@ function exportGanttCSV() {
 // ═══════════════════════════════════════════
 // FINANCE — 수지분석 (Beta)
 // ═══════════════════════════════════════════
+
+// 프리셋 탭 토글
+function togglePreset(type) {
+  const panels = ['salary', 'housing', 'tax'];
+  panels.forEach(t => {
+    const panel = document.getElementById('preset-panel-' + t);
+    const btn   = document.getElementById('preset-btn-'   + t);
+    const isOpen = panel && panel.style.display !== 'none';
+    if (t === type) {
+      if (panel) panel.style.display = isOpen ? 'none' : 'block';
+      if (btn)   btn.style.background = isOpen ? '#fff' : (t === 'salary' ? '#dbeafe' : t === 'housing' ? '#dcfce7' : '#fef9c3');
+    } else {
+      if (panel) panel.style.display = 'none';
+      if (btn)   btn.style.background = '#fff';
+    }
+  });
+}
+
 function syncFinanceFromDeploy() {
   const persons = getAllPersons();
   if (persons.length === 0) return;
