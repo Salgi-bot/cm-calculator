@@ -28,9 +28,9 @@
     --surface3: #e8edf7;
     --border: #ccd6e8;
     --border2: #b0bdd4;
-    --accent: #1d4ed8;
-    --accent2: #2563eb;
-    --accent-glow: rgba(29,78,216,0.12);
+    --accent: #00709F;
+    --accent2: #005a80;
+    --accent-glow: rgba(0,112,159,0.12);
     --green: #059669;
     --yellow: #92400e;
     --red: #dc2626;
@@ -49,10 +49,10 @@
     font-size: 14px;
     background-color: #cfd9ea;
     background-image:
-      linear-gradient(rgba(29,78,216,0.07) 1px, transparent 1px),
-      linear-gradient(90deg, rgba(29,78,216,0.07) 1px, transparent 1px),
-      linear-gradient(rgba(29,78,216,0.025) 1px, transparent 1px),
-      linear-gradient(90deg, rgba(29,78,216,0.025) 1px, transparent 1px);
+      linear-gradient(rgba(0,112,159,0.07) 1px, transparent 1px),
+      linear-gradient(90deg, rgba(0,112,159,0.07) 1px, transparent 1px),
+      linear-gradient(rgba(0,112,159,0.025) 1px, transparent 1px),
+      linear-gradient(90deg, rgba(0,112,159,0.025) 1px, transparent 1px);
     background-size: 80px 80px, 80px 80px, 20px 20px, 20px 20px;
   }
 
@@ -62,9 +62,9 @@
   /* ── TOPBAR ── */
   #topbar {
     display: flex; align-items: center; justify-content: space-between;
-    padding: 0 20px; background: var(--accent); border-bottom: 3px solid #1e40af;
+    padding: 0 20px; background: var(--accent); border-bottom: 3px solid #005a80;
     position: sticky; top: 0; z-index: 100; gap: 12px;
-    box-shadow: 0 2px 12px rgba(29,78,216,0.25);
+    box-shadow: 0 2px 12px rgba(0,112,159,0.25);
   }
   .topbar-brand { display: flex; align-items: baseline; gap: 10px; flex-shrink: 0; }
   .topbar-company {
@@ -79,7 +79,7 @@
 
   /* ── MAIN LAYOUT ── */
   #main { display: grid; grid-template-columns: 370px 1fr; overflow: hidden; }
-  #left-panel { overflow-y: auto; border-right: 1px solid var(--border); background: var(--surface); box-shadow: 2px 0 8px rgba(29,78,216,0.06); }
+  #left-panel { overflow-y: auto; border-right: 1px solid var(--border); background: var(--surface); box-shadow: 2px 0 8px rgba(0,112,159,0.06); }
   #right-panel { display: flex; flex-direction: column; overflow: hidden; background: var(--surface2); }
   #log-panel { border-bottom: 1px solid var(--border); overflow: hidden; display: flex; flex-direction: column; }
   #result-panel { overflow: hidden; display: flex; flex-direction: column; }
@@ -87,7 +87,7 @@
   /* ── FOOTER ── */
   #footer {
     display: flex; align-items: center; justify-content: space-between;
-    padding: 0 20px; background: #1e3a8a; border-top: 1px solid #1e40af;
+    padding: 0 20px; background: #1e3a8a; border-top: 1px solid #005a80;
     font-size: 11px; color: rgba(255,255,255,0.6);
   }
 
@@ -152,8 +152,8 @@
     color: var(--text2); font-family: var(--sans); font-size: 13px; font-weight: 500;
     border-radius: 6px; cursor: pointer; transition: all 0.15s;
   }
-  .seg-btn:hover { border-color: var(--accent); color: var(--accent); background: #eff6ff; }
-  .seg-btn.active { background: var(--accent); border-color: var(--accent); color: #fff; font-weight: 700; box-shadow: 0 2px 8px rgba(29,78,216,0.3); }
+  .seg-btn:hover { border-color: var(--accent); color: var(--accent); background: #e8f4fb; }
+  .seg-btn.active { background: var(--accent); border-color: var(--accent); color: #fff; font-weight: 700; box-shadow: 0 2px 8px rgba(0,112,159,0.3); }
 
   /* ── CHECKBOX ── */
   .chk-row { display: flex; align-items: center; gap: 8px; margin-bottom: 6px; cursor: pointer; user-select: none; }
@@ -204,7 +204,7 @@
   .btn-reset:hover { color: #92400e; border-color: #f59e0b; background: #fffbeb; }
   .btn-calc {
     width: calc(100% - 32px); margin: 14px 16px 16px; height: 46px; font-size: 15px;
-    background: linear-gradient(135deg, #1d4ed8, #3d7fff);
+    background: linear-gradient(135deg, #00709F, #3d7fff);
     box-shadow: 0 2px 16px rgba(61,127,255,0.3); border-radius: 10px;
   }
   .btn-calc:hover { transform: translateY(-1px); box-shadow: 0 6px 22px rgba(61,127,255,0.45); }
@@ -236,21 +236,21 @@
   #res-tbody { transition: opacity 0.3s; }
   #summary-box { transition: opacity 0.3s; }
   .res-table th {
-    position: sticky; top: 0; background: #1d4ed8; color: #fff;
+    position: sticky; top: 0; background: #00709F; color: #fff;
     font-size: 11px; font-weight: 600; letter-spacing: 0.5px; padding: 9px 10px;
-    border-bottom: 2px solid #1e40af; text-align: center; white-space: nowrap;
+    border-bottom: 2px solid #005a80; text-align: center; white-space: nowrap;
   }
   .res-table th:first-child { text-align: left; padding-left: 14px; }
   .res-table td { padding: 6px 10px; border-bottom: 1px solid #e2e8f0; text-align: center; color: var(--text2); }
   .res-table td:first-child { text-align: left; color: var(--text); padding-left: 14px; font-weight: 500; }
-  .res-table tr:hover td { background: #eff6ff; }
-  .res-table .val-cell { font-family: var(--mono); color: #1d4ed8; font-weight: 700; }
+  .res-table tr:hover td { background: #e8f4fb; }
+  .res-table .val-cell { font-family: var(--mono); color: #00709F; font-weight: 700; }
   .res-table .warn { font-size: 10px; color: #d97706; margin-left: 3px; }
   .res-table .th-unit { font-size: 10px; font-weight: 400; color: #bfdbfe; display: block; margin-top: 1px; }
 
   /* ── SUMMARY BOX ── */
   #summary-box {
-    padding: 14px 18px; background: #eff6ff;
+    padding: 14px 18px; background: #e8f4fb;
     border-top: 3px solid var(--accent); display: none; flex-shrink: 0;
   }
   #summary-box.visible { display: block; }
@@ -258,12 +258,12 @@
   .summary-grid { display: grid; grid-template-columns: repeat(5, 1fr); gap: 10px; margin-bottom: 10px; }
   .sum-card {
     background: #fff; border-radius: 8px; padding: 10px 12px;
-    border: 1px solid #bfdbfe; box-shadow: 0 1px 4px rgba(29,78,216,0.08);
+    border: 1px solid #bfdbfe; box-shadow: 0 1px 4px rgba(0,112,159,0.08);
   }
-  .sum-card.highlight { border-color: var(--accent); background: #dbeafe; box-shadow: 0 2px 8px rgba(29,78,216,0.15); }
+  .sum-card.highlight { border-color: var(--accent); background: #dbeafe; box-shadow: 0 2px 8px rgba(0,112,159,0.15); }
   .sum-card-label { font-size: 11px; color: var(--text3); margin-bottom: 4px; }
   .sum-card-value { font-family: var(--mono); font-size: 18px; font-weight: 700; color: #92400e; line-height: 1.2; }
-  .sum-card.highlight .sum-card-value { color: #1d4ed8; }
+  .sum-card.highlight .sum-card-value { color: #00709F; }
   .sum-card-unit { font-size: 11px; color: var(--text3); margin-left: 3px; }
   .sum-note { font-size: 11px; color: #d97706; line-height: 1.7; padding: 6px 0 0; border-top: 1px solid #bfdbfe; font-weight: 500; }
 
@@ -321,11 +321,11 @@
 
   /* ── DEPLOY PANEL ── */
   .dep-table { width: 100%; border-collapse: collapse; font-size: 13px; }
-  .dep-table th { background: #1d4ed8; color: #fff; padding: 7px 10px; font-size: 11px; font-weight: 600; text-align: center; }
+  .dep-table th { background: #00709F; color: #fff; padding: 7px 10px; font-size: 11px; font-weight: 600; text-align: center; }
   .dep-table th:first-child { text-align: left; padding-left: 14px; }
   .dep-table td { padding: 5px 10px; border-bottom: 1px solid #e2e8f0; text-align: center; color: var(--text2); }
   .dep-table td:first-child { text-align: left; padding-left: 14px; }
-  .dep-table tr:hover td { background: #eff6ff; }
+  .dep-table tr:hover td { background: #e8f4fb; }
   .dep-num { font-family: var(--mono); color: var(--accent); font-weight: 700; }
   .dep-dur-input {
     width: 70px; text-align: center; padding: 3px 6px;
@@ -343,7 +343,7 @@
   .dep-date-input:focus { border-color: var(--accent); box-shadow: 0 0 0 2px var(--accent-glow); }
   .dep-month-btn {
     height: 11px; width: 18px; border: 1px solid #bfdbfe; border-radius: 2px;
-    background: #eff6ff; color: #1d4ed8; font-size: 7px; cursor: pointer;
+    background: #e8f4fb; color: #00709F; font-size: 7px; cursor: pointer;
     padding: 0; flex-shrink: 0; line-height: 1; display: flex; align-items: center; justify-content: center;
   }
   .dep-month-btn:hover { background: #dbeafe; border-color: #93c5fd; }
@@ -358,9 +358,9 @@
 
   /* ── FINANCE PANEL ── */
   .fin-table { width: 100%; border-collapse: collapse; font-size: 12px; }
-  .fin-table th { background: #1d4ed8; color: #fff; padding: 6px 8px; font-size: 11px; font-weight: 600; text-align: center; white-space: nowrap; }
+  .fin-table th { background: #00709F; color: #fff; padding: 6px 8px; font-size: 11px; font-weight: 600; text-align: center; white-space: nowrap; }
   .fin-table td { padding: 4px 8px; border-bottom: 1px solid #e2e8f0; text-align: center; color: var(--text2); }
-  .fin-table tr:hover td { background: #eff6ff; }
+  .fin-table tr:hover td { background: #e8f4fb; }
   .fin-num-input {
     width: 90px; text-align: right; padding: 3px 6px;
     border: 1.5px solid var(--border2); border-radius: 5px;
@@ -408,7 +408,7 @@
       color: var(--text2); font-family: var(--sans); font-size: 12px; font-weight: 600;
       border-radius: 6px; cursor: pointer; transition: all 0.15s;
     }
-    .tab-btn.active { background: var(--accent); border-color: var(--accent); color: #fff; box-shadow: 0 2px 8px rgba(29,78,216,0.25); }
+    .tab-btn.active { background: var(--accent); border-color: var(--accent); color: #fff; box-shadow: 0 2px 8px rgba(0,112,159,0.25); }
 
     /* ④ 패널 전환 */
     #left-panel { display: none; border: none; height: 100%; }
@@ -451,7 +451,7 @@
     body { background: #fff !important; color: #000 !important; }
     #topbar {
       position: static; padding: 10px 20px;
-      background: #1d4ed8 !important; border-bottom: 2px solid #1e40af;
+      background: #00709F !important; border-bottom: 2px solid #005a80;
     }
     .topbar-right, #footer, #mobile-tabs { display: none !important; }
     #main { display: block; }
@@ -468,26 +468,26 @@
     #result-panel { height: auto; overflow: visible; }
     #result-scroll { overflow: visible; }
     .panel-header { background: #e8eef8 !important; border-bottom: 1px solid #bfdbfe; }
-    .panel-title { color: #1d4ed8 !important; }
+    .panel-title { color: #00709F !important; }
     .panel-header .btn, #result-buttons { display: none !important; }
     .res-table { background: #fff !important; }
-    .res-table th { background: #1d4ed8 !important; color: #fff !important; }
+    .res-table th { background: #00709F !important; color: #fff !important; }
     .res-table td { color: #334155 !important; border-bottom: 1px solid #e2e8f0; }
     .res-table td:first-child { color: #0f172a !important; }
     .res-table tr:hover td { background: transparent !important; }
-    .res-table .val-cell { color: #1d4ed8 !important; }
-    #summary-box { background: #eff6ff !important; border-top: 3px solid #1d4ed8; }
+    .res-table .val-cell { color: #00709F !important; }
+    #summary-box { background: #e8f4fb !important; border-top: 3px solid #00709F; }
     .sum-card { background: #fff !important; border: 1px solid #bfdbfe; }
     .sum-card.highlight { background: #dbeafe !important; }
     .sum-card-value { color: #92400e !important; }
-    .sum-card.highlight .sum-card-value { color: #1d4ed8 !important; }
+    .sum-card.highlight .sum-card-value { color: #00709F !important; }
     #print-overview {
       display: block !important; margin: 12px 20px; padding: 12px 16px;
       background: #f0f6ff !important; border: 1px solid #bfdbfe; border-radius: 6px;
       font-size: 12px; line-height: 2; color: #1e293b;
       page-break-inside: avoid;
     }
-    #print-overview strong { color: #1d4ed8; }
+    #print-overview strong { color: #00709F; }
     #summary-box.visible { display: block !important; page-break-inside: avoid; }
   }
 </style>
@@ -736,7 +736,7 @@
               </div>
             </div>
             <div id="reduction-info" style="display:none; margin-top:12px; padding:10px 14px; background:#f8faff; border:1px solid #bfdbfe; border-radius:6px; font-size:12px; color:#334155; line-height:1.8;">
-              <div style="font-weight:700; color:#1d4ed8; margin-bottom:6px; font-size:11px; letter-spacing:0.4px;">■ 법적 감액 배치 근거 (발주처 협의 적용 시)</div>
+              <div style="font-weight:700; color:#00709F; margin-bottom:6px; font-size:11px; letter-spacing:0.4px;">■ 법적 감액 배치 근거 (발주처 협의 적용 시)</div>
               <table style="width:100%; border-collapse:collapse;">
                 <tr>
                   <td style="padding:2px 6px; color:#64748b; width:55%;">① 감독권한대행 기준 (100%)</td>
@@ -932,13 +932,13 @@
         </div>
 
         <!-- 합계 배치 인월수 -->
-        <div style="padding:12px 16px 8px;background:#eff6ff;border-top:2px solid var(--accent);display:flex;justify-content:space-between;align-items:center;flex-shrink:0;">
+        <div style="padding:12px 16px 8px;background:#e8f4fb;border-top:2px solid var(--accent);display:flex;justify-content:space-between;align-items:center;flex-shrink:0;">
           <span style="font-size:13px;font-weight:700;color:var(--accent);">합계 배치 인월수</span>
           <span id="deploy-total-mm" style="font-family:var(--mono);color:var(--accent);font-size:22px;font-weight:700;">-</span>
         </div>
 
         <!-- 법적 기준 vs 배치 현황 (합계 하단, 큰 텍스트) -->
-        <div id="deploy-legal-compare" style="padding:14px 16px;background:#eff6ff;border-top:1px solid #bfdbfe;flex-shrink:0;">
+        <div id="deploy-legal-compare" style="padding:14px 16px;background:#e8f4fb;border-top:1px solid #bfdbfe;flex-shrink:0;">
           <div style="display:grid;grid-template-columns:1fr 1fr 1fr;gap:12px;">
             <div style="text-align:center;">
               <div style="font-size:11px;color:var(--text3);margin-bottom:4px;" id="d-legal-label">법적 필요 (최종 투입)</div>
@@ -973,7 +973,7 @@
             <div style="font-weight:700;color:var(--text2);font-size:11px;">■ 배치계획표 (Bar Chart)</div>
             <div style="display:flex;gap:6px;">
               <button class="btn btn-xs btn-green" onclick="exportGanttExcel()">⬇ XLSX</button>
-              <button class="btn btn-xs" style="background:#eff6ff;color:#1d4ed8;border:1px solid #bfdbfe;" onclick="exportGanttDocx()">⬇ DOCX</button>
+              <button class="btn btn-xs" style="background:#e8f4fb;color:#00709F;border:1px solid #bfdbfe;" onclick="exportGanttDocx()">⬇ DOCX</button>
             </div>
           </div>
           <div id="gantt-chart" style="overflow-x:auto;font-size:11px;"></div>
@@ -996,17 +996,17 @@
           <!-- 프리셋 탭 토글 -->
           <div style="margin-bottom:10px;">
             <div style="display:flex;gap:4px;margin-bottom:6px;">
-              <button onclick="togglePreset('salary')" id="preset-btn-salary" style="font-size:11px;padding:3px 12px;border:1.5px solid #3b82f6;border-radius:4px;background:#fff;color:#1d4ed8;font-weight:700;cursor:pointer;">연봉</button>
+              <button onclick="togglePreset('salary')" id="preset-btn-salary" style="font-size:11px;padding:3px 12px;border:1.5px solid #3b82f6;border-radius:4px;background:#fff;color:#00709F;font-weight:700;cursor:pointer;">연봉</button>
               <button onclick="togglePreset('housing')" id="preset-btn-housing" style="font-size:11px;padding:3px 12px;border:1.5px solid #16a34a;border-radius:4px;background:#fff;color:#15803d;font-weight:700;cursor:pointer;">주재비</button>
               <button onclick="togglePreset('tax')" id="preset-btn-tax" style="font-size:11px;padding:3px 12px;border:1.5px solid #d97706;border-radius:4px;background:#fff;color:#92400e;font-weight:700;cursor:pointer;">세금</button>
             </div>
             <div id="preset-panel-salary" style="display:none;padding:8px 10px;background:#f0f9ff;border:1px solid #bae6fd;border-radius:6px;display:none;align-items:center;gap:8px;flex-wrap:wrap;">
               <div style="display:flex;gap:4px;flex-wrap:wrap;">
-                <button onclick="applyAnnualPreset(70000,65000)" style="font-size:11px;padding:3px 10px;border:1.5px solid #3b82f6;border-radius:4px;background:#fff;color:#1d4ed8;font-weight:700;cursor:pointer;">7,000만</button>
-                <button onclick="applyAnnualPreset(65000,60000)" style="font-size:11px;padding:3px 10px;border:1.5px solid #3b82f6;border-radius:4px;background:#fff;color:#1d4ed8;font-weight:700;cursor:pointer;">6,500만</button>
-                <button onclick="applyAnnualPreset(60000,55000)" style="font-size:11px;padding:3px 10px;border:1.5px solid #3b82f6;border-radius:4px;background:#fff;color:#1d4ed8;font-weight:700;cursor:pointer;">6,000만</button>
-                <button onclick="applyAnnualPreset(55000,50000)" style="font-size:11px;padding:3px 10px;border:1.5px solid #3b82f6;border-radius:4px;background:#fff;color:#1d4ed8;font-weight:700;cursor:pointer;">5,500만</button>
-                <button onclick="applyAnnualPreset(50000,45000)" style="font-size:11px;padding:3px 10px;border:1.5px solid #3b82f6;border-radius:4px;background:#fff;color:#1d4ed8;font-weight:700;cursor:pointer;">5,000만</button>
+                <button onclick="applyAnnualPreset(70000,65000)" style="font-size:11px;padding:3px 10px;border:1.5px solid #3b82f6;border-radius:4px;background:#fff;color:#00709F;font-weight:700;cursor:pointer;">7,000만</button>
+                <button onclick="applyAnnualPreset(65000,60000)" style="font-size:11px;padding:3px 10px;border:1.5px solid #3b82f6;border-radius:4px;background:#fff;color:#00709F;font-weight:700;cursor:pointer;">6,500만</button>
+                <button onclick="applyAnnualPreset(60000,55000)" style="font-size:11px;padding:3px 10px;border:1.5px solid #3b82f6;border-radius:4px;background:#fff;color:#00709F;font-weight:700;cursor:pointer;">6,000만</button>
+                <button onclick="applyAnnualPreset(55000,50000)" style="font-size:11px;padding:3px 10px;border:1.5px solid #3b82f6;border-radius:4px;background:#fff;color:#00709F;font-weight:700;cursor:pointer;">5,500만</button>
+                <button onclick="applyAnnualPreset(50000,45000)" style="font-size:11px;padding:3px 10px;border:1.5px solid #3b82f6;border-radius:4px;background:#fff;color:#00709F;font-weight:700;cursor:pointer;">5,000만</button>
               </div>
               <span style="font-size:10px;color:var(--text3);">상주건축 기준, 나머지 -500만원 자동 적용</span>
             </div>
@@ -1057,7 +1057,7 @@
         </div>
 
         <!-- 수지 요약 -->
-        <div id="finance-summary" style="padding:14px 16px;background:#eff6ff;border-top:2px solid var(--accent);display:none;">
+        <div id="finance-summary" style="padding:14px 16px;background:#e8f4fb;border-top:2px solid var(--accent);display:none;">
           <div style="font-size:11px;font-weight:700;color:var(--accent);margin-bottom:10px;">■ 수지 요약</div>
           <div style="display:grid;grid-template-columns:repeat(4,1fr);gap:8px;margin-bottom:10px;" id="finance-summary-grid"></div>
           <div style="display:grid;grid-template-columns:repeat(3,1fr);gap:8px;" id="finance-summary-result"></div>
@@ -1100,13 +1100,13 @@
      HELP MODAL
 ══════════════════════════════ -->
 <div id="help-modal" style="display:none;position:fixed;inset:0;background:rgba(15,23,42,0.6);z-index:999;align-items:center;justify-content:center;">
-  <div style="background:#fff;border:1px solid #bfdbfe;border-radius:12px;width:min(560px,92vw);max-height:85vh;overflow-y:auto;padding:28px;position:relative;box-shadow:0 20px 60px rgba(29,78,216,0.2);">
+  <div style="background:#fff;border:1px solid #bfdbfe;border-radius:12px;width:min(560px,92vw);max-height:85vh;overflow-y:auto;padding:28px;position:relative;box-shadow:0 20px 60px rgba(0,112,159,0.2);">
     <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:18px;">
       <span style="font-size:16px;font-weight:700;color:#0f172a;">사용설명서</span>
       <button onclick="closeHelp()" style="background:#f1f5f9;border:1px solid #e2e8f0;color:#64748b;font-size:18px;cursor:pointer;line-height:1;width:32px;height:32px;border-radius:6px;">✕</button>
     </div>
     <div style="font-size:13px;line-height:2;color:#334155;">
-      <p style="color:#1d4ed8;font-weight:600;margin-bottom:14px;font-size:12px;background:#eff6ff;padding:8px 12px;border-radius:6px;border-left:3px solid #1d4ed8;">
+      <p style="color:#00709F;font-weight:600;margin-bottom:14px;font-size:12px;background:#e8f4fb;padding:8px 12px;border-radius:6px;border-left:3px solid #00709F;">
         국토교통부 고시 제2023-580호 · 건설엔지니어링 대가 등에 관한 기준
       </p>
 
@@ -2368,7 +2368,7 @@ function calcFinance() {
   `;
 
   document.getElementById('finance-summary-result').innerHTML = `
-    <div class="fin-sum-card"><div class="fin-sum-label">총 원가</div><div class="fin-sum-value" style="color:#1d4ed8;">${fmt(totalCost)}<small style="font-size:12px;"> 천원</small></div></div>
+    <div class="fin-sum-card"><div class="fin-sum-label">총 원가</div><div class="fin-sum-value" style="color:#00709F;">${fmt(totalCost)}<small style="font-size:12px;"> 천원</small></div></div>
     <div class="fin-sum-card profit"><div class="fin-sum-label">이윤</div><div class="fin-sum-value" style="color:#059669;">${fmt(profit)}<small style="font-size:12px;"> 천원</small></div></div>
     <div class="fin-sum-card contract"><div class="fin-sum-label">견적금액 (백만원 올림)</div><div class="fin-sum-value" style="color:#b45309;">${fmt(estimate)}<small style="font-size:12px;"> 천원</small></div></div>
   `;
