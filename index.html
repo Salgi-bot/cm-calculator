@@ -2196,20 +2196,6 @@ function syncFinanceFromDeploy() {
     tbody.appendChild(tr);
   });
 
-  // 이윤 기본값: T × 단가(기본 10,000천원 = 1,000만원)
-  {
-    const unitEl = document.getElementById('fin_profit_unit');
-    const profitEl = document.getElementById('fin_profit');
-    const resultEl = document.getElementById('fin_profit_result');
-    const tEl = document.getElementById('fin_profit_T');
-    if (tEl) tEl.textContent = g_T;
-    if (unitEl && profitEl) {
-      const curUnit = parseFloat((unitEl.value || '').replace(/,/g,'')) || 10000;
-      const profit = g_T * curUnit;
-      profitEl.value = profit.toLocaleString('ko-KR');
-      if (resultEl) resultEl.textContent = profit.toLocaleString('ko-KR') + ' 천원';
-    }
-  }
   calcFinance();
 }
 
