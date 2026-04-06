@@ -2166,7 +2166,7 @@ function syncFinanceFromDeploy() {
   persons.forEach((p, i) => {
     const isRes = p.label.startsWith('상주');
     const isArch = p.label === '상주 건축';
-    const defaultAnnual = isArch ? 60000 : (isRes ? 55000 : 50000);
+    const defaultAnnual = isArch ? 60000 : 55000;
     const defaultHousing = isRes ? 700 : 0;
     const defaultTax = 300; // 상주·비상주 모두 기본 세금 적용
     const sv = saved[i] || { annual: defaultAnnual, housing: defaultHousing, tax: defaultTax };
