@@ -2353,7 +2353,7 @@ function calcFinance() {
   const contractEl = document.getElementById('fin_contract');
   if (contractEl) contractEl.value = profitRate > 0 ? estimate.toLocaleString('ko-KR') : '—';
 
-  // 이윤 금액 및 월 평균 이윤 표시
+  // 이윤 금액 및 월 평균 이윤 / 월 평균 감리비 표시
   const profitResultEl = document.getElementById('fin_profit_result');
   if (profitResultEl) profitResultEl.textContent = profitRate > 0 ? profit.toLocaleString('ko-KR') + ' 천원' : '— 천원';
   const T = g_T || 0;
@@ -2363,6 +2363,22 @@ function calcFinance() {
       ? '월 평균 이윤 ' + Math.round(profit / T).toLocaleString('ko-KR') + ' 천원'
       : '';
   }
+  const monthlyFeeEl = document.getElementById('fin_monthly_fee');
+  if (monthlyFeeEl) {
+    monthlyFeeEl.textContent = (profitRate > 0 && T > 0)
+      ? '월 평균 감리비 ' + Math.round(estimate / T).toLocaleString('ko-KR') + ' 천원'
+      : '';
+  }
+  // 이윤율 버튼 하이라이트 동기화
+  [5,6,7,8,10,11,12,13,14,15].forEach(r => {
+    const btn = document.getElementById('profit-rate-btn-' + r);
+    if (btn) {
+      const active = r === profitRate;
+      btn.style.background = active ? '#065f46' : '#ecfdf5';
+      btn.style.color = active ? '#fff' : '#065f46';
+      btn.style.borderColor = active ? '#065f46' : '#a7f3d0';
+    }
+  });
 
   const sumBox = document.getElementById('finance-summary');
   sumBox.style.display = 'block';
