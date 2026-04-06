@@ -2334,12 +2334,25 @@ function calcFinance() {
 
   // 총 원가 = 인건비 + 주재비 + 세금 + 배치전/종료후 기본비 + 퇴직금 전체
   const totalCost = totalMonthly + totalHousing + totalTax + totalStartBase + totalEndBase + totalRetire;
-  const profit    = parseFinVal('fin_profit');
+  const profitRateStr = (document.getElementById('fin_profit_rate')?.value || '').replace(/[^\d.]/g, '');
+  const profitRate = parseFloat(profitRateStr) || 0;
+  const profit = Math.round(totalCost * profitRate / 100);
   const required  = totalCost + profit;
   // 견적금액 = 필요금액을 십만원 자리에서 올림 → 백만원 단위
   const estimate  = Math.ceil(required / 1000) * 1000;
   const contractEl = document.getElementById('fin_contract');
-  if (contractEl) contractEl.value = estimate.toLocaleString('ko-KR');
+  if (contractEl) contractEl.value = profitRate > 0 ? estimate.toLocaleString('ko-KR') : '—';
+
+  // 이윤 금액 및 월 평균 이윤 표시
+  const profitResultEl = document.getElementById('fin_profit_result');
+  if (profitResultEl) profitResultEl.textContent = profitRate > 0 ? profit.toLocaleString('ko-KR') + ' 천원' : '— 천원';
+  const T = g_T || 0;
+  const monthlyProfitEl = document.getElementById('fin_monthly_profit');
+  if (monthlyProfitEl) {
+    monthlyProfitEl.textContent = (profitRate > 0 && T > 0)
+      ? '월 평균 이윤 ' + Math.round(profit / T).toLocaleString('ko-KR') + ' 천원'
+      : '';
+  }
 
   const sumBox = document.getElementById('finance-summary');
   sumBox.style.display = 'block';
