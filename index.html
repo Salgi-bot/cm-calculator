@@ -2196,7 +2196,7 @@ function syncFinanceFromDeploy() {
       <td style="font-family:var(--mono);text-align:center;">${p.dur}개월</td>
       <td><input type="text" inputmode="numeric" class="fin-num-input" id="fin_annual_${i}" value="${fmtV(sv.annual)}" placeholder="연봉" oninput="onAnnualInput(this,${i})" onblur="fmtFinInput(this)"></td>
       <td id="fin_monthly_${i}" style="font-family:var(--mono);text-align:right;color:var(--accent);font-weight:600;">${monthly.toLocaleString('ko-KR')}</td>
-      <td><input type="text" inputmode="numeric" class="fin-num-input" id="fin_housing_${i}" value="${fmtV(sv.housing)}" placeholder="주재비" oninput="calcFinance()" onblur="fmtFinInput(this)"></td>
+      <td><input type="text" inputmode="numeric" class="fin-num-input" id="fin_housing_${i}" value="${sv.housing > 0 ? fmtV(sv.housing) : '0'}" placeholder="주재비" oninput="calcFinance()" onblur="fmtFinInput(this)"></td>
       <td><input type="text" inputmode="numeric" class="fin-num-input" id="fin_tax_${i}" value="${fmtV(sv.tax)}" placeholder="세금" oninput="calcFinance()" onblur="fmtFinInput(this)"></td>
       <td id="fin_start_${i}" style="font-family:var(--mono);text-align:right;color:var(--text2);">${startCost.toLocaleString('ko-KR')}</td>
       <td id="fin_end_${i}"   style="font-family:var(--mono);text-align:right;color:var(--text2);">${endCost.toLocaleString('ko-KR')}</td>
