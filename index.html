@@ -2147,8 +2147,8 @@ function togglePreset(type) {
 }
 
 function syncFinanceFromDeploy() {
-  const persons = getAllPersons();
-  if (persons.length === 0) return;
+  const persons = getAllPersonsWithDates();
+  if (!persons || persons.length === 0) return;
 
   // 기존 저장된 입력값 보존 (연봉·주재비·세금)
   const saved = {};
