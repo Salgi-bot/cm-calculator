@@ -3151,6 +3151,39 @@ renderFooter();
 })();
 
 // ──────────────────────────────────────────────────────
+// 고시 변경 감지 (7일 캐시)
+// ──────────────────────────────────────────────────────
+const LAW_CHECK_KEY = 'cm_law_check';
+const LAW_CURRENT_NO = '제2023-580호';
+const LAW_CURRENT_DATE = '20231005'; // 현행 고시 시행일
+
+async function checkLawUpdate() {
+  try {
+    const cached = JSON.parse(localStorage.getItem(LAW_CHECK_KEY) || '{}');
+    if (cached.ts && (Date.now() - cached.ts) < 7 * 24 * 60 * 60 * 1000) return;
+    const url = `https://www.law.go.kr/DRF/lawSearch.do?OC=bosslaw2026&target=admrul&type=XML&query=${encodeURIComponent('건설엔지니어링 대가 등에 관한 기준')}&display=1`;
+    const res = await fetch(url);
+    if (!res.ok) throw new Error();
+    const xml = (new DOMParser()).parseFromString(await res.text(), 'text/xml');
+    const enfDate = xml.querySelector('시행일자')?.textContent || '';
+    const lawNo   = xml.querySelector('법령명한글')?.textContent || '';
+    localStorage.setItem(LAW_CHECK_KEY, JSON.stringify({ ts: Date.now(), enfDate }));
+    if (enfDate && enfDate > LAW_CURRENT_DATE) showLawUpdateBanner(enfDate, lawNo);
+  } catch { /* 조용히 실패 */ }
+}
+
+function showLawUpdateBanner(enfDate, lawNo) {
+  const fmt = enfDate.length === 8
+    ? `${enfDate.slice(0,4)}.${enfDate.slice(4,6)}.${enfDate.slice(6)}`
+    : enfDate;
+  const banner = document.createElement('div');
+  banner.id = 'law-update-banner';
+  banner.style.cssText = 'position:fixed;top:52px;left:0;width:100%;background:#fef3c7;border-bottom:2px solid #f59e0b;padding:7px 16px;z-index:9998;display:flex;align-items:center;justify-content:space-between;font-size:12px;box-sizing:border-box;';
+  banner.innerHTML = `<span>⚠️ <strong>건설엔지니어링 대가 기준 개정 감지</strong> — 시행일 ${fmt} (현행 적용: ${LAW_CURRENT_NO}) · <a href="https://www.law.go.kr/lsSc.do?query=${encodeURIComponent('건설엔지니어링 대가 등에 관한 기준')}" target="_blank" style="color:#92400e;">법령 확인 →</a></span><button onclick="document.getElementById('law-update-banner').remove()" style="background:none;border:none;cursor:pointer;font-size:16px;color:#92400e;padding:0 4px;">✕</button>`;
+  document.body.insertBefore(banner, document.body.firstChild);
+}
+
+// ──────────────────────────────────────────────────────
 // 국가법령정보 조회 (www.law.go.kr/DRF/)
 // ──────────────────────────────────────────────────────
 async function openLawSearch(query) {
