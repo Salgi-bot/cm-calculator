@@ -2367,8 +2367,8 @@ function calcFinance() {
 
   document.getElementById('finance-summary-result').innerHTML = `
     <div class="fin-sum-card"><div class="fin-sum-label">총 원가</div><div class="fin-sum-value" style="color:#00709F;">${fmt(totalCost)}<small style="font-size:12px;"> 천원</small></div></div>
-    <div class="fin-sum-card profit"><div class="fin-sum-label">이윤</div><div class="fin-sum-value" style="color:#059669;">${fmt(profit)}<small style="font-size:12px;"> 천원</small></div></div>
-    <div class="fin-sum-card contract"><div class="fin-sum-label">견적금액 (백만원 올림)</div><div class="fin-sum-value" style="color:#b45309;">${fmt(estimate)}<small style="font-size:12px;"> 천원</small></div></div>
+    <div class="fin-sum-card profit"><div class="fin-sum-label">이윤 ${profitRate > 0 ? '(' + profitRate + '%)' : ''}</div><div class="fin-sum-value" style="color:#059669;">${profitRate > 0 ? fmt(profit) : '—'}<small style="font-size:12px;"> 천원</small></div></div>
+    <div class="fin-sum-card contract"><div class="fin-sum-label">견적금액 (백만원 올림)</div><div class="fin-sum-value" style="color:#b45309;">${profitRate > 0 ? fmt(estimate) : '—'}<small style="font-size:12px;"> 천원</small></div></div>
   `;
 }
 
